@@ -1,0 +1,227 @@
+#box1{
+    border: 2px dashed;
+    width: 250px;
+    height: 150px;
+    margin-bottom: 5px;   
+    margin-top: 2px;
+}
+#box2{
+    border: 2px dashed;
+    width: 200px;
+    height: 300px;
+    margin-bottom: 2px;
+    padding-left: 50px;
+}
+#box3{
+    border: 2px;
+    width: 254px;
+    height: 400px;
+}
+#box4{
+
+    border: 2px solid;
+    width: 1130px;
+    height: 857px;
+    margin-bottom: 10px;
+    padding: 50px;
+    margin-top: 100;
+    float: right;
+    position: absolute;
+    top: 134px;
+    right: 10px;
+}
+#box5{
+        border: 2px solid;
+        width: 250px;
+        height: 150px;
+        margin-bottom: 10px;
+        
+        padding: 50px;
+        margin-top: 10px;
+        float: left;
+        position: absolute;
+        top: 145px;
+        right: 870px;
+}
+#box6{
+    background-color: RGB(24, 119, 242);
+    width: 321px;
+    height: 15px;
+    margin-bottom: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    float: left;
+    position: absolute;
+    top: 146px;
+    right: 871px;
+}
+#box7{
+    border: 2px solid;
+    width: 321px;
+    height: 15px;
+    margin-bottom: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    float: left;
+    position: absolute;
+    top: 400px;
+    right: 870px;
+}
+#box8{
+    border: 2px solid;
+    width: 321px;
+    height: 15px;
+    margin-bottom: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    float: left;
+    position: absolute;
+    top: 446px;
+    right: 870px;
+}
+#box9{
+    border: 2px solid;
+    background-color: RGB(24, 119, 242);
+    width: 325px;
+    height: 15px;
+    margin-bottom: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    float: left;
+    position: absolute;
+    top: 512px;
+    right: 868px;
+}
+#box10{
+    border: 2px solid;
+    width: 321px;
+    height: 15px;
+    margin-bottom: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    float: left;
+    position: absolute;
+    top: 558px;
+    right: 870px;
+}
+#boxa{
+    background-color: RGB(24, 119, 242);
+    border: 2px solid;
+    width: 323px;
+    height: 15px;
+    margin-bottom: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    float: left;
+    position: absolute;
+    top: 621px;
+    right: 869px;
+}
+#boxb{
+    border: 2px solid;
+    width: 321px;
+    height: 15px;
+    margin-bottom: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    float: left;
+    position: absolute;
+    top: 667px;
+    right: 870px;
+}
+#boxc{
+    border: 2px solid;
+    background-color: RGB(24, 119, 242);
+    width: 322px;
+    height: 15px;
+    margin-bottom: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    float: left;
+    position: absolute;
+    top: 728px;
+    right: 870px;
+}
+#boxd{
+    border: 2px solid;
+    width: 321px;
+    height: 22px;
+    margin-bottom: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    float: left;
+    position: absolute;
+    top: 773px;
+    right: 870px;
+}
+#boxe{
+    background-color: RGB(24, 119, 242);
+    border: 2px solid black;
+    width: 321px;
+    height: 15px;
+    margin-bottom: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    float: left;
+    position: absolute;
+    top: 843px;
+    right: 870px;
+}
+#boxf{
+    border: 2px solid;
+    width: 321px;
+    height: 160px;
+    margin-bottom: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    float: left;
+    position: absolute;
+    top: 891px;
+    right: 870px;
+}
+#boxg{
+    background-color: RGB(24, 119, 242);
+    border: 1px solid;
+    width: 1232px;
+    height: 30px;
+    float: left;
+    position: absolute;
+    top: 104px;
+    left: 17.8%;
+}
+#boxh{
+    background-color: RGB(24, 119, 242);
+    border: 1px solid;
+    width: 800px;
+    height: 45px;
+    float: left;
+    position: absolute;
+    top: 155px;
+    left: 44.5%;
+    border-right: 0;
+}
+#boxi{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+    border: 2px solid;
+    width: 200px;
+    height: 936px;
+    float: left;
+    position: absolute;
+    top: 155px;
+    left: 44.5%;
+    border-right: 0;
+    text-align: left;
+}
+#boxj{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+    border: 2px solid;
+    width: 598px;
+    height: 936px;
+    float: left;
+    position: absolute;
+    top: 155px;
+    left: 57.8%;
+    border-left: 0;
+}
