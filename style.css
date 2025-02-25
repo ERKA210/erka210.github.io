@@ -225,3 +225,10 @@
     left: 57.8%;
     border-left: 0;
 }
+#text{
+    font-size: 1cm;
+    padding-right: 100px;
+}
+#text1{
+    padding-right: 75px;
+}
