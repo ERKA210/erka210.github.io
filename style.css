@@ -1,232 +1,113 @@
-#box1{
-    border: 2px dashed;
-    width: 250px;
-    height: 150px;
-    margin-bottom: 5px;   
-    margin-top: 2px;
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-#box2{
-    border: 2px dashed;
-    width: 200px;
-    height: 300px;
-    margin-bottom: 2px;
-    padding-left: 50px;
+
+.a4-page {
+    width: 210mm;
+    height: 297mm;
+    background: white;
+    border: 1px solid black;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: row;
 }
-#box3{
-    border: 2px;
-    width: 254px;
-    height: 400px;
+
+.container {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-image-source: url(https://i.pinimg.com/736x/4d/f3/22/4df32262be79c38c686879d88a36d3e7.jpg);
+    border-image-width: 20px;
+    border-image-repeat: repeat;
+    border-image-slice: 100;
 }
-#box4{
-    border: 2px solid;
-    width: 1130px;
-    height: 857px;
-    margin-bottom: 10px;
-    padding: 50px;
-    margin-top: 100;
-    float: right;
+
+.sidebar {
+    background-color: #222;
+    color: white;
+    padding: 20px;
+    width: 30%;
+    text-align: center;
+    height: 297mm;
+    background-image: url(https://www.tat.mn/resource/efile/image/2017/10/11/vi04ddzkpk30ukds/khee-source3.jpg);
+    background-repeat: no-repeat;
+}
+
+.sidebar h2 {
+    font-size: 18px;
+}
+
+.sidebar h3 {
+    color: #ffcc00;
+    margin-top: 20px;
+}
+
+.profile-img {
+    width: 80%;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+.sidebar a {
+    color: #ffcc00;
+    text-decoration: none;
+}
+
+.content {
+    width: 60%;
+    padding: 20px;
+    right: 100px;
+}
+
+header {
+    background-color: #ffcc00;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+header h2 {
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+section {
+    margin-bottom: 20px;
+}
+
+h3 {
+    border-bottom: 2px solid black;
+    padding-bottom: 5px;
+}
+
+.job h4 {
+    margin-bottom: 5px;
+}
+
+#picture{
+    top: 100px;
+    left: 100px;
+} 
+
+#box{
+    display: flex;
+    top: 241mm;
+    left: 145mm;
+    width: 74mm;
+    height: 67mm;
     position: absolute;
-    top: 134px;
-    right: 10px;
-}
-#box5{
-        border: 2px solid;
-        width: 250px;
-        height: 150px;
-        margin-bottom: 10px;
-        padding: 50px;
-        margin-top: 10px;
-        float: left;
-        position: absolute;
-        top: 145px;
-        right: 870px;
-}
-#box6{
-    background-color: RGB(24, 119, 242);
-    width: 321px;
-    height: 15px;
-    margin-bottom: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    float: left;
-    position: absolute;
-    top: 146px;
-    right: 871px;
-}
-#box7{
-    border: 2px solid;
-    width: 321px;
-    height: 15px;
-    margin-bottom: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    float: left;
-    position: absolute;
-    top: 400px;
-    right: 870px;
-}
-#box8{
-    border: 2px solid;
-    width: 321px;
-    height: 15px;
-    margin-bottom: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    float: left;
-    position: absolute;
-    top: 446px;
-    right: 870px;
-}
-#box9{
-    border: 2px solid;
-    background-color: RGB(24, 119, 242);
-    width: 325px;
-    height: 15px;
-    margin-bottom: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    float: left;
-    position: absolute;
-    top: 512px;
-    right: 868px;
-}
-#box10{
-    border: 2px solid;
-    width: 321px;
-    height: 15px;
-    margin-bottom: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    float: left;
-    position: absolute;
-    top: 558px;
-    right: 870px;
-}
-#boxa{
-    background-color: RGB(24, 119, 242);
-    border: 2px solid;
-    width: 323px;
-    height: 15px;
-    margin-bottom: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    float: left;
-    position: absolute;
-    top: 621px;
-    right: 869px;
-}
-#boxb{
-    border: 2px solid;
-    width: 321px;
-    height: 15px;
-    margin-bottom: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    float: left;
-    position: absolute;
-    top: 667px;
-    right: 870px;
-}
-#boxc{
-    border: 2px solid;
-    background-color: RGB(24, 119, 242);
-    width: 322px;
-    height: 15px;
-    margin-bottom: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    float: left;
-    position: absolute;
-    top: 728px;
-    right: 870px;
-}
-#boxd{
-    border: 2px solid;
-    width: 321px;
-    height: 22px;
-    margin-bottom: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    float: left;
-    position: absolute;
-    top: 773px;
-    right: 870px;
-}
-#boxe{
-    background-color: RGB(24, 119, 242);
-    border: 2px solid black;
-    width: 321px;
-    height: 15px;
-    margin-bottom: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    float: left;
-    position: absolute;
-    top: 843px;
-    right: 870px;
-}
-#boxf{
-    border: 2px solid;
-    width: 321px;
-    height: 160px;
-    margin-bottom: 10px;
-    padding: 15px;
-    margin-top: 10px;
-    float: left;
-    position: absolute;
-    top: 891px;
-    right: 870px;
-}
-#boxg{
-    background-color: RGB(24, 119, 242);
-    border: 1px solid;
-    width: 1232px;
-    height: 30px;
-    float: left;
-    position: absolute;
-    top: 104px;
-    left: 17.8%;
-}
-#boxh{
-    background-color: RGB(24, 119, 242);
-    border: 1px solid;
-    width: 800px;
-    height: 45px;
-    float: left;
-    position: absolute;
-    top: 155px;
-    left: 44.5%;
-    border-right: 0;
-}
-#boxi{
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: large;
-    border: 2px solid;
-    width: 200px;
-    height: 936px;
-    float: left;
-    position: absolute;
-    top: 155px;
-    left: 44.5%;
-    border-right: 0;
-    text-align: left;
-}
-#boxj{
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: large;
-    border: 2px solid;
-    width: 598px;
-    height: 936px;
-    float: left;
-    position: absolute;
-    top: 155px;
-    left: 57.8%;
-    border-left: 0;
-}
-#text{
-    font-size: 1cm;
-    padding-right: 100px;
-}
-#text1{
-    padding-right: 75px;
+    background-image: url(soyombo.png) ;
 }
