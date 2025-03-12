@@ -19,19 +19,6 @@ body {
     flex-direction: row;
 }
 
-.container {
-    display: flex;
-    width: 100%;
-    max-width: 1000px;
-    margin: auto;
-    background-color: white;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    border-image-source: url(https://i.pinimg.com/736x/4d/f3/22/4df32262be79c38c686879d88a36d3e7.jpg);
-    border-image-width: 20px;
-    border-image-repeat: repeat;
-    border-image-slice: 100;
-}
-
 .sidebar {
     background-color: #222;
     color: white;
@@ -67,6 +54,12 @@ body {
     width: 60%;
     padding: 20px;
     right: 100px;
+    background-color: rgb(254, 255, 232);
+    border-image-source: url(https://i.pinimg.com/736x/4d/f3/22/4df32262be79c38c686879d88a36d3e7.jpg);
+    border-image-width: 20px;
+    border-image-repeat: repeat;
+    border-image-slice: 100;
+    background-blend-mode: multiply;
 }
 
 header {
@@ -105,9 +98,18 @@ h3 {
 #box{
     display: flex;
     top: 241mm;
-    left: 0;
+    left: 143.5mm;
     width: 74mm;
     height: 67mm;
     position: absolute;
     background-image: url(soyombo.png) ;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
