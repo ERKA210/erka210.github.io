@@ -1,87 +1,162 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Миний CV</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+<style type="text/css">
+.jumbotron {
+background-color: #13124f;
+color: white;
+padding-left: 10px;
+padding-top: 60px;
+width: 1190px;
+height: 200px;
+}
+.btn-custom {
+background-color: #f61067;
+border: none;
+padding: 10px 20px;
+color: white;
+font-weight: bold;
+text-decoration: none;
+}
+img {
+object-fit: cover;
+width: 100%;
+}
+.test {
+width: 300px;
+height: 150px;
+overflow: hidden;
+margin: 0;
+}
+.container {
+margin: 0;
+padding: 0;
+width: 1200px;
+height: 1090px;
+justify-content: center;
+justify-items: center;
+justify-self: center;
+background-color: white;
+}
+.col-3 {
+float: left;
+width: calc(100% / 4);
+}
+.col-6 {
+float: left;
+width: calc(100% / 2);
+}
+.col-12 {
+float: center;
+}
+.top-navigation {
+background-color: #352ba5;
+height: 20px;
+width: 1190px;
+margin: 0;
+top: 0;
+font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+padding-top: 20px;
+padding-left: 10px;
+}
+.logo *{
+    margin-left: 50px;
+}
+button{
+    color: white;
+}
+.header {
+background-color: white;
+height: 790px;
+width: 850px;
+}
+@media only screen and (max-width: 480px){
+    .container {
+    margin: 0px auto;
+    width: 100%;
+    }
+    .col-3 {
+    float: left;
+    clear: left;
+    width: calc(100% / 1);
+    }
+    .col-6 {
+    float: left;
+    clear: left;
+    width: calc(100% / 1);
+    }
+    .main {
+    float: left;
+    clear: left;
+    }
+}
+hr{
+    margin-left: 50px;
+    background-color: #9090A5;
+    width: 785px;
+    transition: 50%;
+}
+iframe{
+    padding-left: 50px;
+}
+input{
+    display: grid;
+    place-items: center;
+    background-color: #1b1b6c;
+    border-color: #9090A5;
+    border-left: none;
+    border-right: none;
+    justify-self: center;
+    margin-top: 40px;
+    color: #9090A5;
+    width: 90%;
+}
+button{
+    display: grid;
+    place-items: center;
+    background-color: #f61067;
+    color: white;
+    width: 90%;
+    margin-top: 10px;
+    margin-left: 14px;
+}
+</style>
 </head>
 <body>
-    <div class="a4-page">
-    <div class="container">
-        <aside class="sidebar">
-            <div id="box"></div>
-            <img src="https://th.bing.com/th/id/R.2499bd18079adf1ddeb7f1c07b110531?rik=DI1Jt2BPkDxw7w&riu=http%3a%2f%2fimg3.wikia.nocookie.net%2f__cb20130703134443%2fharrypotter%2fde%2fimages%2fthumb%2fd%2fd1%2fVoldemort_Info.jpg%2f500px-Voldemort_Info.jpg&ehk=XShph6eCwIbtuKwwmDiXtuW4vqvu%2fWR8rrTyRKrR3rs%3d&risl=&pid=ImgRaw&r=0" alt="Profile" class="profile-img">
-            <h2>Хар шидтэн</h2>
-    
-            <h3>Миний тухай</h3>
-            <p><strong></strong><br> 
-                Хогвартсын Слизерин байшинд суралцаж хар шидийн авьяасаа хөгжүүлж, хүчирхэг шидтэн болсон.</p>
-
-            <h3>Чадвар</h3>
-            <p>Хамгийн хүчирхэг<br>Сүнсээ хуваах</p>
-
-            <h3>Холбох хаяг</h3>
-            <p><strong>Phone:</strong>99656061</p>
-            <p><strong>Email:</strong><a href="mailto: erkae4837@gmail.com">erkae4837@gmail.com</a></p>
-            <p><strong>Багш:</strong><br>
-                <a href="https://www.bing.com/ck/a?!&&p=2bfcee883d502447d9e4a56cf9e78f7ab29f886d32eeeed30ab58c633658b87bJmltdHM9MTc0MTY1MTIwMA&ptn=3&ver=2&hsh=4&fclid=01158b35-022d-6b1c-22c5-9eb303f46ae9&psq=%d0%ae%d0%bd%d0%b6%d0%b8%d1%80%d0%b4%d1%83%d0%bb%d0%b0%d0%bc&u=a1aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g_dj0yRk0wSUtBaEVqOA&ntb=1">Эх удган Юнжирдулам</a><br>
-                <a href="https://mn.wikipedia.org/wiki/%D0%94%D0%B0%D0%BB%D0%B0%D0%B9_%D0%BB%D0%B0%D0%BC">Далай лам</a>
-            </p>
-            <p><strong>Гэрийн хаяг:</strong><br> 
-            Тодорхойгүй(дуртай газраа хонодог)</p>
-                <div id="box"><img src="soyombo.png" style="display: flex;" alt="soyombo" width="100%" height=auto;></div>
-        </aside>
-        
-
-        <main class="content">
-            <header>
-                <h1>Лорд Волдеморт</h1>
-                <h2>"Харанхуйн эзэн буюу Хар Лорд"</h2>
-            </header>
-
-            <section>
-                <h3>Танилцуулга</h3>
-<pre>Нэр: Том Марволо Риддл
-Төрсөн огноо: 1926 оны 12-р сарын 31
-Ээж: Меропа Гонт
-Аав: Том Риддл ахмад
-Хаана өссөн: Лондон дахь маглын өнчин хүүхдийн асрамжийн газар</pre>
-            </section>
-
-            <section>
-                <h3>Миний зорилго</h3>
-                <ul>
-                    <li>Цэвэр цуст шидтэнүүдийг эрхэмлэх, магл гаралтай шидтэнүүдийг устгах</li>
-                    <li>Шидтэний ертөнцийг өөрийн удирдлагад оруулах</li>
-                    <li>Дамблдор болон Харри Поттерийг устгах</li>
-                </ul>
-            </section>
-
-            <section>
-                <h3>Эзэмшсэн шидүүд</h3>
-
-                <div class="job">
-                    <h4>Хар шидийн мастер</h4>
-                    <ul>
-                        <li>Хоркрус бүтээх шид</li>
-                        <li>Оюун ухаан удирдах шид</li>
-                        <li>Саваагүй шид хийх, нисэх</li>
-                        <li>Амьтантай ярих</li>
-                        <li>Тулалдах ур чадвар</li>
-                    </ul>
-                </div>
-
-                <section>
-                    <h3>Амжилтын нууц</h3>
-                    <ul>
-                        <li>Хамаргүй болтлоо бэлтгэл хийсэн</li>
-                        <li>Миний нэрийг хэлэхээс айдаг болтол хөдөлмөрлөсөн</li>
-                </section>
-
-            </section>
-        </main>
+<div class="container">
+<div class="col-12 top-navigation" style="color: white;">Webjunto</div>
+<div class="jumbotron">
+    <div class="logo">
+        <h1 class="display-4">Hello, world!</h1>
+        <p>Welcome to Bootstrap v5.3. Check out this awesome jumbotron!</p>
+        <a href="#" class="btn btn-custom">LEARN MORE</a>
     </div>
 </div>
+<main>
+<div class="col-12 header" style="grid-row: 1 / span 12;"><h1 style="margin-left: 50px;">Heading goes here</h1><hr>
+    <pre>       Lorem ipsum dolor, sit amet consectetur adipisicing elit. Deleniti beatae illo odio odit. 
+       Temporibus facere ea, nostrum explicabo, et necessitatibus quis exercitationem expedita odit, 
+       perspiciatis labore quaerat tempore voluptate delectus.</pre>
+    <iframe width="800px" margin-left="50px" height="550px" src="video.htm" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <div class="footer">Whoa! This is a super imporant alert!</div>
+    <div class="end" style="color: white;">2017 All Rights Reserved, SomeCompany.</div>
+</div class="right">
+<div class="col-12 main"><span>MESSAGES</span><span class="count">3</span></div>
+<div class="col-12 down1">Welcome Candidate!</div>
+<div class="col-12 down2">You are a Starfleet Acaademy candidate. Greet the Captain in a <i>respectful</i> fashion <input style="" type="button" value="Input your greeting.."><button>SEND</button></div>
+<div class="col-12 down3"><a href="https://www.bing.com/ck/a?!&&p=76fbedc27b40d077b2a5f3b2894962b73bf31c7bb342521b23ac5f3ec3d45d52JmltdHM9MTc0MjE2OTYwMA&ptn=3&ver=2&hsh=4&fclid=01158b35-022d-6b1c-22c5-9eb303f46ae9&psq=i+don%27t+watch+Star+Trek+and+don%27t+get+the+reference&u=a1aHR0cHM6Ly93d3cucmVkZGl0LmNvbS9yL3N0YXJ0cmVrL2NvbW1lbnRzLzEzeW0zaWMvZG9faV9oYXZlX3RvX3dhdGNoX3RoZV90dl9zaG93X2ZpcnN0X3RvLw&ntb=1" style="color: white;">i don't watch Star Trek and don't get the reference</a></div>
+<div class="col-12 down4">Cast your vote! What do you think about space? See vote progress bar below! <hr style="color: #f61067; width: 90%;"></div>
+<div class="col-12 down5"></div>
+<div class="col-12 down6"></div>
+<div class="col-12 down7"></div>
+<div class="col-12 down8"></div>
+<div class="col-12 down9"></div>
+</div>
+</main>
+</div>
+<link rel="stylesheet" href="style.css">
 </body>
 </html>
