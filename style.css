@@ -1,115 +1,84 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    background-color: #f4f4f4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+main {
+    display: grid;
+    grid-template-columns: auto auto;
 }
-
-.a4-page {
-    width: 210mm;
-    height: 297mm;
-    background: white;
-    border: 1px solid black;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: row;
-}
-
-.sidebar {
-    background-color: #222;
+.main {
+    background-color: #f61067;
+    float: right;
+    width: 300px;
+    height: 30px;
+    margin-top: 30px;
+    margin-left: 20px;
     color: white;
-    padding: 20px;
-    width: 30%;
     text-align: center;
-    height: 297mm;
-    background-image: url(https://www.tat.mn/resource/efile/image/2017/10/11/vi04ddzkpk30ukds/khee-source3.jpg);
-    background-repeat: no-repeat;
+    padding-top: 5px;
 }
-
-.sidebar h2 {
-    font-size: 18px;
+.right{
+    margin-left: 0;
+    width: 200px;
 }
-
-.sidebar h3 {
-    color: #ffcc00;
+.down1 {
+    background-color: #9090A5;
+    float: right;
+    width: 290px;
+    margin-left: 20px;
+    height: 30px;
     margin-top: 20px;
+    color: white;
+    padding-left: 10px;
+    padding-top: 10px;
 }
-
-.profile-img {
-    width: 80%;
-    border-radius: 50%;
-    margin-bottom: 20px;
+.down2{
+    padding: 10px;
+    background-color: #13124f;
+    width: 280px;
+    margin-left: 20px;
+    height: 150px;
+    margin-top: 0;
+    color: white;
 }
-
-.sidebar a {
-    color: #ffcc00;
-    text-decoration: none;
-}
-
-.content {
-    width: 60%;
-    padding: 20px;
-    right: 100px;
-    background-color: rgb(254, 255, 232);
-    border-image-source: url(https://i.pinimg.com/736x/4d/f3/22/4df32262be79c38c686879d88a36d3e7.jpg);
-    border-image-width: 20px;
-    border-image-repeat: repeat;
-    border-image-slice: 100;
-    background-blend-mode: multiply;
-}
-
-header {
-    background-color: #ffcc00;
-    padding: 20px;
+.down3{
+    background-color: #352ba5;
+    width: 300px;
+    margin-top: 0;
+    margin-left: 20px;
+    height: 20px;
     text-align: center;
+    font-size: small;
 }
-
-header h1 {
-    margin: 0;
+.down4{
+    border: 1px solid black;
+    width: 280px;
+    height: 100px;
+    margin-left: 20px;
+    margin-top: 20px;
+    padding: 10px;
 }
-
-header h2 {
-    font-size: 16px;
-    margin-top: 5px;
+.footer{
+    background-color: #9090A5;
+    height: 20px;
+    width: 787px;
+    top: 97vh;
+    margin-left: 50px;
+    padding-top: 10px;
+    margin-top: 10px;
 }
-
-section {
-    margin-bottom: 20px;
+.end{
+    background-color: #1b1b6c;
+    height: 20px;
+    width: 1171px;
+    justify-content: center;
+    margin-top: 20px;
+    margin-left: 0;
+    padding-left: 30px;
+    padding-top: 10px;
 }
-
-h3 {
-    border-bottom: 2px solid black;
-    padding-bottom: 5px;
+body{
+    background-color: black;
 }
-
-.job h4 {
-    margin-bottom: 5px;
-}
-
-#picture{
-    top: 100px;
-    left: 100px;
-} 
-
-#box{
-    display: flex;
-    top: 241mm;
-    left: 143.5mm;
-    width: 74mm;
-    height: 67mm;
-    position: absolute;
-    background-image: url(soyombo.png) ;
-}
-
-.container {
-    display: flex;
-    width: 100%;
-    max-width: 1000px;
-    margin: auto;
-    background-color: white;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+.count{
+    background-color: #352ba5;
+    padding-left: 5px;
+    width: 15px;
+    border-radius: 50px;
 }
