@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+<style type="text/css">
+.jumbotron {
+background-color: #13124f;
+color: white;
+padding-left: 10px;
+padding-top: 60px;
+width: 1190px;
+height: 200px;
+}
+.btn-custom {
+background-color: #f61067;
+border: none;
+padding: 10px 20px;
+color: white;
+font-weight: bold;
+text-decoration: none;
+}
+img {
+object-fit: cover;
+width: 100%;
+}
+.test {
+width: 300px;
+height: 150px;
+overflow: hidden;
+margin: 0;
+}
+.container {
+margin: 0;
+padding: 0;
+width: 1200px;
+height: 1090px;
+justify-content: center;
+justify-items: center;
+justify-self: center;
+background-color: white;
+}
+.col-3 {
+float: left;
+width: calc(100% / 4);
+}
+.col-6 {
+float: left;
+width: calc(100% / 2);
+}
+.col-12 {
+float: center;
+}
+.top-navigation {
+background-color: #352ba5;
+height: 20px;
+width: 1190px;
+margin: 0;
+top: 0;
+font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+padding-top: 20px;
+padding-left: 10px;
+}
+.logo *{
+    margin-left: 50px;
+}
+button{
+    color: white;
+}
+.header {
+background-color: white;
+height: 790px;
+width: 850px;
+}
+@media only screen and (max-width: 480px){
+    .container {
+    margin: 0px auto;
+    width: 100%;
+    }
+    .col-3 {
+    float: left;
+    clear: left;
+    width: calc(100% / 1);
+    }
+    .col-6 {
+    float: left;
+    clear: left;
+    width: calc(100% / 1);
+    }
+    .main {
+    float: left;
+    clear: left;
+    }
+}
+hr{
+    margin-left: 50px;
+    background-color: #9090A5;
+    width: 785px;
+    transition: 50%;
+}
+iframe{
+    padding-left: 50px;
+}
+input{
+    display: grid;
+    place-items: center;
+    background-color: #1b1b6c;
+    border-color: #9090A5;
+    border-left: none;
+    border-right: none;
+    justify-self: center;
+    margin-top: 40px;
+    color: #9090A5;
+    width: 90%;
+}
+button{
+    display: grid;
+    place-items: center;
+    background-color: #f61067;
+    color: white;
+    width: 90%;
+    margin-top: 10px;
+    margin-left: 14px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="col-12 top-navigation" style="color: white;">Webjunto</div>
+<div class="jumbotron">
+    <div class="logo">
+        <h1 class="display-4">Hello, world!</h1>
+        <p>Welcome to Bootstrap v5.3. Check out this awesome jumbotron!</p>
+        <a href="#" class="btn btn-custom">LEARN MORE</a>
+    </div>
+</div>
+<main>
+<div class="col-12 header" style="grid-row: 1 / span 12;"><h1 style="margin-left: 50px;">Heading goes here</h1><hr>
+    <pre>       Lorem ipsum dolor, sit amet consectetur adipisicing elit. Deleniti beatae illo odio odit. 
+       Temporibus facere ea, nostrum explicabo, et necessitatibus quis exercitationem expedita odit, 
+       perspiciatis labore quaerat tempore voluptate delectus.</pre>
+    <iframe width="800px" margin-left="50px" height="550px" src="video.htm" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <div class="footer">Whoa! This is a super imporant alert!</span></div>
+    <div class="end" style="color: white;">2017 All Rights Reserved, SomeCompany.</div>
+</div class="right">
+<div class="col-12 down1">Welcome Candidate!</div>
+<div class="col-12 down2">You are a Starfleet Acaademy candidate. Greet the Captain in a <i>respectful</i> fashion <input style="" type="button" value="Input your greeting.."><button>SEND</button></div>
+<div class="col-12 down3"><a href="https://www.bing.com/ck/a?!&&p=76fbedc27b40d077b2a5f3b2894962b73bf31c7bb342521b23ac5f3ec3d45d52JmltdHM9MTc0MjE2OTYwMA&ptn=3&ver=2&hsh=4&fclid=01158b35-022d-6b1c-22c5-9eb303f46ae9&psq=i+don%27t+watch+Star+Trek+and+don%27t+get+the+reference&u=a1aHR0cHM6Ly93d3cucmVkZGl0LmNvbS9yL3N0YXJ0cmVrL2NvbW1lbnRzLzEzeW0zaWMvZG9faV9oYXZlX3RvX3dhdGNoX3RoZV90dl9zaG93X2ZpcnN0X3RvLw&ntb=1" style="color: white;">i don't watch Star Trek and don't get the reference</a></div>
+<div class="col-12 down4">
+    Cast your vote! What do you think about space? See vote progress bar below!
+    <div class="vote-progress">
+        <div class="progress-bar cool"></div>
+        <div class="progress-bar lame"></div>
+    </div>
+    <div class="vote-options">
+        <div class="vote-option cool">
+            <span>COOL</span>
+        </div>
+        <div class="vote-option lame">
+            <span style="color: #2ad392;">LAME</span>
+        </div>
+    </div>
+</div>
+</div>
+<div class="col-12 down5"></div>
+<div class="col-12 down6"></div>
+<div class="col-12 down7"></div>
+<div class="col-12 down8"></div>
+<div class="col-12 down9"></div>
+</div>
+</main>
+</div>
+<link rel="stylesheet" href="style.css">
+</body>
+</html>
