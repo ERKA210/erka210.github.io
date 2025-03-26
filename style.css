@@ -261,8 +261,8 @@ h3 {
     background-color: transparent; 
     color: #2ad392; 
     border-color: #2ad392;
-    text-align: center;
     width: 40%;
+    text-align: center;
 }
 
 .vote-progress {
@@ -271,8 +271,8 @@ h3 {
     overflow: hidden; 
     height: 7px;
     display: flex;
-    text-align: center;
     width: 40%;
+    text-align: center;
 }
 
 .progress-bar {
