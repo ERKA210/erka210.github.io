@@ -1,411 +1,83 @@
-body {
-    margin: 0;
-    font-family: "Lato", sans-serif;
-    width: 249mm;
-    height: 100vh;
-    padding-left: 275px; 
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; 
-    background-color: black;
-}
-.container {
-    height: 100vh;
-}
-.top-bar {
-    display: flex;
-    align-items: center;
-    height: 10px;
-    width: 249mm;
-    background-color: #1b1b6c; 
-    padding: 10px; 
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-}
-
-.logo {
-    height: 20px;
-    margin-right: 5px; 
-}
-
-.webjunto-text {
-    font-size: 15px;
-    color: #ffffff; 
-}
-
-.web {
-    font-weight: normal;
-}
-
-.junto {
-    font-weight: bold;
-}
-
-.header {
-    background-color: #13124f;
-    padding: 30px;
-    color: #ffffff;
-    width: 901px;
-    height: 125px;
-}
-
-.header h4 {
-    margin: 0;
-    font-size: 35px;
-}
-
-.header p {
-    margin: 5px 0;
-    font-size: 16px;
-}
-
-.learn-more {
-    margin: 20px 0;
-}
-
-.learn-more-button {
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 10px;
-    display: block;
-    background-color: #f61067; 
-    padding: 5px 10px; 
-    width: 18mm;
-}
-
-.main-content {
-    width: 100%;
-    background-color: white;
-    display: flex;
-    flex-direction: row;
-}
-
-.content-area {
-    width: 70%;
-}
-
-.content {
-    padding-left: 25px;
-}
-
-.content h4 {
-    font-size: 30px;
-    font-weight: normal;
-    margin-bottom: 0;
-    padding-top: 25px;
-}
-
-.content p {
-    font-size: 16px;
-}
-
-.alert {
-    background-color: #9090a5;
-    width: 600px;
-    margin-top: 20px;
-    height: 35px;
-    padding-left: 20px;
-    padding-top: 10px;
-    color: white;
-    margin-bottom: 10px;
-}
-
-.alert a {
-    font-size: 15px;
-    color: white;
-    text-decoration: none;
-}
-
-h4{
-    margin: 0;
-}
-
-hr {
-    color: #9090a5;
-}
-
-.right-area {
-    width: 30%;
-    padding-left: 20px;
-    padding-top: 30px;
-    margin-right: 10px;
-}
-
-.messages-section {
-    background-color: #f61067;
-    color: white;
-    padding-left: 80px;
-    height: 30px;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-}
-
-.messages-section img {
-    margin: 0;
-    padding: 0;
-}
-
-.messages-button {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-.messages-count {
-    background-color: #352ba5;
-    padding-left: 5px;
-    width: 12px;
-    border-radius: 50px;
-}
-
-.welcome-candidate{
-    background-color: #9090a5;
-    color: white;
-    font-size: 12px;
-    height: 30px;
-    margin-top: 10px;
-    padding: 0;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-h3 {
-    margin-top: 20px;
-}
-.welcome-candidate h3 {
-    margin: 10px;
-    margin-top: 20px;
-}
-.input-greeting {
-    background-color: #13124f;
-    color: white;
-    font-size: 12px;
-    margin-top: 0;
-    padding-top: 0;
-    padding-left: 10px;
-}
-.input-greeting p {
-    margin: 0;
-    padding-top: 10px;
-}
-
-.input-greeting input {
-    width: 90%;
-    padding-left: 10px;
-    margin-top: 10px;
-}
-
-.input-greeting button {
-    margin-top: 10px;
-    padding: 5px 10px;
-    margin-bottom: 10px;
-    width: 96%;
-    padding-right: 13px;
-    background-color: #f61067;
-    color: white;
-    cursor: pointer;
-    border: none;
-}
-
-.greeting-input {
-    background-color: #1b1b6c;
-    padding: 5px;
-    border-top-color: #9090a5;
-    border-bottom-color: #9090a5;
-    border-left: none;
-    border-right: none;
-}
-
-.neg-yum {
-    background-color: #352ba5;
-    font-size: 7px;
-    height: 15px;
-    padding: 5px;
-}
-
-.neg-yum a {
-    color: white;
-    padding: 55px;
-}
-.vote {
-    border: 1px solid #9090a5; 
-    padding: 15px;
-    margin-top: 20px;
-}
-
-.vote h3 {
-    margin: 0; 
-    padding: 0;
-    font-size: 14px; 
-    color:  black;
-}
-
-.vote-options {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.vote-option {
-    padding: 5px 10px;
-    font-size: 12px; 
-    cursor: pointer;
-    border: 1px solid transparent;
-}
-
-.vote-option.cool {
-    background-color: #f61067; 
-    color: white; 
-    border-color: #f61067;
-}
-
-.vote-option.lame {
-    background-color: transparent; 
-    color: #2ad392; 
-    border-color: #2ad392;
-}
-
-.vote-progress {
-    margin-top: 10px;
-    background-color: #e0e0e0;
-    overflow: hidden; 
-    height: 7px;
-    display: flex;
-}
-
-.progress-bar {
-    height: 100%; 
-}
-
-.progress-bar.cool {
-    background-color: #f61067; 
-    width: 70%;
-}
-
-.progress-bar.lame {
-    background-color: #2ad392;
-    width: 30%; 
-}
-
-.footer {
-    background-color: #13124f;
-    color:white;
-    height: 30px;
-    padding-left: 10px;
-    font-size: 12px;
-    padding-top: 5px;
-    margin-bottom: 20px;
-}
-
-.footer p {
-    margin-bottom: 20px;
-}
-
-
-/* Responsive Design */
-@media (max-width: 1200px) {
-    body {
-        padding-left: 200px;
-    }
-
-    .header {
-        width: 100%;
-    }
-
-    .content-area {
-        width: 60%;
-    }
-
-    .right-area {
-        width: 40%;
-    }
-}
-
-@media only screen and (max-width: 992px) {
-    body {
-        padding-left: 150px;
-    }
-
-    .header h4 {
-        font-size: 30px;
-    }
-
-    .content h4 {
-        font-size: 25px;
-    }
-
-    .content-area {
-        width: 100%;
-    }
-
-    .right-area {
-        width: 100%;
-        padding-left: 25px;
-    }
-}
-
-@media (max-width: 768px) {
-    body {
-        padding-left: 100px;
-    }
-
-    .header h4 {
-        font-size: 25px;
-    }
-
-    .header p {
-        font-size: 14px;
-    }
-
-    .content h4 {
-        font-size: 20px;
-    }
-
-    .content p {
-        font-size: 14px;
-    }
-
-    .alert {
-        width: 100%;
-    }
-
-    .messages-section {
-        padding-left: 20px;
-    }
-}
-
-@media (max-width: 576px) {
-    body {
-        padding-left: 20px;
-    }
-
-    .header h4 {
-        font-size: 20px;
-    }
-
-    .header p {
-        font-size: 12px;
-    }
-
-    .content h4 {
-        font-size: 18px;
-    }
-
-    .content p {
-        font-size: 12px;
-    }
-
-    .learn-more-button {
-        width: auto;
-    }
-
-    .messages-section {
-        padding-left: 10px;
-    }
-
-    .input-greeting input {
-        width: 85%;
-    }
-
-    .input-greeting button {
-        width: 90%;
-    }
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab5</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <img src="logo.jpg" alt="Webjunto Logo" class="logo">
+            <span class="webjunto-text">
+                <span class="web">Web</span><span class="junto">junto</span>
+            </span>
+        </div>
+        <div class="header">
+            <h4>Hello, world!</h4>
+            <p>Welcome to Bootstrap v3.3.7. Check out this awesome jumbotron!</p>
+            <div class="learn-more">
+                <a href="#" class="learn-more-button">LEARN MORE</a>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="content-area">
+                <div class="content">
+                    <h4>Heading goes here</h4>
+                    <hr>
+                    <p>Cupcake ipsum dolor sit amet caramels halvah souffle sugar plum. Fruitcake lollipop tiramisu pastry halvah sweet lemon drops. Jelly beans marshmallow jujubes. Pudding macaroon chocolate cake chupa chups. Tootsie roll wafer jelly beans cotton candy jelly. Liquorice chocolate cake tart jelly. Chocolate pastry cupcake chocolate.</p>
+                    <div class="yt-video">
+                        <img src="yt-video.jpg" alt="Neg Youtube Bichleg">
+                    </div>
+                    <div class="alert">
+                        <a href="#" class="alert-button">&#9432 Whoa! This is a super important alert!</a>
+                    </div>
+                </div>
+            </div>
+        <div class="right-area">
+            <div class="messages-section">
+                <div class="messages-button">
+                    <img src="envelope.jpg" alt="envelope">
+                    <i class="fas fa-envelope"></i>
+                    <span>MESSAGES</span>
+                    <div class="messages-count">3</div>
+                </div>
+            </div>
+            <div class="welcome-candidate">
+                <h3>Welcome Candidate!</h3>
+            </div>
+            <div class="input-greeting">
+                <p>You are a Starfleet Academy candidate. Greet the Captain in a respectful fashion.</p>
+                <input type="text" placeholder="Input your greeting.." class="greeting-input">
+                <button class="send-button">SEND</button>
+            </div>
+            <div class="neg-yum">
+                <a href="#">I don't watch Star Trek and don't get this reference.</a>
+            </div>
+            <div class="vote">
+                <h3>Cast your vote! What do you think about space? See vote progress bar below!</h3>
+                <div class="vote-progress">
+                    <div class="progress-bar cool"></div>
+                    <div class="progress-bar lame"></div>
+                </div>
+                <div class="vote-options">
+                    <div class="vote-option cool">
+                        <span>COOL</span>
+                    </div>
+                    <div class="vote-option lame">
+                        <span>LAME</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="footer">
+            <p>2017 All Rights Reserved,Some Company</p>
+        </div>
+    </div>
+</body>
+</html>
