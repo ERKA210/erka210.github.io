@@ -658,52 +658,64 @@ a{
   .nav-dots span.active {
     background: #6366f1; /* Purple-ish active dot */
   }  
-.accordion {
-    border-top: 1px solid #ccc;
-    max-width: 600px;
-    margin: 2rem auto;
-    font-family: sans-serif;
-  }
-  
   .accordion-item {
     border-bottom: 1px solid #ccc;
   }
   
-  .accordion input {
+  .accordion-item input[type="radio"] {
     display: none;
   }
   
-  .accordion label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .accordion-item label {
+    display: block;
     padding: 1rem;
     font-weight: bold;
     cursor: pointer;
-    position: relative;
+    background: #f0f0f0;
+    transition: background 0.3s;
   }
   
-  .accordion label::before {
-    content: "^";
+  .accordion-item label:hover {
+    background: #e0e0e0;
+  }
+  
+  .accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    background: #fafafa;
+    padding: 0 1rem;
+  }
+  
+  .accordion-item input:checked ~ .accordion-content {
+    max-height: 500px;
+    padding: 1rem;
+  }
+  .accordion-collapse {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+  
+  .accordion-collapse.show {
+    max-height: 500px; /* Зөвхөн агуулгад хангалттай өндөр */
+  }
+  .accordion button{
+    border: none;
+    background-color: white;
+  }
+  .accordion-button::before {
+    content: "^"; /* Эсвэл "►" */
+    display: inline-block;
     margin-right: 0.5rem;
     transition: transform 0.3s ease;
   }
   
-  .accordion input:checked + label::before {
-    transform: rotate(90deg);
+  /* Хаалттай үед дээш заасан сум болгоно */
+  .accordion-button.collapsed::before {
+    content: "►";
   }
   
-  .accordion .content {
-    max-height: 0;
-    overflow: hidden;
-    padding: 0 1rem;
-    transition: max-height 0.3s ease, padding 0.3s ease;
-  }
-  
-  .accordion input:checked ~ .content {
-    max-height: 500px;
-    padding: 1rem;
-  }
 footer{
     padding: 12%;
     color: white;
