@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <title>JavaScript Даалгаврууд</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    section { border: 1px solid #ccc; padding: 10px; margin-bottom: 15px; border-radius: 10px; }
+    input, button { margin-top: 5px; margin-bottom: 5px; display: block; }
+    .result { margin-top: 5px; color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h1>JavaScript Даалгаврууд</h1>
+
+<!-- 1. Палиндром нэр -->
+<section>
+  <h3>1. Нэр палиндром эсэх</h3>
+  <input id="nameInput" placeholder="Нэрээ оруулна уу">
+  <button onclick="checkPalindrome()">Шалгах</button>
+  <div id="nameResult" class="result"></div>
+</section>
+
+<!-- 2. Цифрүүдийн нийлбэр -->
+<section>
+  <h3>2. Цифрүүдийн нийлбэр</h3>
+  <input id="digitSumInput" placeholder="Тоог оруулна уу">
+  <button onclick="sumDigits()">Бодолт</button>
+  <div id="digitSumResult" class="result"></div>
+</section>
+
+<!-- 3. Анхны үржвэр -->
+<section>
+  <h3>3. Анхны тоонуудын нийлбэрт задал</h3>
+  <input id="primeInput" placeholder="Тоог оруулна уу">
+  <button onclick="primeDecompose()">Задлах</button>
+  <div id="primeResult" class="result"></div>
+</section>
+
+<!-- 4. Чоно туулай гүйцэх -->
+<section>
+  <h3>4. Чоно туулайг хэдэн минут секундын дараа гүйцэх вэ?</h3>
+  <input id="distanceInput" placeholder="Зайг км-ээр оруулна уу">
+  <button onclick="catchUp()">Тооцоолох</button>
+  <div id="catchResult" class="result"></div>
+</section>
+
+<!-- 5. Тэгш сондгой ялгах -->
+<section>
+  <h3>5. Тэгш сондгой ялгах</h3>
+  <input id="evenOddInput" placeholder="Жишээ: 1,2,3,4">
+  <button onclick="separateEvenOdd()">Ялгах</button>
+  <div id="evenOddResult" class="result"></div>
+</section>
+
+<!-- 6. Орц давхар хаалга -->
+<section>
+  <h3>6. Тоотоор орц, давхар, хаалга тодорхойлох</h3>
+  <input id="apartmentInput" placeholder="Тоотыг оруулна уу">
+  <button onclick="getApartmentInfo()">Тооцоолох</button>
+  <div id="apartmentResult" class="result"></div>
+</section>
+
+<!-- 7. Өглөө оройн дүрс -->
+<section>
+  <h3>7. Өглөө, оройн дөрвөлжин</h3>
+  <div id="box" style="width:50px;height:50px;position:absolute;"></div>
+</section>
+
+<!-- 8. Петя тоглоом -->
+<section>
+  <h3>8. Петя хожих боломж</h3>
+  <input id="coinsN" placeholder="Нийт зоос (n)">
+  <input id="coinsK" placeholder="Петягийн авах боломж (k)">
+  <button onclick="petyaGame()">Тооцоолох</button>
+  <div id="petyaResult" class="result"></div>
+</section>
+
+<script>
+  function checkPalindrome() {
+    const name = document.getElementById("nameInput").value.trim().toLowerCase();
+    const reversed = name.split('').reverse().join('');
+    document.getElementById("nameResult").textContent = (name === reversed) ? "Палиндром нэр байна." : "Палиндром биш байна.";
+  }
+
+  function sumDigits() {
+    const num = document.getElementById("digitSumInput").value;
+    const sum = num.split('').reduce((s, d) => s + Number(d), 0);
+    document.getElementById("digitSumResult").textContent = "Цифрүүдийн нийлбэр: " + sum;
+  }
+
+  function primeDecompose() {
+    let n = Number(document.getElementById("primeInput").value);
+    const primes = [];
+    for (let i = 2; i <= n; i++) {
+      while (n % i === 0) {
+        primes.push(i);
+        n /= i;
+      }
+    }
+    document.getElementById("primeResult").textContent = "Анхны үржвэр: " + primes.join(" + ");
+  }
+
+  function catchUp() {
+    const d = Number(document.getElementById("distanceInput").value);
+    const relativeSpeed = 25 - 18;
+    const timeH = d / relativeSpeed;
+    const minutes = Math.floor(timeH * 60);
+    const seconds = Math.round((timeH * 60 - minutes) * 60);
+    document.getElementById("catchResult").textContent = `${minutes} минут ${seconds} секундийн дараа гүйцнэ.`;
+  }
+
+  function separateEvenOdd() {
+    const arr = document.getElementById("evenOddInput").value.split(',').map(Number);
+    const even = arr.filter(x => x % 2 === 0);
+    const odd = arr.filter(x => x % 2 !== 0);
+    document.getElementById("evenOddResult").textContent = `Тэгш: ${even.join(', ')}, Сондгой: ${odd.join(', ')}`;
+  }
+
+  function getApartmentInfo() {
+    const num = Number(document.getElementById("apartmentInput").value);
+    const perFloor = 4, floors = 9, entrances = 3;
+    const perEntrance = perFloor * floors;
+    const entrance = Math.ceil(num / perEntrance);
+    if (entrance > entrances) {
+      document.getElementById("apartmentResult").textContent = "Тийм тоот байхгүй.";
+      return;
+    }
+    const pos = num - (entrance - 1) * perEntrance;
+    const floor = Math.ceil(pos / perFloor);
+    const door = ((pos - 1) % perFloor) + 1;
+    document.getElementById("apartmentResult").textContent = `Орц: ${entrance}, Давхар: ${floor}, Хаалга: ${door}`;
+  }
+
+  function petyaGame() {
+    const n = Number(document.getElementById("coinsN").value);
+    const k = Number(document.getElementById("coinsK").value);
+    let result = 0;
+    for (let i = 1; i <= k; i++) {
+      if ((n - i) % (k + 1) === 0) {
+        result = i;
+        break;
+      }
+    }
+    document.getElementById("petyaResult").textContent = "Петя авах ёстой: " + result;
+  }
+
+  // Дүрс
+  const hour = new Date().getHours();
+  const box = document.getElementById("box");
+  if (hour < 12) {
+    box.style.background = "green";
+    box.style.top = "10px";
+    box.style.left = "10px";
+  } else {
+    box.style.background = "red";
+    box.style.bottom = "10px";
+    box.style.right = "10px";
+    box.style.top = "";
+    box.style.left = "";
+  }
+</script>
+</body>
+</html>
