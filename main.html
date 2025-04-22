@@ -1,127 +1,169 @@
 <!DOCTYPE html>
 <html lang="mn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Гүйлгэх боломжтой сэтгэгдэл</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f8f9fa;
-        }
-
-        .carousel-container {
-            width: 350px;
-            overflow: hidden;
-            position: relative;
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .carousel {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-        }
-
-        .testimonial {
-            min-width: 100%;
-            padding: 20px;
-        }
-
-        .quote {
-            font-size: 20px;
-            color: #444;
-            font-style: italic;
-        }
-
-        .author {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-
-        .position {
-            font-size: 14px;
-            color: #666;
-        }
-
-        /* Navigation buttons */
-        .buttons {
-            margin-top: 15px;
-        }
-
-        .prev, .next {
-            cursor: pointer;
-            padding: 8px 12px;
-            margin: 5px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .prev:hover, .next:hover {
-            background-color: #0056b3;
-        }
-
-    </style>
+  <meta charset="UTF-8">
+  <title>JavaScript Даалгаврууд</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    section { border: 1px solid #ccc; padding: 10px; margin-bottom: 15px; border-radius: 10px; }
+    input, button { margin-top: 5px; margin-bottom: 5px; display: block; }
+    .result { margin-top: 5px; color: green; font-weight: bold; }
+  </style>
 </head>
 <body>
 
-    <div class="carousel-container">
-        <div class="carousel">
-            <div class="testimonial">
-                <p class="quote">“Энэ бол гайхалтай бүтээгдэхүүн! Би үнэхээр их сэтгэл хангалуун байна.”</p>
-                <p class="author">Батбаяр Дорж</p>
-                <p class="position">Маркетингийн менежер</p>
-            </div>
-            <div class="testimonial">
-                <p class="quote">“Хэрэглэхэд маш хялбар бөгөөд үр дүнтэй. Бүгдэд санал болгоно.”</p>
-                <p class="author">Сараа Энхбат</p>
-                <p class="position">Санхүүгийн шинжээч</p>
-            </div>
-            <div class="testimonial">
-                <p class="quote">“Би энэ үйлчилгээг ашиглаад маш их баяртай байна. Супер!”</p>
-                <p class="author">Тэмүүжин Ганхуяг</p>
-                <p class="position">Програм хангамжийн инженер</p>
-            </div>
-        </div>
-        <div class="buttons">
-            <button class="prev" onclick="moveSlide(-1)">Өмнөх</button>
-            <button class="next" onclick="moveSlide(1)">Дараах</button>
-        </div>
-    </div>
+<h1>JavaScript Даалгаврууд</h1>
 
-    <script>
-        let currentIndex = 0;
+<!-- 1. Палиндром нэр -->
+<section>
+  <h3>1. Нэр палиндром эсэх</h3>
+  <input id="nameInput" placeholder="Нэрээ оруулна уу">
+  <button onclick="checkPalindrome()">Шалгах</button>
+  <div id="nameResult" class="result"></div>
+</section>
 
-        function moveSlide(direction) {
-            const carousel = document.querySelector('.carousel');
-            const totalSlides = document.querySelectorAll('.testimonial').length;
-            currentIndex += direction;
+<!-- 2. Цифрүүдийн нийлбэр -->
+<section>
+  <h3>2. Цифрүүдийн нийлбэр</h3>
+  <input id="digitSumInput" placeholder="Тоог оруулна уу">
+  <button onclick="sumDigits()">Бодолт</button>
+  <div id="digitSumResult" class="result"></div>
+</section>
 
-            if (currentIndex < 0) {
-                currentIndex = totalSlides - 1;
-            } else if (currentIndex >= totalSlides) {
-                currentIndex = 0;
-            }
+<!-- 3. Анхны үржвэр -->
+<section>
+  <h3>3. Анхны тоонуудын нийлбэрт задал</h3>
+  <input id="primeInput" placeholder="Тоог оруулна уу">
+  <button onclick="primeDecompose()">Задлах</button>
+  <div id="primeResult" class="result"></div>
+</section>
 
-            carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
-        }
-    </script>
+<!-- 4. Чоно туулай гүйцэх -->
+<section>
+  <h3>4. Чоно туулайг хэдэн минут секундын дараа гүйцэх вэ?</h3>
+  <input id="distanceInput" placeholder="Зайг км-ээр оруулна уу">
+  <button onclick="catchUp()">Тооцоолох</button>
+  <div id="catchResult" class="result"></div>
+</section>
 
+<!-- 5. Тэгш сондгой ялгах -->
+<section>
+  <h3>5. Тэгш сондгой ялгах</h3>
+  <input id="evenOddInput" placeholder="Жишээ: 1,2,3,4">
+  <button onclick="separateEvenOdd()">Ялгах</button>
+  <div id="evenOddResult" class="result"></div>
+</section>
+
+<!-- 6. Орц давхар хаалга -->
+<section>
+  <h3>6. Тоотоор орц, давхар, хаалга тодорхойлох</h3>
+  <input id="apartmentInput" placeholder="Тоотыг оруулна уу">
+  <button onclick="getApartmentInfo()">Тооцоолох</button>
+  <div id="apartmentResult" class="result"></div>
+</section>
+
+<!-- 7. Өглөө оройн дүрс -->
+<section>
+  <h3>7. Өглөө, оройн дөрвөлжин</h3>
+  <div id="box" style="width:50px;height:50px;position:absolute;"></div>
+</section>
+
+<!-- 8. Петя тоглоом -->
+<section>
+  <h3>8. Петя хожих боломж</h3>
+  <input id="coinsN" placeholder="Нийт зоос (n)">
+  <input id="coinsK" placeholder="Петягийн авах боломж (k)">
+  <button onclick="petyaGame()">Тооцоолох</button>
+  <div id="petyaResult" class="result"></div>
+</section>
+
+<script>
+  function checkPalindrome() {
+    const name = document.getElementById("nameInput").value.trim().toLowerCase();
+    const reversed = name.split('').reverse().join('');
+    document.getElementById("nameResult").textContent = (name === reversed) ? "Палиндром нэр байна." : "Палиндром биш байна.";
+  }
+
+  function sumDigits() {
+    const num = document.getElementById("digitSumInput").value;
+    const sum = num.split('').reduce((s, d) => s + Number(d), 0);
+    document.getElementById("digitSumResult").textContent = "Цифрүүдийн нийлбэр: " + sum;
+  }
+
+  function primeDecompose() {
+    let n = Number(document.getElementById("primeInput").value);
+    const primes = [];
+    for (let i = 2; i <= n; i++) {
+      while (n % i === 0) {
+        primes.push(i);
+        n /= i;
+      }
+    }
+    document.getElementById("primeResult").textContent = "Анхны үржвэр: " + primes.join(" + ");
+  }
+
+  function catchUp() {
+    const d = Number(document.getElementById("distanceInput").value);
+    const relativeSpeed = 25 - 18;
+    const timeH = d / relativeSpeed;
+    const minutes = Math.floor(timeH * 60);
+    const seconds = Math.round((timeH * 60 - minutes) * 60);
+    document.getElementById("catchResult").textContent = `${minutes} минут ${seconds} секундийн дараа гүйцнэ.`;
+  }
+
+  function separateEvenOdd() {
+    const arr = document.getElementById("evenOddInput").value.split(',').map(Number);
+    const even = arr.filter(x => x % 2 === 0);
+    const odd = arr.filter(x => x % 2 !== 0);
+    document.getElementById("evenOddResult").textContent = `Тэгш: ${even.join(', ')}, Сондгой: ${odd.join(', ')}`;
+  }
+
+  function getApartmentInfo() {
+    const num = Number(document.getElementById("apartmentInput").value);
+    const perFloor = 4, floors = 9, entrances = 3;
+    const perEntrance = perFloor * floors;
+    const entrance = Math.ceil(num / perEntrance);
+    if (entrance > entrances) {
+      document.getElementById("apartmentResult").textContent = "Тийм тоот байхгүй.";
+      return;
+    }
+    const pos = num - (entrance - 1) * perEntrance;
+    const floor = Math.ceil(pos / perFloor);
+    const door = ((pos - 1) % perFloor) + 1;
+    document.getElementById("apartmentResult").textContent = `Орц: ${entrance}, Давхар: ${floor}, Хаалга: ${door}`;
+  }
+
+  function petyaGame() {
+    const n = Number(document.getElementById("coinsN").value);
+    const k = Number(document.getElementById("coinsK").value);
+    let result = 0;
+    for (let i = 1; i <= k; i++) {
+      if ((n - i) % (k + 1) === 0) {
+        result = i;
+        break;
+      }
+    }
+    document.getElementById("petyaResult").textContent = "Петя авах ёстой: " + result;
+  }
+
+  array.forEach(currentItem => {
+    
+  });
+
+  // Дүрс
+  const hour = new Date().getHours();
+  const box = document.getElementById("box");
+  if (hour < 12) {
+    box.style.background = "green";
+    box.style.top = "10px";
+    box.style.left = "10px";
+  } else {
+    box.style.background = "red";
+    box.style.bottom = "10px";
+    box.style.right = "10px";
+    box.style.top = "";
+    box.style.left = "";
+  }
+</script>
 </body>
 </html>
