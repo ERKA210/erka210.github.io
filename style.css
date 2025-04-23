@@ -1151,7 +1151,6 @@ div.row.align-items-center.counter-wrapper.gy-6.text-center {
   }
 }
 
-/* Mobile-first adjustments */
 @media (min-width: 993px) {
   .d-lg-flex {
     display: flex !important;
@@ -1167,4 +1166,120 @@ div.row.align-items-center.counter-wrapper.gy-6.text-center {
 .cardbody {
   padding: 0 !important;
   margin-left: 25px;
+}
+@media (max-width: 360px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .display-1 {
+    font-size: 2rem !important;
+    line-height: 1.2;
+  }
+
+  .display-4 {
+    font-size: 1.5rem !important;
+  }
+
+  .fs-58 {
+    font-size: 1.75rem !important;
+  }
+
+  .fs-30 {
+    font-size: 1.25rem !important;
+  }
+
+  .navbar-brand img {
+    width: 80px !important;
+  }
+
+  .nav-link {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .btn-lg {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .row.gx-lg-8.gx-xl-12.gy-10.mb-14.mb-md-17.align-items-center {
+    margin-top: 50px;
+  }
+
+  .swiper-slide {
+    padding: 15px;
+  }
+
+  blockquote {
+    font-size: 1rem;
+  }
+
+  .blockquote-details h5 {
+    font-size: 1rem;
+  }
+
+  .blockquote-details p {
+    font-size: 0.8rem;
+  }
+
+  .accordion-item label {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .accordion-content {
+    font-size: 0.85rem;
+  }
+
+  /* Footer */
+  footer {
+    padding: 2rem 1rem;
+  }
+
+  .py-12 {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+
+  .mb-8 {
+    margin-bottom: 2rem !important;
+  }
+
+  /* Image adjustments */
+  .icon {
+    width: 250px !important;
+    height: 150px !important;
+  }
+
+  .col-md-8 img {
+    height: 300px;
+    padding-right: 0;
+  }
+
+  .card-body {
+    padding: 25px !important;
+  }
+
+  h3.counter.counter-lg {
+    font-size: 1.75rem !important;
+  }
+
+  .row {
+    --gutter-x: 0.75rem;
+    --gutter-y: 0.5rem;
+  }
+
+  .gy-10 {
+    gap: 15px;
+  }
+}
+
+@media (pointer: coarse) {
+  .nav-link,
+  .btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }
