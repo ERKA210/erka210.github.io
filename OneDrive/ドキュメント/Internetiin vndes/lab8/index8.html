@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <title>Бодлого 8</title>
+</head>
+<body>
+
+<script>
+  function findWinningK(n) {
+    for (let k = 1; k < n; k++) {
+      let maxTake = k + 1;
+      let dp = new Array(n - k + 1).fill(false);
+
+      for (let i = 1; i <= n - k; i++) {
+        for (let take = 1; take <= maxTake; take++) {
+          if (i - take >= 0 && dp[i - take] === false) {
+            dp[i] = true;
+            break;
+          }
+        }
+      }
+
+      if (!dp[n - k]) {
+        return k;
+      }
+    }
+
+    return 0;
+  }
+
+  let n = parseInt(prompt("Зоосны тоог оруулна уу (n):"));
+  if (isNaN(n) || n <= 1) {
+    alert("Зөвхөн 2 буюу түүнээс их бүхэл тоо оруулна уу.");
+  } else {
+    let result = findWinningK(n);
+    if (result === 0) {
+      alert("Петя хожих боломжгүй.");
+    } else {
+      alert("Петя эхлээд " + result + " зоос авбал хожино.");
+    }
+  }
+</script>
+
+</body>
+</html>

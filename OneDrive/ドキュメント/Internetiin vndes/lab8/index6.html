@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бодлого 6</title>
+</head>
+<body>
+    <script>
+        var dawhar = 9;
+        var ail = 4;
+        var ailPerOrts = dawhar * ail;
+
+        var findX = prompt("Олох айлын дугаарыг оруулна уу:");
+
+        if (isNaN(findX) || findX < 1) {
+            alert("Буруу утга оруулсан байна!");
+        } else {
+            var a = Math.floor((findX - 1) / ailPerOrts);            
+            var b = Math.floor(((findX - 1) % ailPerOrts) / ail);    
+            var c = (findX - 1) % ail;
+
+            alert("Орц: " + (a + 1) + " Давхар: " + (b + 1) + " Хаалга: " + (c + 1));
+        }
+    </script>
+</body>
+</html>

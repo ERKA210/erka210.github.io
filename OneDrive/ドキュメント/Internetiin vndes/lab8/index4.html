@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бодлого 4</title>
+</head>
+<body>
+    <script>
+        var speed = 25*1000/3600 - 18*1000/3600;
+        var kilo = window.prompt("Zaig oruulna uu ")*1000;
+        var time = kilo / speed;
+        var min = time % 60;
+        var sec = time - min * 60;
+        alert(min, sec);
+    </script>
+</body>
+</html>
