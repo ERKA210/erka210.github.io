@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <title>Бодлого 7</title>
+  <style>
+    .box {
+      width: 50px;
+      height: 50px;
+      position: absolute;
+    }
+
+    .green {
+      background-color: green;
+    }
+
+    .red {
+      background-color: red;
+    }
+
+    .top-left {
+      top: 0;
+      left: 0;
+    }
+
+    .bottom-right {
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  var hour = new Date().getHours();
+  var box = document.createElement('div');
+  box.classList.add('box');
+
+  if (hour >= 0 && hour < 12) {
+    box.classList.add('green');
+    box.classList.add('top-left');
+  } else {
+    box.classList.add('red');
+    box.classList.add('bottom-right');
+  }
+
+  document.body.appendChild(box);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бодлого 2</title>
+</head>
+<body>
+    <script>
+        var number = window.prompt("Тоо оруулна уу");
+        var total = 0;
+        while(number != 0){
+            total += number  % 10;
+            number = Math.floor(number/10);
+        }
+        alert("Niilber " +total);
+    </script>
+</body>
+</html>

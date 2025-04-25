@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бодлого 5</title>
+</head>
+<body>
+    <script>
+        var n = prompt("Хэдэн тоо оруулах вэ?");
+        var even = [];
+        var odd = [];
+        var array = [];
+
+        for (var i = 0; i < n; i++) {
+            var num = prompt((i + 1) + " дахь тоог оруулна уу:");
+            array.push(num);
+        }
+
+        for (var i = 0; i < n; i++) {
+            if (array[i] % 2 == 0) {
+                even.push(array[i]);
+            } else {
+                odd.push(array[i]);
+            }
+        }
+
+        alert("Сондгой тоонууд: " + odd.join(", "));
+        alert("Тэгш тоонууд: " + even.join(", "));
+    </script>
+</body>
+</html>
