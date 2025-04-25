@@ -11,25 +11,22 @@
     <button class="theme-toggle" id="themeToggle">🌙</button>
     <div class="display" id="display">0</div>
     <div class="buttons">
-      <button>AC</button>
-      <button>←</button>
-      <button>%</button>
-      <button>/</button>
-      <button>7</button>
-      <button>8</button>
-      <button>9</button>
-      <button>*</button>
-      <button>4</button>
-      <button>5</button>
-      <button>6</button>
-      <button>-</button>
-      <button>1</button>
-      <button>2</button>
-      <button>3</button>
-      <button>+</button>
-      <button>0</button>
-      <button>.</button>
-      <button>=</button>
+      <button onclick="appendNumber('1')">1</button>
+      <button onclick="appendNumber('2')">2</button>
+      <button onclick="appendNumber('3')">3</button>
+      <button onclick="multiply()">x</button>
+      <button onclick="appendNumber('4')">4</button>
+      <button onclick="appendNumber('5')">5</button>
+      <button onclick="appendNumber('6')">6</button>
+      <button onclick="divide()">/</button>
+      <button onclick="appendNumber('7')">7</button>
+      <button onclick="appendNumber('8')">8</button>
+      <button onclick="appendNumber('9')">9</button>
+      <button onclick="plus()">+</button>
+      <button onclick="clearDisplay()">C</button>
+      <button onclick="appendNumber('0')">0</button>
+      <button onclick="convertCurrency()">=</button>
+      <button onclick="minus()">-</button>
     </div>
   </div>
   <script src="script.js"></script>
