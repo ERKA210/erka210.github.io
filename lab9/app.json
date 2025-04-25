@@ -7,7 +7,7 @@ const exchangeArray = [
     { name: 'YAN', value: 7.31 },
     { name: 'MNT', value: 3537 }
   ];
-  
+
 const toggleBtn = document.getElementById("themeToggle");
 const body = document.body;
 
