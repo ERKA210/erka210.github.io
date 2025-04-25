@@ -1,0 +1,75 @@
+body {
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  transition: background 0.3s ease;
+}
+
+.light-mode {
+  background: #f0f3fa;
+  color: #000;
+}
+
+.dark-mode {
+  background: #1e1e2f;
+  color: #fff;
+}
+
+.calculator {
+  width: 300px;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  background: inherit;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.display {
+  height: 60px;
+  background: rgba(255,255,255,0.2);
+  margin-bottom: 15px;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 24px;
+  text-align: right;
+  overflow: hidden;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+button {
+  padding: 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.light-mode button {
+  background: #fff;
+  color: #000;
+  box-shadow: 2px 2px 5px #ccc;
+}
+
+.dark-mode button {
+  background: #2c2f48;
+  color: #fff;
+  box-shadow: 2px 2px 5px #000;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  font-size: 20px;
+}
