@@ -28,8 +28,8 @@ body.dark-mode {
   position: relative;
 }
 @font-face {
-  font-family: 'Seven Segment';
-  src: url('fonts/seven_segment/Seven\ Segment.ttf') format('truetype');
+  font-family: 'Seven_segment';
+  src: url('fonts/Seven\ Segment.ttf') format('truetype');
 }
 .display {
   height: 60px;
@@ -43,7 +43,7 @@ body.dark-mode {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  font-family: 'seven_segment', monospace;
+  font-family: 'Seven_segment', monospace;
 }
 
 .buttons {
