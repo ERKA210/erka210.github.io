@@ -1,94 +1,109 @@
 body {
-    font-family: sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    transition: background 0.3s ease;
-  }
-body.light-mode{
-    background-image: url(https://static.vecteezy.com/system/resources/previews/034/966/281/original/abstract-blue-white-geometric-background-with-minimal-circles-vector.jpg);
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  transition: background 0.3s ease;
 }
-body.dark-mode{
-    background-image: url(https://cdn5.vectorstock.com/i/1000x1000/11/54/red-and-black-geometric-circles-tech-background-vector-44941154.jpg);
+
+body.light-mode {
+  background-image: url(https://static.vecteezy.com/system/resources/previews/034/966/281/original/abstract-blue-white-geometric-background-with-minimal-circles-vector.jpg);
+  color: black;
 }
-  .light-mode {
-    background: red;
-    color: black;
-  }
-  
-  .dark-mode {
-    background: red;
-    color: #fff;
-  }
-  .calculator {
-    width: 300px;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    background: inherit;
-    transition: all 0.3s ease;
-    position: relative;
-  }
-  .light-mode{
-    background-color: black;
-    color: black;
-  }
-  .display {
-    height: 60px;
-    background: rgba(255,255,255,0.2);
-    margin-bottom: 15px;
-    border-radius: 10px;
-    padding: 4px;
-    font-size: 24px;
-    text-align: right;
-    overflow: hidden;
-    justify-content: center;
-  }
-  body.light-mode .display{
-    background-color: ;
-  }
-  .buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-  }
-  
-  button {
-    padding: 20px;
-    font-size: 18px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  
-  .light-mode button {
-    background: #fff;
-    color: #000;
-    box-shadow: 2px 2px 5px #ccc;
-    margin-top: 11px;
-  }
-  
-  .dark-mode button {
-    background: #2c2f48;
-    color: #fff;
-    box-shadow: 2px 2px 5px #000;
-    margin-top: 11px;
-  }
-  
-  .theme-toggle {
-    position: absolute;
-    top: 10px;
-    left: 20px;
-    background: none;
-    font-size: 20px;
-  }
-  #toCurrency{
-    float: right;
-  }
-  .converter{
-    display: flex;
-    flex-direction: row;
-  }
+
+body.dark-mode {
+  background-image: url(https://cdn5.vectorstock.com/i/1000x1000/11/54/red-and-black-geometric-circles-tech-background-vector-44941154.jpg);
+  color: white;
+}
+
+.calculator {
+  width: 300px;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  background: rgba(255,255,255,0.2);
+  transition: all 0.3s ease;
+  position: relative;
+}
+@font-face {
+  font-family: 'Seven Segment';
+  src: url('fonts/seven_segment/Seven\ Segment.ttf') format('truetype');
+}
+.display {
+  height: 60px;
+  background: rgba(255,255,255,0.2);
+  margin-bottom: 15px;
+  border-radius: 10px;
+  padding: 4px;
+  font-size: 24px;
+  text-align: right;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-family: 'seven_segment', monospace;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+button {
+  padding: 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-top: 11px;
+}
+
+.light-mode button {
+  background: #fff;
+  color: #000;
+  box-shadow: 2px 2px 5px #ccc;
+}
+
+.dark-mode button {
+  background: #2c2f48;
+  color: #fff;
+  box-shadow: 2px 2px 5px #000;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  background: none;
+  font-size: 20px;
+}
+
+.converter {
+  grid-column: span 4;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+select {
+  width: 48%;
+  padding: 5px;
+  border-radius: 8px;
+}
+
+#result {
+  margin-top: 15px;
+  font-size: 16px;
+  text-align: center;
+}
+button:nth-last-of-type(2){
+  width: 200%;
+}
+button:nth-last-child(2){
+  margin-left: 130%;
+  width: 200%;
+}
