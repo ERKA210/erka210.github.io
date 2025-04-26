@@ -14,27 +14,28 @@
       <button onclick="appendNumber('1')">1</button>
       <button onclick="appendNumber('2')">2</button>
       <button onclick="appendNumber('3')">3</button>
-      <button onclick="multiply()">x</button>
+      <button onclick="setOperation('*')">×</button>
       <button onclick="appendNumber('4')">4</button>
       <button onclick="appendNumber('5')">5</button>
       <button onclick="appendNumber('6')">6</button>
-      <button onclick="divide()">/</button>
+      <button onclick="setOperation('/')">÷</button>
       <button onclick="appendNumber('7')">7</button>
       <button onclick="appendNumber('8')">8</button>
       <button onclick="appendNumber('9')">9</button>
-      <button onclick="plus()">+</button>
-      <button onclick="clearDisplay()">C</button>
+      <button onclick="setOperation('+')">+</button>
+      <button onclick="appendNumber('.')">.</button>
       <button onclick="appendNumber('0')">0</button>
-      <button onclick="convertCurrency()">=</button>
-      <button onclick="minus()">-</button>
-
+      <button onclick="compute()">=</button>
+      <button onclick="setOperation('-')">-</button>
+      <button onclick="clearDisplay()">C</button>
+      <button onclick="convertCurrency()">T</button>
       <div class="converter">
         <select id="fromCurrency"></select>
         <select id="toCurrency"></select>
       </div>
     </div>
-    <div id="result">Хөрвүүлсэн тоог энд гаргана</div>
+    <div id="result">Хөрвүүлсэн дүн энд гарна</div>
   </div>
-  <script src="app.json"></script>
+  <script src="app.js"></script>
 </body>
 </html>
