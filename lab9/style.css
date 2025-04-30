@@ -62,6 +62,16 @@ button {
   margin-top: 11px;
 }
 
+body.light-mode #toCurrency{
+  background-color: #2c2f48;
+  color: white;
+}
+
+body.light-mode #fromCurrency{
+  background-color: #2c2f48;
+  color: white;
+}
+
 .light-mode button {
   background: #fff;
   color: #000;
