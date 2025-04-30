@@ -389,8 +389,12 @@ h6,
 
 @media (max-width: 768px) {
   .icon {
-    width: 100% !important;
+    width: 15% !important;
     height: auto !important;
+    justify-self: center;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
   }
 }
 
@@ -1298,5 +1302,9 @@ div.row.align-items-center.counter-wrapper.gy-6.text-center {
   .row.gx-lg-8.gx-xl-12.gy-10.mb-14.mb-md-17.align-items-center{
     display: flex;
     flex-direction: column;
+  }
+  img *{
+    width: 90%;
+    height: auto;
   }
 }
