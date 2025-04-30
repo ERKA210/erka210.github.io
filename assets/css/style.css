@@ -203,6 +203,7 @@ h6,
 
   .image-wrapper img {
     border-radius: 8px;
+    max-width: 100%;
   }
 
   footer {
@@ -370,10 +371,12 @@ h6,
   .rounded,
   figure.rounded img {
     border-radius: 8px !important;
+    height: auto !important;
+    max-width: 100%;
   }
 
   .icon {
-    width: 15% !important;
+    margin-top: 10px;
     height: auto !important;
     justify-self: center;
     justify-content: center;
@@ -388,17 +391,6 @@ h6,
     font-size: 0.95rem;
     color: #555;
     padding-top: 0.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .icon {
-    width: 15% !important;
-    height: auto !important;
-    justify-self: center;
-    justify-content: center;
-    justify-items: center;
-    align-items: center;
   }
 }
 
@@ -1307,8 +1299,8 @@ div.row.align-items-center.counter-wrapper.gy-6.text-center {
     display: flex;
     flex-direction: column;
   }
-  img *{
-    width: 90%;
-    height: auto;
+  .swiper-wrapper:nth-last-of-type(1){
+    flex-direction: column;
+    width: 100%;
   }
 }
