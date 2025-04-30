@@ -42,9 +42,11 @@ function populateDropdowns() {
 }
 
 function appendNumber(num) {
+  if (num === '.' && currentInput.includes('.')) return;
   currentInput += num;
   display.textContent = currentInput;
 }
+
 
 function setOperation(op) {
   if (currentInput === "") return;
