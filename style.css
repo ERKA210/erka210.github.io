@@ -389,7 +389,7 @@ h6,
 
 @media (max-width: 768px) {
   .icon {
-    width: 100% !important;
+    width: 15% !important;
     height: auto !important;
   }
 }
