@@ -1,122 +1,82 @@
-let currentWord = '';
-let validWords = [];
-let score = 0;
-let lettersList = [];
+document.addEventListener("DOMContentLoaded", function () {
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
 
-const display = document.getElementById('display');
-const result = document.getElementById('result');
-const fileInput = document.getElementById('words');
+  const loginUsername = loginForm.querySelector('input[type="text"]');
+  const loginPassword = loginForm.querySelector('input[type="password"]');
+  const rememberMe = loginForm.querySelector('input[type="checkbox"]');
 
-fileInput.addEventListener('change', function(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const text = e.target.result;
-      validWords = text.split(/\r?\n/).map(word => word.trim().toUpperCase());
-      console.log(validWords);
-    };
-    reader.readAsText(file);
+  const registerUsername = registerForm.querySelector('input[type="text"]');
+  const registerPassword = registerForm.querySelector('input[type="password"]');
+
+  const showRegister = document.getElementById("show-register");
+  const showLogin = document.getElementById("show-login");
+
+  showRegister.addEventListener("click", () => {
+    loginForm.style.display = "none";
+    registerForm.style.display = "block";
+  });
+
+  showLogin.addEventListener("click", () => {
+    registerForm.style.display = "none";
+    loginForm.style.display = "block";
+  });
+
+  if (document.cookie.includes("remember=true")) {
+    const cookies = document.cookie.split("; ");
+    cookies.forEach(cookie => {
+      const [key, value] = cookie.split("=");
+      if (key === "loginUsername") loginUsername.value = decodeURIComponent(value);
+      if (key === "loginPassword") loginPassword.value = decodeURIComponent(value);
+    });
+    rememberMe.checked = true;
+  }
+
+  loginForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const regUsername = getCookie("regUsername");
+    const regPassword = getCookie("regPassword");
+
+    if (
+      loginUsername.value === regUsername &&
+      loginPassword.value === regPassword
+    ) {
+      if (rememberMe.checked) {
+        setCookie("loginUsername", loginUsername.value, 7);
+        setCookie("loginPassword", loginPassword.value, 7);
+        setCookie("remember", "true", 7);
+      } else {
+        deleteCookie("loginUsername");
+        deleteCookie("loginPassword");
+        deleteCookie("remember");
+      }
+      alert("Амжилттай нэвтэрлээ!");
+    } else {
+      alert("Username эсвэл Password буруу байна.");
+    }
+  });
+
+  registerForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    setCookie("regUsername", registerUsername.value, 365);
+    setCookie("regPassword", registerPassword.value, 365);
+    alert("Бүртгэл амжилттай! Одоо нэвтэрнэ үү.");
+    showLogin.click();
+  });
+
+  function setCookie(name, value, days) {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+  }
+
+  function getCookie(name) {
+    return document.cookie
+      .split("; ")
+      .find(row => row.startsWith(name + "="))
+      ?.split("=")[1] || "";
+  }
+
+  function deleteCookie(name) {
+    document.cookie = name + "=; max-age=0; path=/";
   }
 });
-
-function generateRandomLetters() {
-  const numLetters = parseInt(document.getElementById('numLetters').value) || 1;
-  const vowels = 'AEIOU';
-  const consonants = 'BCDFGHJKLMNPQRSTVWXYZ';
-
-  const numVowels = Math.ceil(numLetters / 3);
-  const numConsonants = numLetters - numVowels;
-
-  lettersList = [];
-
-  for (let i = 0; i < numVowels; i++) {
-    addRandomLetter(generateRandomLetter('vowel'));
-  }
-
-  for (let i = 0; i < numConsonants; i++) {
-    addRandomLetter(generateRandomLetter('consonant'));
-  }
-}
-
-function generateRandomLetter(type) {
-  const letterSet = type === 'vowel' ? 'AEIOU' : 'BCDFGHJKLMNPQRSTVWXYZ';
-  const randomIndex = Math.floor(Math.random() * letterSet.length);
-  return letterSet[randomIndex];
-}
-
-function addRandomLetter(newLetter) {
-  lettersList.push(newLetter);
-  console.log(`Нэмэгдсэн үсэг: ${newLetter}`);
-  updateLetterDisplay();  
-}
-
-function useLetter(letter) {
-  const index = lettersList.indexOf(letter);
-  if (index > -1) {
-    lettersList.splice(index, 1);
-    console.log(`Хасагдсан үсэг: ${letter}`);
-  } else {
-    console.log(`Үсэг ${letter} ороогүй байна.`);
-  }
-  updateLetterDisplay();  
-}
-
-function checkWord() {
-  const upperWord = currentWord.toUpperCase();
-  const tempLetters = [...lettersList];
-  let canBuild = true;
-
-  for (let letter of upperWord) {
-    const index = tempLetters.indexOf(letter);
-    if (index > -1) {
-      tempLetters.splice(index, 1);
-    } else {
-      canBuild = false;
-      break;
-    }
-  }
-
-  if (!canBuild) {
-    result.textContent = 'Үсгүүд хүрэлцэхгүй байна.';
-  } else if (validWords.includes(upperWord)) {
-    result.textContent = `Зөв! Оноо авлаа: ${upperWord.length}`;
-    updateScore(upperWord.length);
-    for (let letter of upperWord) {
-      useLetter(letter);
-    }
-  } else {
-    result.textContent = 'Буруу үг.';
-  }
-
-  currentWord = '';
-  updateDisplay();
-}
-
-function pressKey(letter) {
-  currentWord += letter;
-  updateDisplay();
-}
-
-function setOperation(op) {
-  if (op === 'backspace') {
-    currentWord = currentWord.slice(0, -1);
-    updateDisplay();
-  } else if (op === 'enter') {
-    checkWord();
-  }
-}
-
-function updateDisplay() {
-  display.textContent = currentWord || '_';
-}
-
-function updateLetterDisplay() {
-  const letterDisplay = document.getElementById('letters-display');
-  letterDisplay.textContent = `Available Letters: ${lettersList.join(', ')}`;
-}
-
-function updateScore(points) {
-  score += points;
-  document.getElementById('score').textContent = `Оноо: ${score}`;
-}
