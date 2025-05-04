@@ -1,0 +1,25 @@
+body { 
+  font-family: Arial, sans-serif; 
+  text-align: center; 
+  background-image: url(gamebackground.jpg);
+  background-size: cover;
+}
+#word { 
+  font-size: 32px; 
+  letter-spacing: 10px; 
+  margin: 20px; 
+  color: white;
+}
+#wrong { 
+  margin: 10px; 
+  color: red; 
+  color: white;
+}
+canvas { 
+  border: 1px solid white; 
+  margin-top: 20px;
+  color: white; 
+}
+h1{
+  color: white;
+}

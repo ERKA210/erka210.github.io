@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Hangman</title>
+    <link rel="stylesheet" href="Hangman.css">
+</head>
+<body>
+  <h1>Hangman тоглоом</h1>
+  <div id="word"></div>
+  <div id="wrong">Алдаатай үсгүүд: </div>
+  <canvas id="hangmanCanvas" width="200" height="250"></canvas>
+  <canvas id="hangmanCanvas" width="200" height="250"></canvas>
+<div id="word"></div>
+<div id="wrong"></div>
+<div id="message" style="color:red; font-weight:bold;"></div>
+<button id="hintBtn">Hint</button>
+<button id="restartBtn" style="display:none;">Дахин эхлүүлэх</button>
+<div id="stats"></div>
+<div id="timer" style="font-size: 20px; color: green; margin: 10px;"></div>
+
+<audio id="correctSound" src="correct.mp3"></audio>
+<audio id="wrongSound" src="wrong.mp3"></audio>
+
+  <script src="Hangman.js"></script>
+</body>
+</html>
