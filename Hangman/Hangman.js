@@ -1,21 +1,21 @@
 const words = [
   { word: "Алгоритм", meaning: "Өгөгдлийн боловсруулалтыг шийдэхийн тулд ашигладаг тодорхой журам." },
-  { word: "Бинар", meaning: "2-ртын тооллын систем" }
-  { word: "Сүлжээ", meaning: "Олон компьютер, төхөөрөмжийг холбож ажиллуулах систем." }
-  { word: "Компилятор", meaning: "Програмыг бичсэн кодоос машинд ойлгомжтой хэл рүү хөрвүүлэгч програм." }
-  { word: "Дебаг", meaning: "Алдаа олж засварлах үйл явц." }
-  { word: "Синтакс", meaning: "Програмчлалын хэлний дүрэм, үгсийн харилцан холбоо." }
-  { word: "Программчлал", meaning: "Компьютерийг зааварлах хэл ашиглан код бичих үйл явц." }
-  { word: "Функц", meaning: "Програмчлалд тодорхой үүрэг гүйцэтгэдэг бие даасан хэсэг." }
-  { word: "Программ", meaning: "Компьютерийн үйл ажиллагааг удирдах кодын цогц." }
-  { word: "Төхөөрөмж", meaning: "Компьютерийн бүх физик эд ангиуд." }
-  { word: "Шифрлэл", meaning: "Мэдээллийг хамгаалах зорилгоор өөрчлөх үйл явц." }
-  { word: "Пиксел", meaning: "Дижитал дүрсийг бүрдүүлдэг жижиг цэг." }
-  { word: "Өгөгдлийн сан", meaning: "Мэдээллийг хадгалах, удирдах систем." }
-  { word: "Сервер", meaning: "Сүлжээнд холбогдсон бусад төхөөрөмжүүдэд үйлчилдэг компьютер." }
-  { word: "Код", meaning: "Програмыг бичихэд хэрэглэдэг зааварчилгаа." }
-  { word: "Үйлдлийн систем", meaning: "Компьютерийн үндсэн програм, хэрэглэгчийн хөтөч." }
-  { word: "Галын хана", meaning: "Мэдээллийн аюулгүй байдлыг хамгаалах технологи." }
+  { word: "Бинар", meaning: "2-ртын тооллын систем" },
+  { word: "Сүлжээ", meaning: "Олон компьютер, төхөөрөмжийг холбож ажиллуулах систем." },
+  { word: "Компилятор", meaning: "Програмыг бичсэн кодоос машинд ойлгомжтой хэл рүү хөрвүүлэгч програм." },
+  { word: "Дебаг", meaning: "Алдаа олж засварлах үйл явц." },
+  { word: "Синтакс", meaning: "Програмчлалын хэлний дүрэм, үгсийн харилцан холбоо." },
+  { word: "Программчлал", meaning: "Компьютерийг зааварлах хэл ашиглан код бичих үйл явц." },
+  { word: "Функц", meaning: "Програмчлалд тодорхой үүрэг гүйцэтгэдэг бие даасан хэсэг." },
+  { word: "Программ", meaning: "Компьютерийн үйл ажиллагааг удирдах кодын цогц." },
+  { word: "Төхөөрөмж", meaning: "Компьютерийн бүх физик эд ангиуд." },
+  { word: "Шифрлэл", meaning: "Мэдээллийг хамгаалах зорилгоор өөрчлөх үйл явц." },
+  { word: "Пиксел", meaning: "Дижитал дүрсийг бүрдүүлдэг жижиг цэг." },
+  { word: "Өгөгдлийн сан", meaning: "Мэдээллийг хадгалах, удирдах систем." },
+  { word: "Сервер", meaning: "Сүлжээнд холбогдсон бусад төхөөрөмжүүдэд үйлчилдэг компьютер." },
+  { word: "Код", meaning: "Програмыг бичихэд хэрэглэдэг зааварчилгаа." },
+  { word: "Үйлдлийн систем", meaning: "Компьютерийн үндсэн програм, хэрэглэгчийн хөтөч." },
+  { word: "Галын хана", meaning: "Мэдээллийн аюулгүй байдлыг хамгаалах технологи." },
 ];
 
 let current = words[Math.floor(Math.random() * words.length)];
@@ -100,7 +100,7 @@ function updateWrongDisplay() {
 }
 
 function updateStats() {
-  statsDiv.innerHTML = `🎯 Ялалт: ${wins} | 💀 Ялагдал: ${losses} | Тоглогч: ${nickname}`;
+  statsDiv.innerHTML = `Ялалт: ${wins} | Ялагдал: ${losses} | Тоглогч: ${nickname}`;
 }
 
 function checkGameEnd() {
@@ -122,8 +122,8 @@ function checkGameEnd() {
     localStorage.setItem("losses", losses);
     updateStats();
     saveScore(nickname, "losses");
-    messageDiv.textContent = "💀 Ялагдлаа!";
-    alert("💀 Ялагдлаа! Үг: " + word);
+    messageDiv.textContent = "Ялагдлаа!";
+    alert("Ялагдлаа! Үг: " + word);
     document.removeEventListener("keydown", handleKey);
     restartBtn.style.display = "inline-block";
   }
@@ -144,27 +144,27 @@ function drawNext() {
 function startTimer() {
   clearInterval(timer);
   timeLeft = 60;
-  timerDiv.textContent = `⏱ Үлдсэн хугацаа: ${timeLeft} сек`;
+  timerDiv.textContent = `Үлдсэн хугацаа: ${timeLeft} сек`;
   timer = setInterval(() => {
     timeLeft--;
-    timerDiv.textContent = `⏱ Үлдсэн хугацаа: ${timeLeft} сек`;
+    timerDiv.textContent = `Үлдсэн хугацаа: ${timeLeft} сек`;
     if (timeLeft <= 0) {
       clearInterval(timer);
-      messageDiv.textContent = "⏰ Хугацаа дууслаа!";
+      messageDiv.textContent = "Хугацаа дууслаа!";
       losses++;
       localStorage.setItem("losses", losses);
       updateStats();
       saveScore(nickname, "losses");
       document.removeEventListener("keydown", handleKey);
       restartBtn.style.display = "inline-block";
-      alert("💀 Ялагдлаа! Үг: " + word);
+      alert("Ялагдлаа! Үг: " + word);
     }
   }, 1000);
 }
 
 function nextWord() {
   if (usedWords.length === words.length) {
-    alert("👏 Та бүх үгсийг таалаа! Тоглоом дахин эхэлнэ.");
+    alert("Та бүх үгсийг таалаа! Тоглоом дахин эхэлнэ.");
     usedWords = [];
   }
   let newWordObj;
