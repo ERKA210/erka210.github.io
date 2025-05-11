@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mn">
 <head>
   <meta charset="UTF-8">
   <title>Hangman</title>
@@ -7,6 +7,7 @@
 </head>
 <body>
   <div class="main">
+  <div id="meaning"></div>
   <div id="word" style="font-size: 2rem; margin: 20px;"></div>
   <div id="wrong" style="color: red;"></div>
   <div id="message" style="color: orange;"></div>
@@ -19,12 +20,12 @@
   <audio id="wrongSound" src="wrong.mp3"></audio>
 
   <div id="hangman-container" style="position: relative; width: 200px; height: 250px;">
-    <img src="gallows.png" style="position: absolute; top: 50px; left: 40vw; width: 600px; height: 600px;">
+    <img src="gallows.png" style="position: absolute; top: 0; left: 40vw; width: 600px; height: 600px;">
     <div class="hole"></div>
-    <img id="head" src="head.png" style="position: absolute; top: 20.5vh; left: 51vw; width: 100px; display: none;">
-    <img id="body" src="body.png" style="position: absolute; top: 31.9vh; left: 51vw; width: 100px; display: none;">
-    <img id="leg-left" src="leg-left.png" style="position: absolute; top: 47vh; left: 52.3vw; width: 30px; display: none;">
-    <img id="leg-right" src="leg-right.png" style="position: absolute; top: 47vh; left: 54.3vw; width: 50px; display: none;">
+    <img id="head" src="head.png" style="position: absolute; top: 14.4vh; left: 51vw; width: 100px; display: one;">
+    <img id="body" src="body.png" style="position: absolute; top: 25.7vh; left: 51vw; width: 100px; display: one;">
+    <img id="leg-left" src="leg-left.png" style="position: absolute; top: 40.8vh; left: 52.3vw; width: 30px; display: one;">
+    <img id="leg-right" src="leg-right.png" style="position: absolute; top: 40.8vh; left: 54.3vw; width: 50px; display: one;">
   </div>
 
   <script src="Hangman.js"></script>
