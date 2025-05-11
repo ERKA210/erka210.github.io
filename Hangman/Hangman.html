@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hangman</title>
+  <link rel="stylesheet" href="Hangman.css">
+</head>
+<body>
+  <div id="word" style="font-size: 2rem; margin: 20px;"></div>
+  <div id="wrong" style="color: red;"></div>
+  <div id="message" style="color: orange;"></div>
+  <button id="restartBtn" style="display: none;">↺</button>
+  <div id="stats" style="margin-top: 10px;"></div>
+  <div id="timer" style="font-weight: bold;"></div>
+  <div id="nicknameModal">...</div>
+  <div id="gameContainer" class="hidden">...</div>
+
+  <audio id="correctSound" src="correct.mp3"></audio>
+  <audio id="wrongSound" src="wrong.mp3"></audio>
+
+  <div id="hangman-container" style="position: relative; width: 200px; height: 250px;">
+    <img src="gallows.png" style="position: absolute; top: 100px; left: 40vw; width: 600px; height: 600px;">
+    <div class="hole"></div>
+    <img id="head" src="head.png" style="position: absolute; top: 26.5vh; left: 51vw; width: 100px; display: none;">
+    <img id="body" src="body.png" style="position: absolute; top: 37.9vh; left: 51vw; width: 100px; display: none;">
+    <img id="leg-left" src="leg-left.png" style="position: absolute; top: 53vh; left: 52.3vw; width: 30px; display: none;">
+    <img id="leg-right" src="leg-right.png" style="position: absolute; top: 53vh; left: 54.3vw; width: 50px; display: none;">
+  </div>
+
+  <script src="Hangman.js"></script>
+</body>
+</html>

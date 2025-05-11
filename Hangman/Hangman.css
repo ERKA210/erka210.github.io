@@ -1,0 +1,13 @@
+body{
+  background-image: url(https://wallpapers.com/images/hd/old-town-western-aesthetic-87otv3nnofq978zj.jpg);
+  background-size: cover;
+}
+.hole{
+  background-color: rgb(248, 185, 129);
+  width: 100px;
+  height: 30px;
+  position: absolute;
+  top: 59vh;
+  left: 51vw;
+  box-shadow: 0 0 5px 5px;
+}
