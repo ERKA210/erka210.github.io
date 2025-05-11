@@ -1,10 +1,33 @@
-const words = ["javascript", "hangman", "canvas", "python", "developer", "padding", "margin", "html", "cascading", "width", "height", "color", "center", "left", "right", "display", "button", "body", "head"];
-let word = words[Math.floor(Math.random() * words.length)].toUpperCase();
+const words = [
+  { word: "Алгоритм", meaning: "Өгөгдлийн боловсруулалтыг шийдэхийн тулд ашигладаг тодорхой журам." },
+  { word: "Бинар", meaning: "2-ртын тооллын систем" }
+  { word: "Сүлжээ", meaning: "Олон компьютер, төхөөрөмжийг холбож ажиллуулах систем." }
+  { word: "Компилятор", meaning: "Програмыг бичсэн кодоос машинд ойлгомжтой хэл рүү хөрвүүлэгч програм." }
+  { word: "Дебаг", meaning: "Алдаа олж засварлах үйл явц." }
+  { word: "Синтакс", meaning: "Програмчлалын хэлний дүрэм, үгсийн харилцан холбоо." }
+  { word: "Программчлал", meaning: "Компьютерийг зааварлах хэл ашиглан код бичих үйл явц." }
+  { word: "Функц", meaning: "Програмчлалд тодорхой үүрэг гүйцэтгэдэг бие даасан хэсэг." }
+  { word: "Программ", meaning: "Компьютерийн үйл ажиллагааг удирдах кодын цогц." }
+  { word: "Төхөөрөмж", meaning: "Компьютерийн бүх физик эд ангиуд." }
+  { word: "Шифрлэл", meaning: "Мэдээллийг хамгаалах зорилгоор өөрчлөх үйл явц." }
+  { word: "Пиксел", meaning: "Дижитал дүрсийг бүрдүүлдэг жижиг цэг." }
+  { word: "Өгөгдлийн сан", meaning: "Мэдээллийг хадгалах, удирдах систем." }
+  { word: "Сервер", meaning: "Сүлжээнд холбогдсон бусад төхөөрөмжүүдэд үйлчилдэг компьютер." }
+  { word: "Код", meaning: "Програмыг бичихэд хэрэглэдэг зааварчилгаа." }
+  { word: "Үйлдлийн систем", meaning: "Компьютерийн үндсэн програм, хэрэглэгчийн хөтөч." }
+  { word: "Галын хана", meaning: "Мэдээллийн аюулгүй байдлыг хамгаалах технологи." }
+];
+
+let current = words[Math.floor(Math.random() * words.length)];
+let word = current.word.toUpperCase();
+
 let correctLetters = [];
 let wrongLetters = [];
 let usedWords = [];
 let step = 0;
 
+const meaningDiv = document.getElementById('meaning');
+meaningDiv.textContent = `${current.meaning}`;
 const wordDiv = document.getElementById('word');
 const wrongDiv = document.getElementById('wrong');
 const messageDiv = document.getElementById('message');
@@ -42,7 +65,7 @@ restartBtn.addEventListener("click", () => location.reload());
 function handleKey(e) {
   messageDiv.textContent = "";
   const letter = e.key.toUpperCase();
-  if (!letter.match(/^[A-Z]$/)) {
+  if (!letter.match(/^[А-ЯЁӨҮ]{1}$/i)) {
     messageDiv.textContent = "Зөвхөн нэг үсэг оруулна уу!";
     return;
   }
@@ -69,6 +92,7 @@ function updateWordDisplay() {
     .split("")
     .map(l => (correctLetters.includes(l) ? l : "_"))
     .join(" ");
+  meaningDiv.textContent = ` ${current.meaning}`;
 }
 
 function updateWrongDisplay() {
@@ -143,13 +167,14 @@ function nextWord() {
     alert("👏 Та бүх үгсийг таалаа! Тоглоом дахин эхэлнэ.");
     usedWords = [];
   }
-  let newWord;
+  let newWordObj;
   do {
-    newWord = words[Math.floor(Math.random() * words.length)].toUpperCase();
-  } while (usedWords.includes(newWord));
+    newWordObj = words[Math.floor(Math.random() * words.length)];
+  } while (usedWords.includes(newWordObj.word));
 
-  usedWords.push(newWord);
-  word = newWord;
+  usedWords.push(newWordObj.word);
+  current = newWordObj;
+  word = current.word.toUpperCase();
   correctLetters = [];
   wrongLetters = [];
   step = 0;
