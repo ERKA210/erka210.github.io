@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NUMDelivery</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <figure class="logo-box">
+      <img src="assets/img/logo.png" alt="NUMDelivery Logo" class="logo" />
+    </figure>
+
+    <nav class="main-nav">
+      <ul>
+        <li class="active"><a href="#">Нүүр</a></li>
+        <li><a href="#">Захиалга</a></li>
+        <li><a href="#">Хүргэлт</a></li>
+        <li><a href="#">Профайл</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="order-form">
+      <button class="btn btn-secondary">Хүргэгч болох</button>
+
+      <form>
+        <fieldset class="route-select">
+          <legend class="visually-hidden">Хаанаас хаашаа</legend>
+
+          <div class="location-grid">
+            <label>
+              <span class="visually-hidden">Хаанаас</span>
+              <select>
+                <option>Хаанаас</option>
+              </select>
+            </label>
+
+            <span class="arrow">→</span>
+
+            <label>
+              <span class="visually-hidden">Хаашаа</span>
+              <select>
+                <option>Хаашаа</option>
+              </select>
+            </label>
+          </div>
+        </fieldset>
+
+        <label class="input-box">
+          <input type="date" value="2025-10-08" />
+        </label>
+
+        <label class="input-box">
+          <input type="time" value="09:36" />
+        </label>
+
+        <label class="input-box">
+          <select>
+            <option>Хоол сонгох</option>
+          </select>
+        </label>
+
+        <button type="submit" class="btn btn-primary">Захиалах</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="bottom-nav">
+  </footer>
+</body>
+</html>
