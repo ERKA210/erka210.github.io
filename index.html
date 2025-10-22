@@ -90,16 +90,20 @@
       padding: 1rem;
     }
 
-    .offers-row{
-      display: flex;
-      flex-wrap: nowrap;          
-      gap: 1rem;                 
-      overflow-x: auto;          
-      overscroll-behavior-x: contain;
-      -webkit-overflow-scrolling: touch;
-      scroll-snap-type: x mandatory;
-      padding-bottom: 0.25rem;   
+    .offers-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     }
+    
+    .offers-row::-webkit-scrollbar {display: none;}
 
     .offer-card{
       flex: 0 0 calc((100% - 2rem) / 4);
