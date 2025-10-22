@@ -2,19 +2,137 @@
 <html lang="mn">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NUMDelivery</title>
   <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    main{
+      padding-top: 5rem;
+      background: var(--color-bg-light);
+      min-height: 100vh;
+    }
+
+    .filter-section{
+      margin: 2rem;
+      background: var(--color-bg);
+      border: 0.0625rem solid var(--color-border); 
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .top-row{ 
+      display:flex; 
+      justify-content:flex-end; 
+    }
+
+    .middle-row{
+      display:flex; 
+      flex-wrap:wrap; 
+      align-items:center;
+      gap: 0.8rem; 
+      justify-content:center;
+    }
+
+    .bottom-row{ 
+      display:flex; 
+      flex-wrap: wrap;
+      align-items:center; 
+      justify-content:space-between; 
+    }
+
+    .ctrl{
+      display:flex; align-items:center; gap:0.5rem;
+      height: 2.75rem;                 
+      padding: 0 0.75rem;             
+      min-width: 10rem;                 
+      border: 0.0625rem solid var(--color-border);
+      border-radius: var(--radius);
+      background:#fff;
+      flex: 1 1 10rem;
+    }
+
+    .ctrl select,.ctrl input{
+      border:none; outline:none; background:transparent;
+      width:100%; height:100%; font-size: var(--font-size-base);
+    }
+    .ctrl.wide{ 
+      flex: 1 1 100%; 
+    }
+
+    .arrow{ 
+      font-size:1.5rem; 
+      color:var(--color-muted); 
+    }
+
+    .btn{
+      height: 2.75rem;
+      padding: 0 1.2rem;
+      border-radius: var(--radius);
+      border: 0.0625rem solid var(--color-border);
+      background:#fff;
+      font-weight: var(--font-weight-bold);
+      cursor:pointer; transition: var(--transition);
+    }
+
+    .btn--accent{ background: var(--color-accent); color:#fff; border:none; }
+    .btn--accent:hover{ background:#a00a27; }
+    .order-btn{ align-self:flex-end; margin-top:0.5rem; }
+
+    .offers-container{
+      margin: 2rem;
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 1rem;
+    }
+
+    .offers-row{
+      display: flex;
+      flex-wrap: nowrap;          
+      gap: 1rem;                 
+      overflow-x: auto;          
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 0.25rem;   
+    }
+
+    .offer-card{
+      flex: 0 0 calc((100% - 2rem) / 4);
+      scroll-snap-align: start;
+      background:#fff;
+      border: 0.0625rem solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-light);
+      padding: 0.75rem;
+      transition: var(--transition);
+    }
+    .offer-card:hover{ transform: translateY(-0.25rem); box-shadow: var(--shadow-card); }
+
+    .offer-thumb{
+      width: 100%;
+      height: 6rem;
+      background: var(--color-bg-light);
+      border-radius: var(--radius);
+      display:flex; align-items:center; justify-content:center;
+      color: var(--color-muted);
+      margin-bottom: 0.625rem;
+    }
+    .offer-title{ font-weight:600; margin-bottom:0.25rem; }
+    .offer-meta{ font-size:0.9rem; color:var(--color-muted); margin-bottom:0.25rem; }
+    .offer-price{ font-weight:700; }
+  </style>
 </head>
 <body>
   <header class="site-header">
-    <figure class="logo-box">
-      <img src="assets/img/logo.png" alt="NUMDelivery Logo" class="logo" />
-    </figure>
-
-    <nav class="main-nav">
+    <img src="assets/img/logo.svg" alt="NUMDelivery Logo" class="logo" />
+    <nav>
       <ul>
-        <li class="active"><a href="#">Нүүр</a></li>
+        <li><a href="#" style="font-weight:700; color:var(--color-accent);">Нүүр</a></li>
         <li><a href="#">Захиалга</a></li>
         <li><a href="#">Хүргэлт</a></li>
         <li><a href="#">Профайл</a></li>
@@ -23,52 +141,120 @@
   </header>
 
   <main>
-    <section class="order-form">
-      <button class="btn btn-secondary">Хүргэгч болох</button>
+      <section class="filter-section">
+        <div class="top-row">
+          <button class="btn btn--accent">Хүргэгч болох</button>
+        </div>
 
-      <form>
-        <fieldset class="route-select">
-          <legend class="visually-hidden">Хаанаас хаашаа</legend>
-
-          <div class="location-grid">
-            <label>
-              <span class="visually-hidden">Хаанаас</span>
-              <select>
-                <option>Хаанаас</option>
-              </select>
-            </label>
-
-            <span class="arrow">→</span>
-
-            <label>
-              <span class="visually-hidden">Хаашаа</span>
-              <select>
-                <option>Хаашаа</option>
-              </select>
-            </label>
+        <div class="middle-row">
+          <div class="ctrl">
+            <span>📍</span>
+            <select>
+              <option>Хаанаас</option>
+            </select>
           </div>
-        </fieldset>
 
-        <label class="input-box">
-          <input type="date" value="2025-10-08" />
-        </label>
+          <span class="arrow">→</span>
 
-        <label class="input-box">
-          <input type="time" value="09:36" />
-        </label>
+          <div class="ctrl">
+            <span>📍</span>
+            <select>
+              <option>Хаашаа</option>
+            </select>
+          </div>
 
-        <label class="input-box">
-          <select>
-            <option>Хоол сонгох</option>
-          </select>
-        </label>
+          <div class="ctrl">
+            <span>📅</span>
+            <input type="date" />
+          </div>
 
-        <button type="submit" class="btn btn-primary">Захиалах</button>
-      </form>
-    </section>
+          <div class="ctrl">
+            <span>⏰</span>
+            <input type="time" />
+          </div>
+        </div>
+        <div class="bottom-row">
+          <div class="ctrl wide">
+            <span>⭐</span>
+            <select>
+              <option>Юуг</option>
+            </select>
+          </div>
+        </div>
+        <div class="top-row">
+          <button class="btn btn--accent order-btn">Захиалах</button>
+        </div>
+      </section>
+      <section class="offers-container">
+        <div class="offers-row">
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/box.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">GL burger · 7-р байр 207</div>
+            <div class="offer-meta">2.6км • 20мин</div>
+            <div class="offer-price">10,000₮</div>
+          </article>
+
+          <article class="offer-card">
+            <div class="offer-thumb"><img src="assets/img/tor.svg" alt="icon"/></div>
+            <div class="offer-title">CU · 8-р байр 209</div>
+            <div class="offer-meta">3.2км • 25мин</div>
+            <div class="offer-price">5,000₮</div>
+          </article>
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/tor.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">GL burger · 7-р байр 209</div>
+            <div class="offer-meta">2.4км • 22мин</div>
+            <div class="offer-price">10,000₮</div>
+          </article>
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/box.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">CU · 9-р байр 209</div>
+            <div class="offer-meta">3.8км • 28мин</div>
+            <div class="offer-price">5,000₮</div>
+          </article>
+        </div>
+
+
+        <div class="offers-row">
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/document.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">GL burger · 7-р байр 207</div>
+            <div class="offer-meta">2.6км • 20мин</div>
+            <div class="offer-price">10,000₮</div>
+          </article>
+
+          <article class="offer-card">
+            <div class="offer-thumb"><img src="assets/img/tor.svg" alt="icon"/></div>
+            <div class="offer-title">CU · 8-р байр 209</div>
+            <div class="offer-meta">3.2км • 25мин</div>
+            <div class="offer-price">5,000₮</div>
+          </article>
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/document.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">GL burger · 7-р байр 209</div>
+            <div class="offer-meta">2.4км • 22мин</div>
+            <div class="offer-price">10,000₮</div>
+          </article>
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/box.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">CU · 9-р байр 209</div>
+            <div class="offer-meta">3.8км • 28мин</div>
+            <div class="offer-price">5,000₮</div>
+          </article>
+        </div>
+      </section>
   </main>
-
-  <footer class="bottom-nav">
-  </footer>
 </body>
 </html>
