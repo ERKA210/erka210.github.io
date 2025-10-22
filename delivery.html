@@ -1,70 +1,278 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NUMDelivery</title>
-    <link rel="stylesheet" href="assets/delivery.css">
-    <img src="" alt="logo">
-    <h1>Num Delivery</h1>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NUMD Хүргэлт</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+  --color-primary: #c90d30;
+  --color-bg: #ffffff;
+  --color-bg-light: #f9f9f9;
+  --color-border: #e0e0e0;
+  --color-text: #333;
+  --color-muted: #777;
+
+  --font-family: "Poppins", sans-serif;
+  --font-size-base: 14px;
+  --font-weight-bold: 600;
+
+  --radius: 8px;
+  --radius-lg: 14px;
+  --shadow-light: 0 2px 5px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+}
+
+body {
+  background: var(--color-bg-light);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+}
+
+/* HEADER */
+.navbar {
+  background: var(--color-bg);
+  box-shadow: var(--shadow-light);
+  padding: 15px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+nav a {
+  margin-left: 25px;
+  text-decoration: none;
+  color: var(--color-text);
+  transition: var(--transition);
+  font-weight: 500;
+}
+
+nav a:hover,
+nav a.active {
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: 2px;
+}
+
+/* MAIN LAYOUT */
+.container {
+  display: flex;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 40px;
+  align-items: flex-start;
+}
+
+/* LEFT COLUMN (ORDERS) */
+.orders {
+  flex: 1;
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 25px 30px;
+}
+
+.orders h2 {
+  margin-bottom: 20px;
+  color: var(--color-text);
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.order-card {
+  background: var(--color-bg-light);
+  border-radius: var(--radius);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  transition: var(--transition);
+}
+
+.order-card:hover {
+  background: #fff5f6;
+  border-left: 5px solid var(--color-primary);
+}
+
+.order-info h3 {
+  font-size: 16px;
+  color: var(--color-text);
+}
+
+.order-info p {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.view-btn {
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  padding: 8px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: var(--font-weight-bold);
+  transition: var(--transition);
+}
+
+.view-btn:hover {
+  background: #a70b29;
+}
+
+/* RIGHT COLUMN (DETAILS) */
+.details {
+  flex: 1.5;
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 30px;
+}
+
+.details h2 {
+  margin-bottom: 15px;
+}
+
+.detail-header {
+  background: var(--color-bg-light);
+  padding: 15px 20px;
+  border-radius: var(--radius);
+  margin-bottom: 25px;
+  border: 1px solid var(--color-border);
+}
+
+.date {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.step {
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  background: var(--color-bg-light);
+  color: var(--color-muted);
+  border-left: 4px solid transparent;
+  transition: var(--transition);
+}
+
+.step.active {
+  background: #fff0f3;
+  color: var(--color-primary);
+  border-left: 4px solid var(--color-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.next-btn {
+  margin-top: 30px;
+  padding: 12px 40px;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: var(--transition);
+}
+
+.next-btn:hover {
+  background: #a70b29;
+}
+
+/* FOOTER */
+footer {
+  background: var(--color-bg);
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 40px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+}
+
+  </style>
 </head>
 <body>
-    <h2>Хүргэлтийн хэсэг</h2>
-    <div>
-        <img src="" alt="Size">
-        <h3>Үнэ :</h3>
-        <h3>Авсан бараа :</h3>
-    </div>
-    <article>
-        <h3>Хаанаас - Хаашаа</h3>
-        <h3>Хэнээр</h3>
-        <h3>Юу :</h3>
-    </article>
+  <header class="navbar">
+    <div class="logo">NUMD</div>
+    <img src="assets/img/logo.svg" alt="NUMDelivery Logo" class="logo" />
+    <nav>
+      <a href="index.html" >Нүүр</a>
+      <a href="#" >Захиалгууд</a>
+      <a href="delivery.html" class="active">Хүргэлт</a>
+      <a href="profile.html">Профайл</a>
+    </nav>
+  </header>
 
-    <main>
-        <section>
-            <span>
-                <input type="checkbox">
-                <h3>Хүлээн авсан</h3>
-                <p>Цаг :</p>
-            </span>
-        </section>
+  <main class="container">
+    <!-- Захиалгын жагсаалт -->
+    <section class="orders">
+      <h2>Идэвхтэй захиалгууд</h2>
+      <div class="order-list">
+        <div class="order-card">
+          <div class="order-info">
+            <h3>GL Burger - 7-р байр 207</h3>
+            <p>3 ширхэг • 10,000₮</p>
+          </div>
+          <button class="view-btn">Дэлгэрэнгүй</button>
+        </div>
 
-        <section>
-            <span>
-                <input type="checkbox">
-                <h3>Хүргэлтэнд гарсан</h3>
-                <p>Цаг :</p>
-            </span>
-        </section>
+        <div class="order-card">
+          <div class="order-info">
+            <h3>CU - 8-р байр 209</h3>
+            <p>1 ширхэг • 5,000₮</p>
+          </div>
+          <button class="view-btn">Дэлгэрэнгүй</button>
+        </div>
+      </div>
+    </section>
 
-        <section>
-            <span>
-                <input type="checkbox">
-                <h3>Хүргэгдсэн</h3>
-                <p>Цаг :</p>
-            </span>
-        </section>
-            <div>
-                <span>&#9733;</span>
-                <span>&#9733;</span>
-                <span>&#9733;</span>
-                <span>&#9733;</span>
-                <span>&#9733;</span>
-            </div>
-            <p>Таны үнэлгээ: <span>0</span></p>
-            <input type="text">
-            <button>Submit</button>
-    </main>
-    
-    <footer>
-        <nav>
-            <a href="">Нүүр</a>
-            <a href="">Нэг юм</a>
-            <a href="">Нийт зарууд</a>
-            <a href="">Миний зар</a>
-            <a href="">Хувийн мэдээлэл</a>
-        </nav>
-    </footer>
+    <!-- Захиалгын дэлгэрэнгүй -->
+    <section class="details">
+      <h2>Захиалгын дэлгэрэнгүй</h2>
+      <div class="detail-header">
+        <p><strong>GS25</strong> → <strong>МУИС 7-р байр</strong></p>
+        <p class="date">2025.10.08 • 09:36</p>
+      </div>
+
+      <div class="steps">
+        <div class="step active">Захиалга бэлтгэх</div>
+        <div class="step">Хүргэлтэнд гарсан</div>
+        <div class="step">Амжилттай хүргэсэн</div>
+      </div>
+
+      <button class="next-btn">Next</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 NUMD Delivery — Хүргэлтийн систем</p>
+  </footer>
 </body>
 </html>
