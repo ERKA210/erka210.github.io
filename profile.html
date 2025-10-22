@@ -1,5 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+  <style>
+    body.main {
+  font-family: "Poppins", sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+  margin-top: 4em;
+}
+
+h2 {
+  color: #c90d30;
+  margin-bottom: 15px;
+}
+
+.main-profile,
+body.main > img {
+  display: block;
+}
+
+body.main > img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  margin-right: 30px;
+}
+
+body.main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+}
+
+.main-profile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.rating {
+  align-self: flex-start;
+  margin-left: 180px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+section {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.rating {
+  margin-left: -10px;
+}
+  </style>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,9 +78,9 @@
     <img src="assets/img/logo.svg" alt="NUMDelivery Logo" class="logo" />
     <nav>
       <ul>
-        <li><a href="#" style="font-weight:700; color:var(--color-accent);">Нүүр</a></li>
-        <li><a href="#">Захиалга</a></li>
-        <li><a href="#">Хүргэлт</a></li>
+        <li><a href="index.html" style="font-weight:700; color:var(--color-accent);">Нүүр</a></li>
+        <li><a href="AllOrder.html">Захиалга</a></li>
+        <li><a href="delivery.html">Хүргэлт</a></li>
         <li><a href="#">Профайл</a></li>
       </ul>
     </nav>
@@ -22,14 +91,23 @@
     <div class="profile-container">
     <img src="assets/img/profile.webp" alt="profile">
     <article class="main-profile">
-        <h3>Нэр :</h3>
-        <h3>Дугаар :</h3>
-        <h3>Сиси ID :</h3>
-        <h3>Үнэлгээ :</h3>
+        <h3>Нэр :
+          <input type="text">
+        </h3>
+        <h3>Дугаар :
+          <input type="number">
+        </h3>
+        <h3>Сиси ID :
+          <input type="number">
+        </h3>
+        <div class="rating">
+          <span>★</span>
+          <span>★</span>
+          <span>★</span>
+          <span>★</span>
+          <span>★</span>
+        </div>
     </article>
-    </div>
-    <div class="rating">
-        rating
     </div>
     <section>
         <h2>Сэтгэгдэл</h2>
