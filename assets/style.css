@@ -47,7 +47,7 @@ nav ul {
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 1.25rem; 
+  gap: 1.25rem;; 
 }
 
 nav a {
@@ -61,4 +61,77 @@ nav a:hover {
   color: var(--color-hover);
 }
 
+/* ===== MOBILE: ===== */
+@media (max-width: 40rem) { /* ≤ 640px */
+
+  .site-header{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--color-bg);
+    padding: .75rem 1rem;
+    height: 3.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    z-index: 1000;
+  }
+  .logo{ height: 2.25rem; }
+
+  .site-header nav{
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: #fff;
+    padding: .5rem 1rem;
+    box-shadow: 0 -8px 20px rgba(0,0,0,.12);
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    z-index: 1000;
+  }
+  .site-header nav ul{
+    margin: 0; padding: 0;
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: .5rem;
+  }
+  .site-header nav a{
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .85rem;
+    color: var(--color-muted);
+    text-decoration: none;
+    padding: .35rem .5rem;
+  }
+  .site-header nav li.active a{ 
+    color: var(--color-accent); 
+    font-weight: 700; 
+  }
+
+  main{
+    padding-top: 4.25rem;    
+    padding-bottom: 4.5rem;  
+  }
+}
+
+@media (max-width: 40rem) {
+  .site-header nav a::before{
+    content:"";
+    width: 1.35rem; height: 1.35rem;
+    display:inline-block;
+    background: currentColor;        
+    -webkit-mask-repeat:no-repeat;
+    -webkit-mask-position:center;
+    -webkit-mask-size:contain;
+            mask-repeat:no-repeat;
+            mask-position:center;
+            mask-size:contain;
+    margin-right:.25rem;
+  }
+
+  .nav-home    a::before{ -webkit-mask-image:url(assets/img/home1.svg);     mask-image:url(assets/img/home1.svg); }
+  .nav-orders  a::before{ -webkit-mask-image:url(assets/img/cart.svg);   mask-image:url(assets/img/cart.svg); }
+  .nav-delivery a::before{ -webkit-mask-image:url(assets/img/delivery.svg);   mask-image:url(assets/img/delivery.svg); }
+  .nav-profile a::before{ -webkit-mask-image:url(assets/img/profile.svg);     mask-image:url(assets/img/profile.svg); }
+  .site-header nav li.active a{ color: var(--color-accent); font-weight:700; }
+}
 

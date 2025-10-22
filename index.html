@@ -8,6 +8,7 @@
   <style>
     main{
       padding-top: 5rem;
+      padding-bottom: 2rem;
       background: var(--color-bg-light);
       min-height: 100vh;
     }
@@ -45,7 +46,10 @@
     }
 
     .ctrl{
-      display:flex; align-items:center; gap:0.5rem;
+      position: relative;
+      display:flex; 
+      align-items:center; 
+      gap:0.5rem;
       height: 2.75rem;                 
       padding: 0 0.75rem;             
       min-width: 10rem;                 
@@ -55,19 +59,56 @@
       flex: 1 1 10rem;
     }
 
-    .ctrl select,.ctrl input{
-      border:none; outline:none; background:transparent;
-      width:100%; height:100%; font-size: var(--font-size-base);
+    .ctrl select{
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        border-radius: var(--radius);
+        font-size: var(--font-size-base);
+        cursor: pointer;
+
     }
+    .ctrl:has(select:focus) {
+        border-color: var(--color-accent);
+        box-shadow: 0 0 0 .15rem rgba(201, 13, 48, .18);
+      }
+    .ctrl select:invalid { color: var(--color-muted); }
+    .ctrl select::-ms-expand { display: none; }
+    .ctrl input{
+      border:none; 
+      outline:none; 
+      background:transparent;
+      width:100%; 
+      height:100%; 
+      font-size: var(--font-size-base);
+    }
+    select,
+      input[type="date"],
+      input[type="time"] {
+        accent-color: var(--color-accent);
+      }
+      .ctrl:has(input[type="time"]:focus){
+        border-color: var(--color-accent);
+        box-shadow: 0 0 0 .15rem rgba(201,13,48,.18);
+      }
+      .ctrl:has(input[type="date"]:focus){
+        border-color: var(--color-accent);
+        box-shadow: 0 0 0 .15rem rgba(201,13,48,.18);
+      }
     .ctrl.wide{ 
       flex: 1 1 100%; 
+    }
+
+    select {
+      accent-color: var(--color-accent); 
     }
 
     .arrow{ 
       font-size:1.5rem; 
       color:var(--color-muted); 
     }
-
     .btn{
       height: 2.75rem;
       padding: 0 1.2rem;
@@ -88,6 +129,7 @@
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-card);
       padding: 1rem;
+      margin-bottom: 2rem;
     }
 
     .offers-row{
@@ -99,6 +141,9 @@
       -webkit-overflow-scrolling: touch;
       scroll-snap-type: x mandatory;
       padding-bottom: 0.25rem;   
+    }
+    .offers-row::-webkit-scrollbar {
+      display: none;
     }
 
     .offer-card{
@@ -115,7 +160,7 @@
 
     .offer-thumb{
       width: 100%;
-      height: 6rem;
+      height: 10rem;
       background: var(--color-bg-light);
       border-radius: var(--radius);
       display:flex; align-items:center; justify-content:center;
@@ -125,6 +170,57 @@
     .offer-title{ font-weight:600; margin-bottom:0.25rem; }
     .offer-meta{ font-size:0.9rem; color:var(--color-muted); margin-bottom:0.25rem; }
     .offer-price{ font-weight:700; }
+    /* =========================RESPONSIVE ========================= */
+
+@media (max-width: 64rem) {
+  main { padding-top: 4.75rem; }
+  .filter-section { margin: 1rem; padding: 1rem 1.25rem; gap: .75rem; }
+  .middle-row { gap: .6rem; }
+  .offers-container { margin: 1rem; padding: .875rem; }
+  .offers-row { gap: .875rem; }
+  .offer-card { flex: 0 0 calc((100% - .875rem) / 2); } /* 2 карт харагдана */
+}
+
+@media (max-width: 40rem) {
+  main { padding-top: 4.25rem; padding-bottom: 4rem; }
+
+  .filter-section { margin: .75rem; padding: .875rem 1rem; gap: .75rem; }
+  .top-row { justify-content: flex-end; }
+  .middle-row,
+  .bottom-row { flex-direction: column; align-items: stretch; gap: .6rem; }
+
+  .ctrl,
+  .ctrl.wide { min-width: 100%; flex: 1 1 100%; }
+  .ctrl { height: 2.75rem; }                
+  .ctrl select,
+  .ctrl input { font-size: .95rem; height: 2.75rem;}
+  
+  .order-btn { width: 100%; align-self: stretch; margin-top: .25rem; }
+
+  .offers-container { margin: .75rem; padding: .75rem; }
+  .offers-row { gap: .75rem; }
+  .offer-card { flex: 0 0 85%; }             
+  .offer-thumb { height: 8.5rem; }
+  .offer-title { font-size: 1rem; }
+  .offer-meta { font-size: .9rem; }
+}
+
+@media (max-width: 22.5rem) {
+  .offer-card { flex-basis: 92%; }
+  .ctrl { padding: 0 .6rem; }
+}
+@media (max-width: 40rem) {
+  .middle-row img[src*="arrow.svg"] {
+    transform: rotate(90deg);
+    width: 2rem;
+    opacity: 1.2;
+  }
+
+  .middle-row span img {
+    margin: 0.25rem auto;
+    display: block;
+  }
+}
   </style>
 </head>
 <body>
@@ -132,10 +228,10 @@
     <img src="assets/img/logo.svg" alt="NUMDelivery Logo" class="logo" />
     <nav>
       <ul>
-        <li><a href="#" style="font-weight:700; color:var(--color-accent);">Нүүр</a></li>
-        <li><a href="#">Захиалга</a></li>
-        <li><a href="#">Хүргэлт</a></li>
-        <li><a href="#">Профайл</a></li>
+        <li class="active nav-home"><a href="#">Нүүр</a></li>
+        <li class="nav-orders"><a href="#">Захиалга</a></li>
+        <li class="nav-delivery"><a href="#">Хүргэлт</a></li>
+        <li class="nav-profile"><a href="#">Профайл</a></li>
       </ul>
     </nav>
   </header>
@@ -149,35 +245,58 @@
         <div class="middle-row">
           <div class="ctrl">
             <span><img src="assets/img/map_pin.svg" alt="icon"/></span>
-            <select>
-              <option>Хаанаас</option>
-            </select>
+            <select id="from">
+              <option value="" selected disabled hidden>Хаанаас</option>
+              <option>CU</option>
+              <option>GS25</option>
+              <option>GL Burger</option>
+              <option>Зөөгийн үүр зоогийн газар</option>
+              <option>Дэлгэрэх</option>
+          </select>
           </div>
 
-          <span class="arrow">→</span>
+          <span><img src="assets/img/arrow.svg" alt="icon"/></span>
 
           <div class="ctrl">
             <span><img src="assets/img/map_pin.svg" alt="icon"/></span>
-            <select>
-              <option>Хаашаа</option>
+            <select id="to"> 
+              <option value="" selected disabled hidden>Хаашаа</option>
+            <option>МУИС 1-р байр</option>
+            <option>МУИС 2-р байр</option>
+            <option>МУИС 3-р байр</option>
+            <option>МУИС 4-р байр</option>
             </select>
           </div>
 
           <div class="ctrl">
-            <span>📅</span>
+            <!-- <span>📅</span> -->
             <input type="date" />
           </div>
 
           <div class="ctrl">
-            <span>⏰</span>
+            <!-- <span>⏰</span> -->
             <input type="time" />
           </div>
         </div>
         <div class="bottom-row">
           <div class="ctrl wide">
-            <span><img src="assets/img/fork.svg" alt="icon"/></span>
+            <span><img src="assets/img/fork.svg" alt="icon" /></span>
             <select>
-              <option>Хоол сонгох</option>
+              <option value="" selected disabled hidden>Юуг</option>
+
+              <optgroup label="🥘 Идэх юм">
+                <option>Кимбаб</option>
+                <option>Бургер</option>
+                <option>Бууз</option>
+                <option>Салад</option>
+              </optgroup>
+
+              <optgroup label="🥤 Уух юм">
+                <option>Кола 0.5л</option>
+                <option>Хар цай</option>
+                <option>Кофе</option>
+                <option>Жүүс 0.33л</option>
+              </optgroup>
             </select>
           </div>
         </div>
@@ -218,10 +337,6 @@
             <div class="offer-meta">3.8км • 28мин</div>
             <div class="offer-price">5,000₮</div>
           </article>
-        </div>
-
-
-        <div class="offers-row">
           <article class="offer-card">
             <div class="offer-thumb">
               <img src="assets/img/document.svg" alt="icon"/>
