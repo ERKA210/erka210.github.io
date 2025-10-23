@@ -89,14 +89,16 @@
       input[type="time"] {
         accent-color: var(--color-accent);
       }
-      .ctrl:has(input[type="time"]:focus){
+    .ctrl:has(input[type="time"]:focus){
         border-color: var(--color-accent);
         box-shadow: 0 0 0 .15rem rgba(201,13,48,.18);
       }
-      .ctrl:has(input[type="date"]:focus){
+    .ctrl:has(input[type="date"]:focus){
         border-color: var(--color-accent);
         box-shadow: 0 0 0 .15rem rgba(201,13,48,.18);
       }
+
+
     .ctrl.wide{ 
       flex: 1 1 100%; 
     }
@@ -227,7 +229,7 @@
     <img src="assets/img/logo.svg" alt="NUMDelivery Logo" class="logo" />
     <nav>
       <ul>
-        <li class="active nav-home"><a href="#">Нүүр</a></li>
+        <li class="active nav-home" ><a href="#" style="font-weight:700; color:var(--color-accent);">Нүүр</a></li>
         <li class="nav-orders"><a href="AllOrder.html">Захиалга</a></li>
         <li class="nav-delivery"><a href="delivery.html">Хүргэлт</a></li>
         <li class="nav-profile"><a href="profile.html">Профайл</a></li>
@@ -245,12 +247,12 @@
           <div class="ctrl">
             <span><img src="assets/img/map_pin.svg" alt="icon"/></span>
             <select id="from">
-              <option value="" selected disabled hidden>Хаанаас</option>
-              <option>CU</option>
-              <option>GS25</option>
-              <option>GL Burger</option>
-              <option>Зөөгийн үүр зоогийн газар</option>
-              <option>Дэлгэрэх</option>
+              <option value="0" selected disabled hidden>Хаанаас</option>
+              <option value="1">CU</option>
+              <option value="2">GS25</option>
+              <option value="3">GL Burger</option>
+              <option value="4">Зөөгийн үүр зоогийн газар</option>
+              <option value="5">Дэлгэрэх</option>
           </select>
           </div>
 
@@ -316,7 +318,7 @@
 
           <article class="offer-card">
             <div class="offer-thumb"><img src="assets/img/tor.svg" alt="icon"/></div>
-            <div class="offer-title">CU · 8-р байр 209</div>
+            <div class="offer-title">CU - 8-р байр 209</div>
             <div class="offer-meta">3.2км • 25мин</div>
             <div class="offer-price">5,000₮</div>
           </article>
@@ -324,7 +326,7 @@
             <div class="offer-thumb">
               <img src="assets/img/tor.svg" alt="icon"/>
             </div>
-            <div class="offer-title">GL burger · 7-р байр 209</div>
+            <div class="offer-title">GL burger - 7-р байр 209</div>
             <div class="offer-meta">2.4км • 22мин</div>
             <div class="offer-price">10,000₮</div>
           </article>
@@ -332,7 +334,7 @@
             <div class="offer-thumb">
               <img src="assets/img/box.svg" alt="icon"/>
             </div>
-            <div class="offer-title">CU · 9-р байр 209</div>
+            <div class="offer-title">CU - 9-р байр 209</div>
             <div class="offer-meta">3.8км • 28мин</div>
             <div class="offer-price">5,000₮</div>
           </article>
@@ -340,14 +342,14 @@
             <div class="offer-thumb">
               <img src="assets/img/document.svg" alt="icon"/>
             </div>
-            <div class="offer-title">GL burger · 7-р байр 207</div>
+            <div class="offer-title">GL burger - 7-р байр 207</div>
             <div class="offer-meta">2.6км • 20мин</div>
             <div class="offer-price">10,000₮</div>
           </article>
 
           <article class="offer-card">
             <div class="offer-thumb"><img src="assets/img/tor.svg" alt="icon"/></div>
-            <div class="offer-title">CU · 8-р байр 209</div>
+            <div class="offer-title">CU - 8-р байр 209</div>
             <div class="offer-meta">3.2км • 25мин</div>
             <div class="offer-price">5,000₮</div>
           </article>
@@ -355,7 +357,7 @@
             <div class="offer-thumb">
               <img src="assets/img/document.svg" alt="icon"/>
             </div>
-            <div class="offer-title">GL burger · 7-р байр 209</div>
+            <div class="offer-title">GL burger - 7-р байр 209</div>
             <div class="offer-meta">2.4км • 22мин</div>
             <div class="offer-price">10,000₮</div>
           </article>
@@ -363,7 +365,7 @@
             <div class="offer-thumb">
               <img src="assets/img/box.svg" alt="icon"/>
             </div>
-            <div class="offer-title">CU · 9-р байр 209</div>
+            <div class="offer-title">CU - 9-р байр 209</div>
             <div class="offer-meta">3.8км • 28мин</div>
             <div class="offer-price">5,000₮</div>
           </article>
