@@ -4,28 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NUMD Хүргэлт</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="assets/style.css" />
   <style>
-    :root {
-  --color-primary: #c90d30;
-  --color-bg: #ffffff;
-  --color-bg-light: #f9f9f9;
-  --color-border: #e0e0e0;
-  --color-text: #333;
-  --color-muted: #777;
-
-  --font-family: "Poppins", sans-serif;
-  --font-size-base: 14px;
-  --font-weight-bold: 600;
-
-  --radius: 8px;
-  --radius-lg: 14px;
-  --shadow-light: 0 2px 5px rgba(0, 0, 0, 0.05);
-  --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.08);
-  --transition: all 0.3s ease;
-}
-
-/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -40,7 +20,6 @@ body {
   line-height: 1.6;
 }
 
-/* HEADER */
 .navbar {
   background: var(--color-bg);
   box-shadow: var(--shadow-light);
@@ -53,7 +32,7 @@ body {
 .logo {
   font-size: 28px;
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
 
 nav a {
@@ -66,12 +45,10 @@ nav a {
 
 nav a:hover,
 nav a.active {
-  color: var(--color-primary);
-  border-bottom: 2px solid var(--color-primary);
+  color: var(--color-accent);
+  border-bottom: 2px solid var(--color-accent);
   padding-bottom: 2px;
 }
-
-/* MAIN LAYOUT */
 .container {
   display: flex;
   gap: 40px;
@@ -80,8 +57,6 @@ nav a.active {
   padding: 0 40px;
   align-items: flex-start;
 }
-
-/* LEFT COLUMN (ORDERS) */
 .orders {
   flex: 1;
   background: var(--color-bg);
@@ -114,7 +89,7 @@ nav a.active {
 
 .order-card:hover {
   background: #fff5f6;
-  border-left: 5px solid var(--color-primary);
+  border-left: 5px solid var(--color-accent);
 }
 
 .order-info h3 {
@@ -128,7 +103,7 @@ nav a.active {
 }
 
 .view-btn {
-  background: var(--color-primary);
+  background: var(--color-accent);
   color: var(--color-bg);
   border: none;
   padding: 8px 20px;
@@ -139,10 +114,9 @@ nav a.active {
 }
 
 .view-btn:hover {
-  background: #a70b29;
+  background: --color-hover;
 }
 
-/* RIGHT COLUMN (DETAILS) */
 .details {
   flex: 1.5;
   background: var(--color-bg);
@@ -184,16 +158,16 @@ nav a.active {
 }
 
 .step.active {
-  background: #fff0f3;
-  color: var(--color-primary);
-  border-left: 4px solid var(--color-primary);
+  background: --color-bg;
+  color: var(--color-accent);
+  border-left: 4px solid var(--color-accent);
   font-weight: var(--font-weight-bold);
 }
 
 .next-btn {
   margin-top: 30px;
   padding: 12px 40px;
-  background: var(--color-primary);
+  background: var(--color-accent);
   color: var(--color-bg);
   border: none;
   border-radius: 25px;
@@ -203,10 +177,9 @@ nav a.active {
 }
 
 .next-btn:hover {
-  background: #a70b29;
+  background: --color-hover;
 }
 
-/* FOOTER */
 footer {
   background: var(--color-bg);
   text-align: center;
@@ -220,18 +193,18 @@ footer {
 </head>
 <body>
   <header class="navbar">
-    <div class="logo">NUMD</div>
     <img src="assets/img/logo.svg" alt="NUMDelivery Logo" class="logo" />
     <nav>
-      <a href="index.html" >Нүүр</a>
-      <a href="AllOrder.html" >Захиалгууд</a>
-      <a href="#" class="active">Хүргэлт</a>
-      <a href="profile.html">Профайл</a>
+      <ul>
+        <li class="active nav-home" ><a href="index.html" >Нүүр</a></li>
+        <li class="nav-orders"><a href="order.html">Захиалга</a></li>
+        <li class="nav-delivery"><a href="delivery.html" style="font-weight:700; color:var(--color-accent);">Хүргэлт</a></li>
+        <li class="nav-profile"><a href="profile.html">Профайл</a></li>
+      </ul>
     </nav>
   </header>
 
   <main class="container">
-    <!-- Захиалгын жагсаалт -->
     <section class="orders">
       <h2>Идэвхтэй захиалгууд</h2>
       <div class="order-list">
@@ -253,7 +226,6 @@ footer {
       </div>
     </section>
 
-    <!-- Захиалгын дэлгэрэнгүй -->
     <section class="details">
       <h2>Захиалгын дэлгэрэнгүй</h2>
       <div class="detail-header">
