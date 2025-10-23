@@ -114,7 +114,7 @@ nav a:hover {
 }
 
 @media (max-width: 40rem) {
-  .site-header nav a::before{
+  .site-header nav a::after{
     content:"";
     width: 1.35rem; height: 1.35rem;
     display:inline-block;
@@ -128,10 +128,11 @@ nav a:hover {
     margin-right:.25rem;
   }
 
-  .nav-home    a::before{ -webkit-mask-image:url(assets/img/home1.svg);     mask-image:url(assets/img/home1.svg); }
-  .nav-orders  a::before{ -webkit-mask-image:url(assets/img/cart.svg);   mask-image:url(assets/img/cart.svg); }
-  .nav-delivery a::before{ -webkit-mask-image:url(assets/img/delivery.svg);   mask-image:url(assets/img/delivery.svg); }
-  .nav-profile a::before{ -webkit-mask-image:url(assets/img/profile.svg);     mask-image:url(assets/img/profile.svg); }
+  .nav-home    a::after{ -webkit-mask-image:url(assets/img/home1.svg);     mask-image:url(assets/img/home1.svg); }
+  .nav-orders  a::after{ -webkit-mask-image:url(assets/img/cart.svg);   mask-image:url(assets/img/cart.svg); }
+  .nav-delivery a::after{ -webkit-mask-image:url(assets/img/delivery.svg);   mask-image:url(assets/img/delivery.svg); }
+  .nav-profile a::after{ -webkit-mask-image:url(assets/img/profile.svg);     mask-image:url(assets/img/profile.svg); }
   .site-header nav li.active a{ color: var(--color-accent); font-weight:700; }
+  .nav-home a::after{ -webkit-mask-image:url(assets/img/home2.svg);     mask-image:url(assets/img/home2.svg);}
 }
 

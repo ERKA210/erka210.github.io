@@ -157,7 +157,13 @@
       box-shadow: var(--shadow-light);
       padding: 0.75rem;
       transition: var(--transition);
+      display: block;
     }
+    .offers-row > offer-card {
+  flex: 0 0 calc((100% - 2rem) / 4);
+  scroll-snap-align: start;
+}
+  
     .offer-card:hover{ transform: translateY(-0.25rem); box-shadow: var(--shadow-card); }
 
     .offer-thumb{
@@ -179,7 +185,10 @@
   .middle-row { gap: .6rem; }
   .offers-container { margin: 1rem; padding: .875rem; }
   .offers-row { gap: .875rem; }
-  .offer-card { flex: 0 0 calc((100% - .875rem) / 2); }
+  .offers-row > offer-card { 
+    flex: 0 0 calc((100% - .875rem) / 2); 
+    scroll-snap-align: start; 
+  }
 }
 
 @media (max-width: 40rem) {
@@ -199,7 +208,7 @@
   .order-btn { width: 100%; align-self: stretch; margin-top: .25rem; }
 
   .offers-container { margin: .75rem; padding: .75rem; }
-  .offers-row { gap: .75rem; }
+  .offers-row { gap: .75rem; flex-direction: column;}
   .offer-card { flex: 0 0 85%; }             
   .offer-thumb { height: 8.5rem; }
   .offer-title { font-size: 1rem; }
@@ -223,14 +232,80 @@
   }
 }
   </style>
+  <script>
+      class OfferCard extends HTMLElement {
+        connectedCallback() {
+          this.innerHTML = `
+            <article class="offer-card">
+              <div class="offer-thumb">
+                <img src="${this.getAttribute('thumb') || 'assets/img/box.svg'}" alt="icon"/>
+              </div>
+              <div class="offer-title">${this.getAttribute('title') || ''}</div>
+              <div class="offer-meta">${this.getAttribute('meta') || ''}</div>
+              <div class="offer-price">${this.getAttribute('price') || ''}</div>
+            </article>
+          `;
+        }
+      }
+customElements.define('offer-card', OfferCard);
+
+          class OffersList extends HTMLElement {
+            connectedCallback() {
+              this.innerHTML = `
+                <section class="offers-container">
+                  <div class="offers-row"></div>
+                </section>
+              `;
+            }
+
+          set items(list) {
+            const row = this.querySelector('.offers-row');
+            row.innerHTML = '';
+            list.forEach(item => {
+              const card = document.createElement('offer-card');
+              card.setAttribute('thumb', item.thumb);
+              card.setAttribute('title', item.title);
+              card.setAttribute('meta', item.meta);
+              card.setAttribute('price', item.price);
+              row.appendChild(card);
+            });
+          }
+        }
+customElements.define('offers-list', OffersList);
+
+// --- data ---
+        document.addEventListener('DOMContentLoaded', ()=>{
+          const offers = [
+            { thumb: 'assets/img/box.svg', title: 'GL burger · 7-р байр 207', meta: '2.6км • 20мин', price: '10,000₮' },
+            { thumb: 'assets/img/tor.svg', title: 'CU - 8-р байр 209', meta: '3.2км • 25мин', price: '5,000₮' },
+            { thumb: 'assets/img/tor.svg', title: 'GL burger - 7-р байр 209', meta: '2.4км • 22мин', price: '10,000₮' },
+            { thumb: 'assets/img/box.svg', title: 'CU - 9-р байр 209', meta: '3.8км • 28мин', price: '5,000₮' },
+            { thumb: 'assets/img/box.svg', title: 'CU - 9-р байр 209', meta: '3.8км • 28мин', price: '5,000₮' },
+            { thumb: 'assets/img/box.svg', title: 'CU - 9-р байр 209', meta: '3.8км • 28мин', price: '5,000₮' },
+            { thumb: 'assets/img/box.svg', title: 'CU - 9-р байр 209', meta: '3.8км • 28мин', price: '5,000₮' },
+            { thumb: 'assets/img/box.svg', title: 'CU - 9-р байр 209', meta: '3.8км • 28мин', price: '5,000₮' },
+          ];
+          document.querySelector('#offers').items = offers;
+        });
+</script>
+
 </head>
 <body>
   <header class="site-header">
     <img src="assets/img/logo.svg" alt="NUMDelivery Logo" class="logo" />
     <nav>
       <ul>
-        <li class="active nav-home" ><a href="#" style="font-weight:700; color:var(--color-accent);">Нүүр</a></li>
-        <li class="nav-orders"><a href="order.html">Захиалга</a></li>
+        <li class="active nav-home" >
+          <a href="#" style="font-weight:700; color:var(--color-accent);">
+            <svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M26.0821 10.6965L14.9138 0.573094C14.9084 0.568518 14.9032 0.563588 14.8985 0.55834C14.4873 0.199078 13.9515 0 13.3956 0C12.8398 0 12.304 0.199078 11.8928 0.55834L11.8775 0.573094L0.72175 10.6965C0.494193 10.8975 0.31255 11.1417 0.188313 11.4137C0.0640769 11.6856 -4.69666e-05 11.9794 2.58096e-08 12.2764V24.6758C2.58096e-08 25.2449 0.235331 25.7907 0.654222 26.1932C1.07311 26.5956 1.64125 26.8217 2.23366 26.8217H8.93462C9.52702 26.8217 10.0952 26.5956 10.5141 26.1932C10.9329 25.7907 11.1683 25.2449 11.1683 24.6758V18.238H15.6356V24.6758C15.6356 25.2449 15.8709 25.7907 16.2898 26.1932C16.7087 26.5956 17.2768 26.8217 17.8692 26.8217H24.5702C25.1626 26.8217 25.7307 26.5956 26.1496 26.1932C26.5685 25.7907 26.8039 25.2449 26.8039 24.6758V12.2764C26.8039 11.9794 26.7398 11.6856 26.6156 11.4137C26.4913 11.1417 26.3097 10.8975 26.0821 10.6965ZM24.5702 24.6758H17.8692V18.238C17.8692 17.6689 17.6339 17.1231 17.215 16.7206C16.7961 16.3182 16.228 16.0921 15.6356 16.0921H11.1683C10.5759 16.0921 10.0077 16.3182 9.58884 16.7206C9.16995 17.1231 8.93462 17.6689 8.93462 18.238V24.6758H2.23366V12.2764L2.24901 12.263L13.4019 2.14364L24.5562 12.2603L24.5716 12.2737L24.5702 24.6758Z" fill="#A6A6A6"/>
+            </svg>
+            <span>Нүүр</span>
+
+          </a></li>
+        <li class="nav-orders">
+          
+          <a href="order.html">Захиалга</a></li>
         <li class="nav-delivery"><a href="delivery.html">Хүргэлт</a></li>
         <li class="nav-profile"><a href="profile.html">Профайл</a></li>
       </ul>
@@ -271,12 +346,12 @@
 
           <div class="ctrl">
             <!-- <span>📅</span> -->
-            <input type="date" />
+            <input type="date" value="2025-10-23"/>
           </div>
 
           <div class="ctrl">
             <!-- <span>⏰</span> -->
-            <input type="time" />
+            <input type="time" value="11:22" />
           </div>
         </div>
         <div class="bottom-row">
@@ -305,72 +380,7 @@
           <button class="btn btn--accent order-btn">Захиалах</button>
         </div>
       </section>
-      <section class="offers-container">
-        <div class="offers-row">
-          <article class="offer-card">
-            <div class="offer-thumb">
-              <img src="assets/img/box.svg" alt="icon"/>
-            </div>
-            <div class="offer-title">GL burger · 7-р байр 207</div>
-            <div class="offer-meta">2.6км • 20мин</div>
-            <div class="offer-price">10,000₮</div>
-          </article>
-
-          <article class="offer-card">
-            <div class="offer-thumb"><img src="assets/img/tor.svg" alt="icon"/></div>
-            <div class="offer-title">CU - 8-р байр 209</div>
-            <div class="offer-meta">3.2км • 25мин</div>
-            <div class="offer-price">5,000₮</div>
-          </article>
-          <article class="offer-card">
-            <div class="offer-thumb">
-              <img src="assets/img/tor.svg" alt="icon"/>
-            </div>
-            <div class="offer-title">GL burger - 7-р байр 209</div>
-            <div class="offer-meta">2.4км • 22мин</div>
-            <div class="offer-price">10,000₮</div>
-          </article>
-          <article class="offer-card">
-            <div class="offer-thumb">
-              <img src="assets/img/box.svg" alt="icon"/>
-            </div>
-            <div class="offer-title">CU - 9-р байр 209</div>
-            <div class="offer-meta">3.8км • 28мин</div>
-            <div class="offer-price">5,000₮</div>
-          </article>
-          <article class="offer-card">
-            <div class="offer-thumb">
-              <img src="assets/img/document.svg" alt="icon"/>
-            </div>
-            <div class="offer-title">GL burger - 7-р байр 207</div>
-            <div class="offer-meta">2.6км • 20мин</div>
-            <div class="offer-price">10,000₮</div>
-          </article>
-
-          <article class="offer-card">
-            <div class="offer-thumb"><img src="assets/img/tor.svg" alt="icon"/></div>
-            <div class="offer-title">CU - 8-р байр 209</div>
-            <div class="offer-meta">3.2км • 25мин</div>
-            <div class="offer-price">5,000₮</div>
-          </article>
-          <article class="offer-card">
-            <div class="offer-thumb">
-              <img src="assets/img/document.svg" alt="icon"/>
-            </div>
-            <div class="offer-title">GL burger - 7-р байр 209</div>
-            <div class="offer-meta">2.4км • 22мин</div>
-            <div class="offer-price">10,000₮</div>
-          </article>
-          <article class="offer-card">
-            <div class="offer-thumb">
-              <img src="assets/img/box.svg" alt="icon"/>
-            </div>
-            <div class="offer-title">CU - 9-р байр 209</div>
-            <div class="offer-meta">3.8км • 28мин</div>
-            <div class="offer-price">5,000₮</div>
-          </article>
-        </div>
-      </section>
+      <offers-list id="offers"></offers-list>
   </main>
 </body>
 </html>
