@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+    <style>
+        
+    .offers-container{
+      margin: 2rem;
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 1rem;
+    }
+
+    .offers-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    }
+
+    .offers-row::-webkit-scrollbar {display: none;}
+
+    .offer-card{
+      flex: 0 0 calc((100% - 2rem) / 4);
+      scroll-snap-align: start;
+      background:#fff;
+      border: 0.0625rem solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-light);
+      padding: 0.75rem;
+      transition: var(--transition);
+    }
+    .offer-card:hover{ transform: translateY(-0.25rem); box-shadow: var(--shadow-card); }
+
+    .offer-thumb{
+      width: 100%;
+      height: 6rem;
+      background: var(--color-bg-light);
+      border-radius: var(--radius);
+      display:flex; align-items:center; justify-content:center;
+      color: var(--color-muted);
+      margin-bottom: 0.625rem;
+    }
+    .offer-title{ font-weight:600; margin-bottom:0.25rem; }
+    .offer-meta{ font-size:0.9rem; color:var(--color-muted); margin-bottom:0.25rem; }
+    .offer-price{ font-weight:700; }
+    main{overflow: auto;}
+    main::-webkit-scrollbar {display: none;}
+    main { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUMDelivery</title>
+    <link rel="stylesheet" href="assets/style.css">
+  <header class="site-header">
+    <img src="assets/img/logo.svg" alt="NUMDelivery Logo" class="logo" />
+    <nav>
+      <ul>
+        <li><a href="index.html">Нүүр</a></li>
+        <li><a href="#" style="font-weight:700; color:var(--color-accent);">Захиалга</a></li>
+        <li><a href="delivery.html">Хүргэлт</a></li>
+        <li><a href="profile.html">Профайл</a></li>
+      </ul>
+    </nav>
+  </header>
+<body>
+    <h2>Нийт зарууд</h2>
+    <main>
+    <section class="offers-container">
+        <div class="offers-row">
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/box.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">GL burger · 7-р байр 207</div>
+            <div class="offer-meta">2.6км • 20мин</div>
+            <div class="offer-price">10,000₮</div>
+          </article>
+
+          <article class="offer-card">
+            <div class="offer-thumb"><img src="assets/img/tor.svg" alt="icon"/></div>
+            <div class="offer-title">CU · 8-р байр 209</div>
+            <div class="offer-meta">3.2км • 25мин</div>
+            <div class="offer-price">5,000₮</div>
+          </article>
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/tor.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">GL burger · 7-р байр 209</div>
+            <div class="offer-meta">2.4км • 22мин</div>
+            <div class="offer-price">10,000₮</div>
+          </article>
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/box.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">CU · 9-р байр 209</div>
+            <div class="offer-meta">3.8км • 28мин</div>
+            <div class="offer-price">5,000₮</div>
+          </article>
+        </div>
+
+
+        <div class="offers-row">
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/document.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">GL burger · 7-р байр 207</div>
+            <div class="offer-meta">2.6км • 20мин</div>
+            <div class="offer-price">10,000₮</div>
+          </article>
+
+          <article class="offer-card">
+            <div class="offer-thumb"><img src="assets/img/tor.svg" alt="icon"/></div>
+            <div class="offer-title">CU · 8-р байр 209</div>
+            <div class="offer-meta">3.2км • 25мин</div>
+            <div class="offer-price">5,000₮</div>
+          </article>
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/document.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">GL burger · 7-р байр 209</div>
+            <div class="offer-meta">2.4км • 22мин</div>
+            <div class="offer-price">10,000₮</div>
+          </article>
+          <article class="offer-card">
+            <div class="offer-thumb">
+              <img src="assets/img/box.svg" alt="icon"/>
+            </div>
+            <div class="offer-title">CU · 9-р байр 209</div>
+            <div class="offer-meta">3.8км • 28мин</div>
+            <div class="offer-price">5,000₮</div>
+          </article>
+        </div>
+      </section>
+    </main>
+    <footer>
+    </footer>
+</body>
+</html>
