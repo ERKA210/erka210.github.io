@@ -6,6 +6,7 @@
   <title>NUMDelivery</title>
   <link rel="stylesheet" href="assets/style.css">
   <style>
+
     body.main {
       font-family: "Poppins", sans-serif;
       background-color: #f9f9f9;
@@ -30,17 +31,17 @@
       border: 1px solid gray;
       border-radius: 10px;
       padding: 15px;
-      width: 50rem;
-      height: 40rem;
+      width: 20rem;
+      height: 30rem;
       background-color: #fff;
       justify-items: center;
       margin-left: 5rem;
-      margin-top: 5rem;
+      margin-top: 2rem;
     }
 
     .profile-container img {
-      width: 250px;
-      height: 250px;
+      width: 150px;
+      height: 150px;
       object-fit: cover;
       border-radius: 50%;
       border: 2px solid #ccc;
@@ -51,11 +52,11 @@
     .main-profile h3 {
       font-weight: 500;
       margin-bottom: 10px;
-      margin-top: 3rem;
+      margin-top: 2rem;
     }
 
     .main-profile h3:first-child{
-      margin-top: 5rem;
+      margin-top: 3rem;
     }
 
     .main-profile input {
@@ -81,7 +82,7 @@
       gap: 20px;
       margin-left: 5rem;
       width: max-content;
-      margin-top: 5rem  ;
+      margin-top: 2rem  ;
       margin-right: 5rem  ;
     }
 
@@ -91,7 +92,7 @@
       border: 1px solid #ddd;
       border-radius: 10px;
       padding: 15px;
-      height: 310px;
+      height: 230px;
     }
 
     header.site-header {
@@ -120,28 +121,34 @@
       color: #333;
     }
 
-    footer {
-      margin-top: 40px;
-      padding: 20px;
-      background-color: #fff;
-      border-top: 1px solid #ddd;
-    }
+footer {
+  padding: 20px;
+  background-color: #fff;
+}
 
-    footer div{
-      border: 1px solid gray;
-      border-radius: var(--radius);
-      width: max-content;
-    }
-
-    footer section {
+footer section {
   display: flex;
-  flex-direction: row; 
+  flex-direction: row;
   gap: 20px;
-  flex-wrap: wrap; 
+  flex-wrap: nowrap; 
   padding: 20px;
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 10px;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  width: 100%;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+
+footer div{
+border: 1px solid gray;
+border-radius: var(--radius);
+width: max-content;
 }
 
 footer section div {
@@ -152,9 +159,11 @@ footer section div {
   border: 1px solid gray;
   border-radius: 10px;
   padding: 10px 15px;
-  width: 250px; 
+  width: 350px;
+  height: 100px; 
   background-color: #fafafa;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: inline-block;
 }
 
 footer section div h4 {
@@ -163,6 +172,18 @@ footer section div h4 {
 
 footer section div p {
   margin: 3px 0;
+}
+
+footer section::-webkit-scrollbar {
+  height: 10px;
+  display: none;
+}
+footer section::-webkit-scrollbar-thumb {
+  background-color: #c90d30;
+  border-radius: 10px;
+}
+footer section::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
 }
 
 
@@ -221,18 +242,16 @@ footer section div p {
     <img src="assets/img/logo.svg" alt="NUMDelivery Logo" class="logo" />
     <nav>
       <ul>
-        <li><a href="index.html" style="font-weight:700; color:var(--color-accent);">Нүүр</a></li>
+        <li><a href="index.html">Нүүр</a></li>
         <li><a href="AllOrder.html">Захиалга</a></li>
         <li><a href="delivery.html">Хүргэлт</a></li>
-        <li><a href="#">Профайл</a></li>
+        <li><a href="#" style="font-weight:700; color:var(--color-accent);">Профайл</a></li>
       </ul>
     </nav>
   </header>
-
-  <h2>Хувийн мэдээлэл</h2>
   <div class="main-content">
     <div class="profile-container">
-      <img src="assets/img/User 07b.svg" alt="profile">
+      <img src="assets/img/user-head.svg" alt="profile">
       <article class="main-profile">
         <h3>Нэр: <input type="text"></h3>
         <h3>Дугаар:
@@ -274,11 +293,11 @@ footer section div p {
       <div><h4>Бат</h4><p>Үнэхээр найдвартай хүргэгч байна.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span>★</span></p></div>
       <div><h4>Дулам</h4><p>Цагаасаа хоцорч ирсэн.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span>★</span><span>★</span><span>★</span></p></div>
       <div><h4>Дорж</h4><p>Соёлтой залуу байна. Үнэхээр баярлалаа.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span></p></div>
-            <div><h4>Бат</h4><p>Үнэхээр найдвартай хүргэгч байна.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span>★</span></p></div>
+      <div><h4>Бат</h4><p>Үнэхээр найдвартай хүргэгч байна.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span>★</span></p></div>
+      <div><h4>Бат</h4><p>Үнэхээр найдвартай хүргэгч байна.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span>★</span></p></div>
       <div><h4>Дулам</h4><p>Цагаасаа хоцорч ирсэн.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span>★</span><span>★</span><span>★</span></p></div>
       <div><h4>Дорж</h4><p>Соёлтой залуу байна. Үнэхээр баярлалаа.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span></p></div>
-            <div><h4>Бат</h4><p>Үнэхээр найдвартай хүргэгч байна.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span>★</span></p></div>
-      <div><h4>Дулам</h4><p>Цагаасаа хоцорч ирсэн.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span>★</span><span>★</span><span>★</span></p></div>
+      <div><h4>Бат</h4><p>Үнэхээр найдвартай хүргэгч байна.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span>★</span></p></div>
     </section>
   </footer>
 </body>
