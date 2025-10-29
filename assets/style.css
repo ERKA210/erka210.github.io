@@ -16,6 +16,8 @@
   --shadow-light: 0 2px 5px rgba(0, 0, 0, 0.05);
   --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.08);
   --transition: all 0.3s ease;
+
+   --top-h: 4rem;
 }
 
 * {
@@ -23,129 +25,120 @@
   font-family: var(--font-family);
 }
 
-
-.site-header {
+.site-top{
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: var(--color-bg);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2.5rem; 
-  box-shadow: 0 0.125rem 0.3125rem rgba(0, 0, 0, 0.1); /* 2px 5px */
+  top: 0; left: 0; right: 0;
+  height: var(--top-h);
+  background: var(--color-bg, #fff);
+  border-bottom: 0.0625rem solid var(--color-border, #e5e7eb);
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  padding: 0 1.25rem; 
+  gap: 1rem;         
 }
 
-.site-header nav svg{
+.site-top .brand { display:flex; align-items:center; }
+.site-top .brand-logo { height: 2rem; display:block; }
+
+.top-menu {
+  margin-left: auto;        
+  align-items: center;
+  gap: 2.5rem;
+}
+.top-menu a {
+  text-decoration: none;
+  color: var(--color-text, #333);
+  font-weight: 500;
+  padding: 0.375rem 0.8rem; 
+  line-height: 1;
+  border-bottom: 0.125rem solid transparent;
+  transition: all 0.2s ease;
+}
+.top-menu a:hover {
+  color: var(--color-accent);
+}
+.top-menu a.is-active {
+  color: var(--color-accent);
+}
+
+.top-menu svg{
   display: none;
 }
-
-.site-header nav span{
-  font-size: var(--font-size-base);
+main {
+  padding-top: calc(var(--top-h) + 0.75rem);
 }
 
-.logo {
-  height: 3rem;
-}
-
-nav ul {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 1.25rem;; 
-}
-
-nav a {
-  text-decoration: none;
-  color: var(--color-muted);
-  font-weight: 500;
-  font-size: 1rem;
-}
-
-nav a:hover {
-  color: var(--color-hover);
-}
-
-@media (max-width: 40rem) {
-  .site-header {
+@media (max-width: 59.9375rem){
+  .top-menu{
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: auto;
-    background: var(--color-bg);
-    border-top: 0.0625rem solid var(--color-border);
-    z-index: 100;
-  }
-
-  .site-header nav{
-    padding: 0;
-  }
-  .site-header nav ul{
-    .site-header nav ul {
+    left: 0; right: 0; bottom: 0;
     display: flex;
     justify-content: space-around;
-    align-items: center;
-    padding: 0.5rem 0;
-    margin: 0;
-    gap: 0.25rem;
+    align-items: flex-end;
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+    background: var(--color-bg, #fff);
+    border-top: 0.0625rem solid var(--color-border, #e0e0e0);
+    z-index: 900;
   }
-  .site-header nav li {
-    list-style: none;
-  }
-  .site-header nav svg {
-    display: block;
-    width: 1.6rem;
-    height: 1.6rem;
-    padding: 0.35rem;
-    border-radius: 50%;
-    background: transparent;
-    transition: transform .18s ease, background-color .18s ease, box-shadow .18s ease;
-    box-sizing: content-box;
-  }
-  .site-header nav svg path {
-    fill: var(--color-muted) !important;
-    transition: fill .18s ease;
-  }
-  .site-header nav li.active a,
-  .site-header nav li.active a span,
-  .site-header nav li.active a svg {
-    color: var(--color-accent);
-  }
-   .site-header nav li.active svg {
-    background: var(--color-accent);
-    box-shadow: 0 8px 20px rgba(201,13,48,0.18);
-    transform: translateY(-6px) scale(1.05);
-  }
-  .site-header nav li.active svg path {
-    fill: #fff !important;
-  }
- .site-header nav span {
-    font-size: 0.75rem;
-  }
-  .site-header nav a {
+
+  .top-menu a{
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    color: var(--color-muted);
     text-decoration: none;
-    transition: color .18s ease;
+    color: var(--color-muted, #777);
+    transition: all .25s ease;
   }
 
-  .site-header nav li.active a{ 
-    color: var(--color-accent); 
-    font-weight: 700; 
+  .top-menu svg{
+    display: block;
+    width: 1.6rem; height: 1.6rem;
+    z-index: 2;
+    transition: all .25s ease;
+  }
+  .top-menu svg path{ fill: var(--color-muted, #777); }
+
+  .top-menu a span{
+    display: none;
+    font-size: .75rem;
+    margin-top: .25rem;
   }
 
-  main{
-    padding-top: 4.25rem;    
-    padding-bottom: 4.5rem;  
+  .top-menu a.is-active{
+    color: var(--color-accent);
+    transform: translateY(-1.2rem);
   }
+
+  /* арын дугуй (цагаан суурь) */
+  .top-menu a.is-active::before{
+    content: "";
+    position: absolute;
+    bottom: -0.4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5rem; height: 5rem;
+    background: #fff;
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  .top-menu a.is-active svg{
+    padding: .45rem;
+    border-radius: 50%;
+    background: var(--color-accent, #c90d30);
+    box-shadow: 0 .6rem 1.5rem rgba(201,13,48,.25);
+    transform: translateY(-.2rem);
+  }
+  .top-menu a.is-active svg path{ fill: #fff; }
+
+  .top-menu a.is-active span{
+    display: block;
+    color: var(--color-accent, #c90d30);
+    font-weight: 700;
+    z-index: 2;
+  }
+
+  main{ padding-bottom: 5.5rem; }
 }
-
-
