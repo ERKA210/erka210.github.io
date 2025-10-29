@@ -111,7 +111,6 @@ main {
     transform: translateY(-1.2rem);
   }
 
-  /* арын дугуй (цагаан суурь) */
   .top-menu a.is-active::before{
     content: "";
     position: absolute;
