@@ -334,7 +334,6 @@ body {
 <script>
 (function(){
   var path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-  // Дээд (desktop/mobile) top-menu
   document.querySelectorAll('.top-menu a').forEach(function(a){
     var href = (a.getAttribute('href')||'#').toLowerCase();
     var active = (path === href) || (href === '#' && path === 'index.html');
