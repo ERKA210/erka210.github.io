@@ -7,12 +7,23 @@
   <link rel="stylesheet" href="assets/style.css">
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
+      font-family: var(--font-family);
       margin: 0;
       background: var(--color-bg-light);
       color: var(--color-text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+      color:#111827;
     }
-
+    .pay{     
+      width:360px;
+      background:var(--color-bg);
+      border-radius:18px;
+      box-shadow:var(--shadow-light);
+      padding:22px;
+    }
     .container {
       display: flex;
       gap: 40px;
@@ -130,7 +141,7 @@
   </style>
 </head>
 <body>
-
+  <div class="pay">
   <main class="container">
     <section class="orders">
       <h2>Миний захиалга</h2>
@@ -167,6 +178,6 @@
       </a>
     </div>
   </article>
-
+  </div>
 </body>
 </html>
