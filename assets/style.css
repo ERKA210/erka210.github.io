@@ -69,7 +69,7 @@ main {
   padding-top: calc(var(--top-h) + 0.75rem);
 }
 
-@media (max-width: 59.9375rem){
+@media (max-width: 40rem){
   .top-menu{
     position: fixed;
     left: 0; right: 0; bottom: 0;
