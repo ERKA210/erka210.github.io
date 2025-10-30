@@ -73,6 +73,7 @@
       border-radius: 10px;
       width: fit-content;
       margin-top: 3rem;
+      color: orange;
     }
     
     .right-side {
@@ -93,8 +94,6 @@
       border-radius: 10px;
       padding: 15px;
       height: 230px;
-      overflow-y: auto;
-      scrollbar-width: none ;
     }
 
     header.site-header {
@@ -238,8 +237,30 @@ footer section::-webkit-scrollbar-track {
 .jobs button {
   background-color: var(--color-accent);
   color: #ffffff;
+  border: none;
+  padding: 3px;
+  border-radius: var(--radius);
 }
 
+.orders,
+.jobs{
+  overflow-y: scroll;
+  height: 150px;
+  scrollbar-width: none;
+}
+
+@media (max-width: 64rem) {
+  body{
+    flex-direction: column;
+  }
+  .main-content{
+    flex-direction: column;
+  }
+  footer section{
+    flex-direction: column;
+  }
+  .orders, .jobs{flex-direction: column;}
+}
   </style>
 </head>
 <body class="main">
@@ -280,7 +301,7 @@ footer section::-webkit-scrollbar-track {
     <div class="profile-container">
       <img src="assets/img/user-head.svg" alt="profile">
       <article class="main-profile">
-        <h3>Нэр: <input type="text"></h3>
+        <h3>Нэр: <input type="text" placeholder="Эрка"></h3>
         <h3>Дугаар:
           <input type="tel" name="phone" placeholder="+976XXXXXXXX" pattern="(\+976)?[0-9]{8}" inputmode="tel" />
         </h3>
@@ -328,15 +349,34 @@ footer section::-webkit-scrollbar-track {
     </section>
   </footer>
 </body>
-<script>
-(function(){
-  var path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-  // Дээд (desktop/mobile) top-menu
-  document.querySelectorAll('.top-menu a').forEach(function(a){
-    var href = (a.getAttribute('href')||'#').toLowerCase();
-    var active = (path === href) || (href === '#' && path === 'index.html');
-    a.classList.toggle('is-active', active);
+  <script>
+  (function(){
+    var path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    document.querySelectorAll('.top-menu a').forEach(function(a){
+      var href = (a.getAttribute('href')||'#').toLowerCase();
+      var active = (path === href) || (href === '#' && path === 'index.html');
+      a.classList.toggle('is-active', active);
+    });
+  })();
+
+  const profile = {
+    name: "Бат",
+    phone: "+97699656061",
+    id: "23B1NUM0102"
+  };
+  document.querySelector('input[placeholder="Нэр"]').value = profile.name;
+  document.querySelector('input[name="phone"]').value = profile.phone;
+  document.querySelector('input[name="userID"]').value = profile.id;
+
+  document.querySelectorAll('.detail-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const detail = btn.closest('p').nextElementSibling;
+      if (detail && (detail.classList.contains('order-details') || detail.classList.contains('job-details'))) {
+        detail.classList.toggle('hidden');
+        btn.textContent = detail.classList.contains('hidden') ? 'Дэлгэрэнгүй' : 'Нуух';
+      }
+    });
   });
-})();
-</script>
+  </script>
+</body>
 </html>
