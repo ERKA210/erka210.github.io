@@ -323,6 +323,7 @@ body {
 </header>
   <main class="container">
     <section class="orders">
+      <offers-list id="offers"></offers-list>
       <h2>Миний захиалга</h2>
         <div class="order-list">
           <div class="order-card">
@@ -365,13 +366,71 @@ body {
           <img src="assets/img/unf.svg" alt="process">
           <div class="step">Амжилттай хүлээн авсан</div>
         </span>
-        <div class="rating">
-            <span>★</span>
-            <span>★</span>
-            <span>★</span>
-            <span>★</span>
-            <span>★</span>
-        </div>
+        <rating-stars max="5" color="orange" size="28px"></rating-stars>
+        <script type="module">
+class RatingStars extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.value = 0;
+  }
+
+  connectedCallback() {
+    const max = parseInt(this.getAttribute('max')) || 5;
+    const color = this.getAttribute('color') || 'gold';
+    const size = this.getAttribute('size') || '26px';
+
+    const style = document.createElement('style');
+    style.textContent = `
+      .rating {
+        display: flex;
+        gap: 5px;
+        cursor: pointer;
+      }
+      .star {
+        font-size: ${size};
+        color: #ccc;
+        transition: color 0.25s;
+      }
+      .star.filled {
+        color: ${color};
+      }
+    `;
+
+    const container = document.createElement('div');
+    container.classList.add('rating');
+
+    for (let i = 1; i <= max; i++) {
+      const span = document.createElement('span');
+      span.textContent = '★';
+      span.classList.add('star');
+
+      span.addEventListener('mouseover', () => this.updateStars(i));
+      span.addEventListener('mouseout', () => this.updateStars(this.value));
+
+      span.addEventListener('click', () => {
+        this.value = i;
+        this.setAttribute('value', i);
+        this.dispatchEvent(new CustomEvent('rate', { detail: i }));
+      });
+
+      container.appendChild(span);
+    }
+
+    this.shadowRoot.append(style, container);
+  }
+
+  updateStars(count) {
+    const stars = this.shadowRoot.querySelectorAll('.star');
+    stars.forEach((s, idx) => {
+      s.classList.toggle('filled', idx < count);
+    });
+  }
+}
+
+customElements.define('rating-stars', RatingStars);
+</script>
+
         <input type="text" placeholder="Сэтгэгдэл үлдээнэ үү...">
         <button class="submit">Илгээх</button>
       </div>
@@ -387,5 +446,49 @@ body {
     a.classList.toggle('is-active', active);
   });
 })();
+  class OfferCard extends HTMLElement {
+    connectedCallback() {
+      this.innerHTML = `
+        <article class="offer-card">
+          <div class="offer-thumb">
+            <img src="${this.getAttribute('thumb')}" alt="icon"/>
+          </div>
+          <div class="offer-info">
+            <div class="offer-title">${this.getAttribute('title')}</div>
+            <div class="offer-meta">${this.getAttribute('meta')}</div>
+            <div class="offer-price">${this.getAttribute('price')}</div>
+          </div>
+        </article>
+      `;
+    }
+  }
+  customElements.define('offer-card', OfferCard);
+
+  class OffersList extends HTMLElement {
+    connectedCallback() {
+      this.innerHTML = `<section class="offers-container"><div class="offers-row"></div></section>`;
+    }
+    set items(list) {
+      const row = this.querySelector('.offers-row');
+      row.innerHTML = '';
+      list.forEach(item => {
+        row.innerHTML += `<offer-card thumb="${item.thumb}" title="${item.title}" meta="${item.meta}" price="${item.price}"></offer-card>`;
+      });
+    }
+  }
+  customElements.define('offers-list', OffersList);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const data = localStorage.getItem('offers');
+    if (data) {
+      const offers = JSON.parse(data);
+      document.querySelector('#offers').items = offers;
+    }
+  });
+
+    document.querySelector('rating-stars')
+    .addEventListener('rate', e => {
+      console.log('Үнэлгээ:', e.detail);
+    });
 </script>
 </html>

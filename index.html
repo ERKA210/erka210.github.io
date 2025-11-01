@@ -311,6 +311,7 @@ customElements.define('offers-list', OffersList);
             { thumb: 'assets/img/box.svg', title: 'CU - 9-р байр 209', meta: '3.8км • 28мин', price: '5,000₮' },
             { thumb: 'assets/img/box.svg', title: 'CU - 9-р байр 209', meta: '3.8км • 28мин', price: '5,000₮' },
           ];
+          localStorage.setItem('offers', JSON.stringify(offers));
           document.querySelector('#offers').items = offers;
         });
 </script>
