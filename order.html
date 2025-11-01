@@ -10,7 +10,7 @@ body {
   background: var(--color-bg-light);
   color: var(--color-text);
   line-height: 1.6;
-  margin-top: 1rem;
+  margin-top: 3rem;
 }
 
 .navbar {
@@ -48,6 +48,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+.order-list button {
+  padding: 10px;
+  border-radius: 1rem;
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  border: var(--border-show);
+  cursor: pointer;
 }
 
 .order-card {
@@ -253,7 +262,7 @@ body {
   </style>
 </head>
 <body>
- <header class="site-top">
+<header class="site-top">
   <div class="brand">
     <img src="assets/img/logo.svg" alt="Logo" class="brand-logo" />
   </div>
@@ -286,7 +295,6 @@ body {
     </a>
   </nav>
 </header>
-
   <main class="container">
     <section class="orders">
       <h2>Миний захиалга</h2>
@@ -302,6 +310,7 @@ body {
             </div>
                 <img src="assets/img/tor.svg" alt="hemjee">
           </div>
+          <button>Хүргэгчийн мэдээлэл харах</button>
         </div>
       </section>
 
@@ -339,4 +348,5 @@ body {
   });
 })();
 </script>
+
 </html>

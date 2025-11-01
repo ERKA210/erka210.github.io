@@ -16,7 +16,7 @@
   --shadow-light: 0 2px 5px rgba(0, 0, 0, 0.05);
   --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.08);
   --transition: all 0.3s ease;
-
+  --border-show: none
    --top-h: 4rem;
 }
 
