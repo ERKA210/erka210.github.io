@@ -129,6 +129,7 @@ footer {
   background-color: #fff;
   margin-top: 2em;
   border-radius: var(--radius);
+  border: 1px solid grey;
 }
 
 footer section {
@@ -258,8 +259,19 @@ footer section::-webkit-scrollbar-track {
   }
   footer section{
     flex-direction: column;
+    width: max-content;
+    overflow: hidden;
+  }
+  footer{
+    width: max-content;
+    margin-left: -1.3rem;
   }
   .orders, .jobs{flex-direction: column;}
+
+  .main-content{margin-left: 0rem;}
+
+  .right-side{margin-left: 0rem;}
+  .profile-container{margin-left: 2.5rem;}
 }
   </style>
 </head>
