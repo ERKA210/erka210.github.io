@@ -29,13 +29,14 @@ body {
   width: 90%;
   margin-left: 5%;
   align-items: flex-start;
+  justify-content: center;
 }
 
 .orders {
-  flex: 1;
+  flex: 0.8;
   background: var(--color-bg);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 5px 10px 15px rgba(0, 0, 0, 0.08);;
   padding: 25px 30px;
 }
 
@@ -60,14 +61,19 @@ body {
 }
 
 .order-card {
-  background: var(--color-bg-light);
+  background: white;
   border-radius: var(--radius);
   padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-accent);
   transition: var(--transition);
+}
+
+.order-card img {
+  width: 10rem;
+  height: 10rem;
 }
 
 .order-card:hover {
@@ -86,6 +92,12 @@ body {
   border: 1px solid gray;
   border-radius: var(--radius);
   padding: 5px;
+  word-spacing: 5rem;
+}
+
+.order-info img {
+  width: 10rem;
+  height: 10rem;
 }
 
 .order-info p:last-child{
@@ -108,23 +120,15 @@ body {
 }
 
 .details {
-  flex: 1.5;
+  width: 30rem;
   background: var(--color-bg);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 5px 10px 15px rgba(0, 0, 0, 0.08);;;
   padding: 30px;
 }
 
 .details h2 {
   margin-bottom: 15px;
-}
-
-.detail-header {
-  background: var(--color-bg-light);
-  padding: 15px 20px;
-  border-radius: var(--radius);
-  margin-bottom: 25px;
-  border: 1px solid var(--color-border);
 }
 
 .date {
@@ -138,8 +142,21 @@ body {
   gap: 15px;
 }
 
+.steps img {
+  width: 30px;
+  height: 30px;
+  margin-top: 1rem;
+}
+
+.steps span{
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
 .step {
-  padding: 12px 20px;
+  width: 80%;
+  margin-top: 1rem;
+  padding: 10px;
   border-radius: var(--radius);
   background: var(--color-bg-light);
   color: var(--color-muted);
@@ -223,7 +240,7 @@ body {
   width: 100%;
   padding: 10px 15px;
   margin-top: 15px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-accent);
   border-radius: var(--radius);
   font-size: 14px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -239,20 +256,29 @@ body {
   width: 100%;
   margin-top: 20px;
   padding: 12px 0;
-  background: var(--color-primary);
+  background: var(--color-accent);
   border-radius: 25px;
   font-size: 15px;
   font-weight: bold;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
+  color: #ffffff;
 }
 
-.submit:hover {
-  background: #a70b29;
-  transform: translateY(-2px);
-  color: var(--color-bg);
+.delivery {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius);
+  padding: 15px;
 }
 
+.delivery img{
+  width: 10rem;
+  height: 10rem;
+  border-radius: 100%;
+}
 @media (max-width: 756px) {
     .container{
         flex-direction: column;
@@ -302,29 +328,43 @@ body {
           <div class="order-card">
             <div class="order-info">
               <h3>GL Burger - 7-р байр 207</h3>
-                <p>XL багц:&nbsp;&nbsp;&nbsp;&nbsp;10000₮</p>
-                <p>M багц:&nbsp;&nbsp;&nbsp;&nbsp;8000₮</p>
-                <p>L багц:&nbsp;&nbsp;&nbsp;&nbsp;9000₮</p>
+                <p>XLбагц: 10000₮</p>
+                <p>Mбагц: 8000₮</p>
+                <p>Lбагц: 9000₮</p>
                 <hr>
                 <p>Дүн: 37,000₮</p>
             </div>
                 <img src="assets/img/tor.svg" alt="hemjee">
           </div>
-          <button>Хүргэгчийн мэдээлэл харах</button>
-        </div>
+          <article>
+            <p style="font-weight: bold; font-size: 1.5rem;">Хүргэгчийн мэдээлэл</p>
+            <div class="delivery">
+              <img src="assets/img/profile.jpg" alt="Хүргэгчийн зураг">
+                <div class="delivery-info">
+                  <h3>Нэр: Чигцалмаа</h3>
+                  <p>Утас: 99001234</p>
+                  <p>ID: 23B1NUM0245</p>
+                </div>
+              </div>
+            </div>
+          </article>
       </section>
 
     <section class="details">
-      <h2>Захиалгын дэлгэрэнгүй</h2>
-      <div class="detail-header">
-        <p><strong>GS25</strong> → <strong>МУИС 7-р байр</strong></p>
-        <p class="date">2025.10.08 • 09:36</p>
-      </div>
-
+      <h2>Захиалгын явц</h2>
       <div class="steps">
-        <div class="step active">Захиалга хүлээн авсан</div>
-        <div class="step">Хүргэлтэнд гарсан</div>
-        <div class="step">Амжилттай хүлээн авсан</div>
+        <span>
+          <img src="assets/img/unf.svg" alt="process">
+          <div class="step active">Захиалга хүлээн авсан</div>
+        </span>
+        <span>
+          <img src="assets/img/unf.svg" alt="process">
+          <div class="step">Хүргэлтэнд гарсан</div>
+        </span>
+        <span>
+          <img src="assets/img/unf.svg" alt="process">
+          <div class="step">Амжилттай хүлээн авсан</div>
+        </span>
         <div class="rating">
             <span>★</span>
             <span>★</span>
@@ -348,5 +388,4 @@ body {
   });
 })();
 </script>
-
 </html>
