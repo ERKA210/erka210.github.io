@@ -19,7 +19,6 @@
   --border-show: none
    --top-h: 4rem;
 }
-
 * {
   box-sizing: border-box;
   font-family: var(--font-family);
@@ -39,7 +38,7 @@
 }
 
 .site-top .brand { display:flex; align-items:center; }
-.site-top .brand-logo { height: 2rem; display:block; }
+.site-top .brand-logo { height: 4rem; display:block; }
 
 .top-menu {
   margin-left: auto;        
