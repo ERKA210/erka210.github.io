@@ -171,9 +171,6 @@
     .offer-meta{ font-size:0.9rem; color:var(--color-muted); margin-bottom:0.25rem; }
     .offer-price{ font-weight:700; }
 
-
-
-
 @media (max-width: 64rem) {
   main { padding-top: 4.75rem; }
   .filter-section { margin: 1rem; padding: 1rem 1.25rem; gap: .75rem; }
@@ -188,7 +185,6 @@
 
 @media (max-width: 40rem) {
   main { padding-top: 4.25rem; padding-bottom: 4rem; }
-
   .filter-section { margin: .75rem; padding: .875rem 1rem; gap: .75rem; }
   .top-row { justify-content: flex-end; }
   .middle-row,
