@@ -175,6 +175,65 @@
     .offer-title{ font-weight:600; margin-bottom:0.25rem; }
     .offer-meta{ font-size:0.9rem; color:var(--color-muted); margin-bottom:0.25rem; }
     .offer-price{ font-weight:700; }
+    .offer-wrapper {
+  position: relative;
+  margin: 0.5rem 0;
+}
+
+.swipe-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 1rem;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.swipe-bg.active {
+  opacity: 1;
+}
+
+.swipe-bg .bg-left,
+.swipe-bg .bg-right {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: white;
+}
+
+.swipe-bg.confirm .bg-left {
+  background: #3cb371; /* Ногоон */
+}
+.swipe-bg.confirm .bg-right {
+  background: transparent;
+}
+
+.swipe-bg.delete .bg-right {
+  background: #d9534f; /* Улаан */
+}
+.swipe-bg.delete .bg-left {
+  background: transparent;
+}
+
+.offer-card {
+  position: relative;
+  z-index: 2;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 1rem;
+  transition: transform 0.3s ease;
+  user-select: none;
+  touch-action: pan-y;
+  cursor: grab;
+}
 
     .cart {
   width: 100%;
