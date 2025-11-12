@@ -183,7 +183,7 @@
 
 }
 .cart-content > div:first-child {
-  max-height: 15rem;           /* 2 item хүртэл чөлөөтэй, дараагаас scroll */
+  max-height: 15rem;          
   overflow-y: auto;
   padding-right: 0.4rem;
 }
@@ -199,7 +199,6 @@
   background: #999;
 }
 
-/* Delivery ба Total хэсгүүд хөдөлдөггүй */
 .delivery-box,
 .total-box {
   position: static;
@@ -279,7 +278,6 @@
 .delivery-box {
   border: 0.06rem solid #e2e2e2;
   border-radius: 0.8rem;
-  padding: 1rem 1.2rem;
   text-align: center;
   margin-top: 0.5rem;
   height: 90%;

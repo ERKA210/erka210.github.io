@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartBadge = cart.querySelector(".cart-icon span");
   const foodSelect = document.querySelector(".bottom-row select");
 
+  cart.style.display = "none";
+
   const prices = {
     "Кимбаб": 5500,
     "Бургер": 6500,
@@ -39,9 +41,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateCount() {
     const count = cart.querySelectorAll(".item-box").length;
     cartBadge.textContent = count;
+
+    // 🔁 Сагс хоосон бол нуух, бусад үед харуулах
+    if (count === 0) {
+      cart.style.display = "none";
+    } else {
+      cart.style.display = "block";
+    }
   }
 
-  // ✅ бараа нэмэх
   function addItemToCart(name, price) {
     const existing = [...cartItemsContainer.querySelectorAll(".item-box")].find(
       (box) => box.querySelector("b").textContent.trim() === name
@@ -69,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCount();
   }
 
-  // ✅ Сонгосон option-оор бараа нэмэх
   foodSelect.addEventListener("change", (e) => {
     const selected = e.target.value;
     if (!selected) return;
@@ -78,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
     e.target.selectedIndex = 0;
   });
 
-  // ✅ Delete товчийг “event delegation”-оор сонгох
   cartItemsContainer.addEventListener("click", (e) => {
     const delBtn = e.target.closest("svg.del-btn");
     if (!delBtn) return;
