@@ -172,7 +172,7 @@
     .offer-price{ font-weight:700; }
 
     .cart {
-  width: 38rem;
+  width: 50rem;
   margin: 2rem auto;
   border: 0.06rem solid #000;
   border-radius: 0.8rem;
@@ -182,7 +182,6 @@
   position: relative;
 }
 
-/* Гарчиг ба сагсны icon */
 .cart h3 {
   font-size: 1.5rem;
   font-weight: 700;
@@ -216,18 +215,18 @@
   justify-content: center;
 }
 
-/* Доторх үндсэн бүтэц */
 .cart-content {
   border: 0.06rem solid #ddd;
   border-radius: 0.6rem;
   padding: 1rem;
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr auto;
   align-items: start;
   gap: 1.5rem;
+  position: relative;
 }
 
-/* Зүүн тал — item box */
 .item-box {
   border: 0.06rem solid #e2e2e2;
   border-radius: 0.8rem;
@@ -237,6 +236,7 @@
   grid-template-columns: 1fr auto auto;
   align-items: center;
   gap: 0.6rem;
+  margin-top: 0.5rem;
 }
 
 .item-box p {
@@ -253,9 +253,12 @@
   height: 1.2rem;
 }
 
-/* Баруун тал — хүргэлт */
 .delivery-box {
+  border: 0.06rem solid #e2e2e2;
+  border-radius: 0.8rem;
+  padding: 1rem 1.2rem;
   text-align: center;
+  margin-top: 0.5rem;
 }
 
 .delivery-box p {
@@ -269,12 +272,14 @@
   margin: 0.4rem 0;
 }
 
-/* Нийт дүн — баруун доод талд */
 .total-box {
+  position: absolute;
+  bottom: 1rem; /* доош 1rem зай */
+  right: 1rem;  /* баруун тийш 1rem зай */
   display: flex;
-  flex-direction: column;
   align-items: flex-end;
-  justify-content: flex-start;
+  gap: 0.3rem;
+  padding-top: 1rem;
 }
 
 .total-box p {
