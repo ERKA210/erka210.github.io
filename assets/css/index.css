@@ -172,7 +172,7 @@
     .offer-price{ font-weight:700; }
 
     .cart {
-  width: 50rem;
+  width: 100%;
   margin: 2rem auto;
   border: 0.06rem solid #000;
   border-radius: 0.8rem;
@@ -180,6 +180,29 @@
   padding: 1.5rem 2rem 2rem;
   font-family: "Inter", sans-serif;
   position: relative;
+
+}
+.cart-content > div:first-child {
+  max-height: 15rem;           /* 2 item хүртэл чөлөөтэй, дараагаас scroll */
+  overflow-y: auto;
+  padding-right: 0.4rem;
+}
+
+.cart-content > div:first-child::-webkit-scrollbar {
+  width: 0.4rem;
+}
+.cart-content > div:first-child::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 1rem;
+}
+.cart-content > div:first-child::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Delivery ба Total хэсгүүд хөдөлдөггүй */
+.delivery-box,
+.total-box {
+  position: static;
 }
 
 .cart h3 {
@@ -220,7 +243,7 @@
   border-radius: 0.6rem;
   padding: 1rem;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 65% 25%;
   grid-template-rows: 1fr auto;
   align-items: start;
   gap: 1.5rem;
@@ -259,7 +282,13 @@
   padding: 1rem 1.2rem;
   text-align: center;
   margin-top: 0.5rem;
+  height: 90%;
+   display: flex;                
+  flex-direction: column;        
+  justify-content: center;       
+  align-items: center;  
 }
+
 
 .delivery-box p {
   margin: 0.2rem 0;
@@ -279,7 +308,7 @@
   display: flex;
   align-items: flex-end;
   gap: 0.3rem;
-  padding-top: 1rem;
+  margin-top: 1rem;
 }
 
 .total-box p {
@@ -352,6 +381,19 @@
     font-weight: 700;
     white-space: nowrap;
   }
+  .cart {
+    width: 90%;
+    padding: 1rem 1.2rem 1.5rem;
+  }
+  .cart-content {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .total-box {
+    position: static;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
 }
 
 @media (max-width: 22.5rem) {
@@ -369,4 +411,5 @@
     margin: 0.25rem auto;
     display: block;
   }
+  
 }
