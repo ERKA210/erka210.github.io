@@ -150,7 +150,12 @@
       padding: 0.75rem;
       transition: var(--transition);
       display: block;
+      position: relative;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      touch-action: pan-y;
     }
+   
     .offers-row > offer-card {
       flex: 0 0 calc((100% - 2rem) / 4);
       scroll-snap-align: start;
@@ -281,7 +286,7 @@
   text-align: center;
   margin-top: 0.5rem;
   height: 90%;
-   display: flex;                
+  display: flex;                
   flex-direction: column;        
   justify-content: center;       
   align-items: center;  
@@ -301,8 +306,8 @@
 
 .total-box {
   position: absolute;
-  bottom: 1rem; /* доош 1rem зай */
-  right: 1rem;  /* баруун тийш 1rem зай */
+  bottom: 1rem;
+  right: 1rem; 
   display: flex;
   align-items: flex-end;
   gap: 0.3rem;
