@@ -14,30 +14,29 @@ class OfferCard extends HTMLElement {
       </article>
     `;
 
-    // --- swipe  ---
     const card = this.querySelector('.offer-card');
     let startX = 0;
     let currentX = 0;
     let isSwiping = false;
 
-    card.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
+    const start = (x) => {
+      startX = x;
       isSwiping = true;
       card.style.transition = 'none';
-    });
+    };
 
-    card.addEventListener('touchmove', (e) => {
+    const move = (x) => {
       if (!isSwiping) return;
-      currentX = e.touches[0].clientX - startX;
+      currentX = x - startX;
       card.style.transform = `translateX(${currentX}px)`;
-    });
+    };
 
-    card.addEventListener('touchend', () => {
+    const end = () => {
       card.style.transition = '0.3s ease';
       if (currentX < -80) {
         card.style.transform = 'translateX(-100%)';
         card.style.opacity = '0.5';
-        setTimeout(() => alert('Confirmed'), 200);
+        setTimeout(() => alert('Confirmed ✅'), 200);
       } else if (currentX > 80) {
         card.style.transform = 'translateX(100%)';
         card.style.opacity = '0.5';
@@ -48,12 +47,24 @@ class OfferCard extends HTMLElement {
       isSwiping = false;
       startX = 0;
       currentX = 0;
+    };
+
+    // --- Touch Events ---
+    card.addEventListener('touchstart', (e) => start(e.touches[0].clientX));
+    card.addEventListener('touchmove', (e) => move(e.touches[0].clientX));
+    card.addEventListener('touchend', end);
+
+    // --- Mouse Events (PC) ---
+    card.addEventListener('mousedown', (e) => start(e.clientX));
+    document.addEventListener('mousemove', (e) => {
+      if (isSwiping) move(e.clientX);
     });
+    document.addEventListener('mouseup', end);
   }
 }
 customElements.define('offer-card', OfferCard);
 
-// -----------------------
+// ---------------------
 class OffersList extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
