@@ -360,6 +360,7 @@ footer section::-webkit-scrollbar-track {
       <div><h4>Бат</h4><p>Үнэхээр найдвартай хүргэгч байна.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span>★</span></p></div>
     </section>
   </footer>
+  <script type="module" src="order.html"></script>
 </body>
   <script>
   (function(){
@@ -388,6 +389,17 @@ footer section::-webkit-scrollbar-track {
         btn.textContent = detail.classList.contains('hidden') ? 'Дэлгэрэнгүй' : 'Нуух';
       }
     });
+  });
+
+    const rating = document.querySelector('rating-stars');
+  rating.addEventListener('rate', e => {
+    console.log('Rated:', e.detail);
+  });
+
+  document.querySelector('.submit').addEventListener('click', () => {
+    const stars = rating.getAttribute('value') || 0;
+    const comment = document.querySelector('input[type="text"]').value;
+    alert(`Таны үнэлгээ: ${stars} од.\nСэтгэгдэл: ${comment}`);
   });
   </script>
 </body>
