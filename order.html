@@ -168,8 +168,16 @@ body {
   color: var(--color-primary);
   border-left: 4px solid var(--color-primary);
   font-weight: var(--font-weight-bold);
+  background-color: var(--color-accent);
+  color: white;
 }
 
+.step.completed, details img{
+  background: #e6f8ec;
+  color: #1b7d2a;
+  border-left: 4px solid #1b7d2a;
+  font-weight: 600;
+}
 .next-btn {
   margin-top: 30px;
   padding: 12px 40px;
@@ -352,19 +360,19 @@ body {
 
     <section class="details">
       <h2>Захиалгын явц</h2>
-      <div class="steps">
-        <span>
-          <img src="assets/img/unf.svg" alt="process">
-          <div class="step active">Захиалга хүлээн авсан</div>
-        </span>
-        <span>
-          <img src="assets/img/unf.svg" alt="process">
-          <div class="step">Хүргэлтэнд гарсан</div>
-        </span>
-        <span>
-          <img src="assets/img/unf.svg" alt="process">
-          <div class="step">Амжилттай хүлээн авсан</div>
-        </span>
+        <div class="steps">
+          <span>
+            <img src="assets/img/unf.svg" alt="process">
+            <div id="step1" class="step">Захиалга хүлээн авсан</div>
+          </span>
+          <span>
+            <img src="assets/img/unf.svg" alt="process" >
+            <div id="step2" class="step">Хүргэлтэнд гарсан</div>
+          </span>
+          <span>
+            <img src="assets/img/unf.svg" alt="process" >
+            <div id="step3" class="step">Амжилттай хүлээн авсан</div>
+          </span>
         <rating-stars max="5" color="orange" size="28px"></rating-stars>
         <script type="module">
 class RatingStars extends HTMLElement {
@@ -445,45 +453,33 @@ customElements.define('rating-stars', RatingStars);
     a.classList.toggle('is-active', active);
   });
 })();
-  class OfferCard extends HTMLElement {
-    connectedCallback() {
-      this.innerHTML = `
-        <article class="offer-card">
-          <div class="offer-thumb">
-            <img src="${this.getAttribute('thumb')}" alt="icon"/>
-          </div>
-          <div class="offer-info">
-            <div class="offer-title">${this.getAttribute('title')}</div>
-            <div class="offer-meta">${this.getAttribute('meta')}</div>
-            <div class="offer-price">${this.getAttribute('price')}</div>
-          </div>
-        </article>
-      `;
-    }
-  }
-  customElements.define('offer-card', OfferCard);
 
-  class OffersList extends HTMLElement {
-    connectedCallback() {
-      this.innerHTML = `<section class="offers-container"><div class="offers-row"></div></section>`;
-    }
-    set items(list) {
-      const row = this.querySelector('.offers-row');
-      row.innerHTML = '';
-      list.forEach(item => {
-        row.innerHTML += `<offer-card thumb="${item.thumb}" title="${item.title}" meta="${item.meta}" price="${item.price}"></offer-card>`;
-      });
-    }
-  }
-  customElements.define('offers-list', OffersList);
+document.addEventListener('DOMContentLoaded', () => {
+  const stepIndex = parseInt(localStorage.getItem("orderStep")) || 0;
+  const steps = document.querySelectorAll('.step');
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const data = localStorage.getItem('offers');
-    if (data) {
-      const offers = JSON.parse(data);
-      document.querySelector('#offers').items = offers;
+  steps.forEach((step, idx) => {
+    step.classList.remove('active', 'completed');
+
+    if (idx < stepIndex) {
+      step.classList.add('completed');   
+    } else if (idx === stepIndex) {
+      step.classList.add('active');      
     }
   });
+});
+
+    const step = parseInt(localStorage.getItem("orderStep")) || 0;
+
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById(`step${i}`);
+    if (!el) continue;
+    if (i === step) {
+      el.classList.add("active");
+    } else {
+      el.classList.remove("active");
+    }
+  }
 
     document.querySelector('rating-stars')
     .addEventListener('rate', e => {
