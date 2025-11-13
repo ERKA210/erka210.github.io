@@ -118,7 +118,7 @@
     .order-btn{ align-self:flex-end; margin-top:0.5rem; }
 
     .offers-container{
-      margin: 5rem 2rem;
+      margin: 2rem 2rem;
       background: var(--color-bg);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-card);
