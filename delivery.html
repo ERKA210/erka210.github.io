@@ -14,7 +14,7 @@
 }
 
 body {
-  background: var(--color-bg-light);
+  background: var(--color-bg);
   color: var(--color-text);
   margin-top: 6rem;
   line-height: 1.6;
@@ -68,7 +68,7 @@ body {
 }
 
 .order-card:hover {
-  background: #fff5f6;
+  background: var(--color-bg);
   border-left: 4px solid var(--color-accent);
 }
 
@@ -210,6 +210,21 @@ footer {
 }
 .next-btn:hover{ background:var(--color-hover); }
 
+@media (max-width: 60rem){
+    .orders{grid-area: ord;}
+    .details{grid-area: det;}
+    .order-step{grid-area: stp;align-content: center;height:auto; margin-top:3rem ; margin-bottom: 3rem;}
+    .steps{gap: 50px;margin-top: 50px;}
+    .container{display: grid;
+      grid-template: 'ord ord stp'
+                              'det det stp';}
+    ;
+  }
+
+@media (max-width: 42rem){
+    .container{display: flex;flex-direction: column};
+    .delivery{display: flex; flex-direction: column;}
+  }
 
 </style>
 </head>
