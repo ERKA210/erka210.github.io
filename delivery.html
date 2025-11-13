@@ -303,39 +303,60 @@ footer {
       </div>
 
     </section>
-    <section class="order-step">
-      <h2>Захиалгын явц</h2>
-       <div class="steps">
-        <div class="step active">Захиалга бэлтгэх</div>
-        <div class="step">Хүргэлтэнд гарсан</div>
-        <div class="step">Амжилттай хүргэсэн</div>
-        <button class="next-btn">Дараагийн алхам</button>
-      </div>
-    </section>
-    
+ <section class="order-step">
+  <h2>Захиалгын явц</h2>
+  <div class="steps">
+    <div class="step active">Захиалга бэлтгэх</div>
+    <div class="step">Хүргэлтэнд гарсан</div>
+    <div class="step">Амжилттай хүргэсэн</div>
+  </div>
+  <button id="nextStep" class="next-btn">Дараагийн алхам</button>
+</section>
+
 <script>
   const steps = Array.from(document.querySelectorAll('.step'));
-  document.querySelector('.next-btn')?.addEventListener('click', () => {
-    const i = steps.findIndex(s=>s.classList.contains('active'));
-    if(i>-1 && i<steps.length-1){ steps[i].classList.remove('active'); steps[i+1].classList.add('active'); }
+  const nextBtn = document.getElementById('nextStep');
+
+  let currentStep = parseInt(localStorage.getItem("orderStep")) || 0;
+
+  highlightStep(currentStep);
+
+  nextBtn.addEventListener('click', () => {
+    if (currentStep < steps.length - 1) {
+      currentStep++;
+    } else {
+      currentStep = 0; 
+    }
+
+    localStorage.setItem("orderStep", currentStep);
+
+    highlightStep(currentStep);
+
   });
+
+  function highlightStep(index) {
+    steps.forEach((step, i) => {
+      step.classList.toggle('active', i === index);
+    });
+  }
 </script>
 
-  </main>
+</main>
 
-  <footer>
-    <p>© 2025 NUMD Delivery — Хүргэлтийн систем</p>
-  </footer>
-</body>
+<footer>
+  <p>© 2025 NUMD Delivery — Хүргэлтийн систем</p>
+</footer>
+
 <script>
-(function(){
-  var path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-  // Дээд (desktop/mobile) top-menu
-  document.querySelectorAll('.top-menu a').forEach(function(a){
-    var href = (a.getAttribute('href')||'#').toLowerCase();
-    var active = (path === href) || (href === '#' && path === 'index.html');
-    a.classList.toggle('is-active', active);
-  });
-})();
+  (function() {
+    var path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    document.querySelectorAll('.top-menu a').forEach(function(a) {
+      var href = (a.getAttribute('href') || '#').toLowerCase();
+      var active = (path === href) || (href === '#' && path === 'index.html');
+      a.classList.toggle('is-active', active);
+    });
+  })();
 </script>
+</body>
+</html>
 </html>
