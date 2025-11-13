@@ -118,7 +118,7 @@
     .order-btn{ align-self:flex-end; margin-top:0.5rem; }
 
     .offers-container{
-      margin: 2rem;
+      margin: 5rem 2rem;
       background: var(--color-bg);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-card);
@@ -340,7 +340,7 @@
 }
 
 .delivery-box {
-  border: 0.06rem solid #e2e2e2;
+  border: 0.06rem solid #c90d30;
   border-radius: 0.8rem;
   text-align: center;
   margin-top: 0.5rem;
@@ -349,8 +349,8 @@
   flex-direction: column;        
   justify-content: center;       
   align-items: center;  
+  padding: 1.5rem;
 }
-
 
 .delivery-box p {
   margin: 0.2rem 0;
@@ -396,7 +396,7 @@
   }
 }
 
-@media (max-width: 40rem) {
+@media (max-width: 42rem) {
   main { padding-top: 4.25rem; padding-bottom: 4rem; }
   .filter-section { margin: .75rem; padding: .875rem 1rem; gap: .75rem; }
   .top-row { justify-content: flex-end; }
