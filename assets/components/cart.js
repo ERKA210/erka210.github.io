@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const count = cart.querySelectorAll(".item-box").length;
     cartBadge.textContent = count;
 
-    // 🔁 Сагс хоосон бол нуух, бусад үед харуулах
     if (count === 0) {
       cart.style.display = "none";
     } else {
