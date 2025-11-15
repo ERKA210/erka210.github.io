@@ -92,26 +92,6 @@
         margin-top: 3rem;
         color: orange;
       }
-      
-      .right-side {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        margin-left: 5rem;
-        width: max-content;
-        margin-top: 1rem  ;
-        margin-right: 5rem  ;
-      }
-
-      .profile-orders,
-      .profile-jobs{
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 15px;
-        height: 230px;
-      }
 
       header.site-header {
         display: flex;
@@ -141,29 +121,29 @@
 
   footer {
     margin-left: 5rem;
-    width: 60rem;
+    width: 40rem;
     padding: 20px;
     background-color: #fff;
     margin-top: 1em;
     border-radius: var(--radius);
     border: 1px solid gray;
+    max-height: 40rem;
   }
 
 footer section {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
-  flex-wrap: nowrap; 
   padding: 20px;
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 10px;
   justify-content: flex-start;
   overflow-x: hidden; 
-  overflow-y: auto;
+  overflow-y: scroll;
   scroll-behavior: smooth;
   width: 100%;
-  scrollbar-width: none;
 }
 
   footer div{
@@ -199,58 +179,6 @@ footer section div {
   }
   footer section::-webkit-scrollbar-track {
     background-color: #f1f1f1;
-  }
-
-
-  .orders{
-    gap: 5rem;
-    align-content: space-between;
-  }
-
-  .orders p,
-  .jobs p {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    border-bottom: 1px solid #eee;
-    margin: 0;
-  }
-
-  .orders p:first-child,
-  .jobs p:first-child {
-    font-weight: 600;
-    border-bottom: 2px solid #ccc;
-  }
-
-  .orders p:last-child,
-  .jobs p:last-child {
-    border-bottom: none;
-  }
-
-  .orders span,
-  .jobs span {
-    flex: 1;
-    text-align: center;
-  }
-
-  .orders span:first-child,
-  .jobs span:first-child {
-    text-align: left;
-  }
-
-  .orders span:last-child,
-  .jobs span:last-child {
-    text-align: right;
-  }
-
-
-
-  .orders,
-  .jobs{
-    overflow-y: scroll;
-    height: 150px;
-    scrollbar-width: none;
   }
 
   @media (max-width: 64rem) {
@@ -343,7 +271,7 @@ footer section div {
   <main></main>
   <div class="profile">  
     <img src="assets/img/profile.jpg" alt="profile">
-  </div>  
+  </div class="main">  
     <div class="main-content">
         <div class="profile-container">
           <article class="main-profile">
