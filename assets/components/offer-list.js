@@ -89,12 +89,12 @@ customElements.define('offers-list', OffersList);
 // --- data ---
 document.addEventListener('DOMContentLoaded', () => {
   const offers = [
-    { thumb: 'assets/img/box.svg', title: 'GL burger · 7-р байр 207', meta: '2.6км • 20мин', price: '10,000₮' },
-    { thumb: 'assets/img/tor.svg', title: 'CU - 8-р байр 209', meta: '3.2км • 25мин', price: '5,000₮' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger · 7-р байр 207', meta: '2.6км • 20мин', price: '10,000₮' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger · 7-р байр 207', meta: '2.6км • 20мин', price: '10,000₮' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger · 7-р байр 207', meta: '2.6км • 20мин', price: '10,000₮' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger · 7-р байр 207', meta: '2.6км • 20мин', price: '10,000₮' },
+    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: ' 11/21/25• 14:00', price: '10,000₮' },
+    { thumb: 'assets/img/tor.svg', title: 'CU - 8-р байр 209', meta: '11/21/25 • 14:00', price: '5,000₮' },
+    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮' },
+    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮' },
+    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮' },
+    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮' },
   ];
   localStorage.setItem('offers', JSON.stringify(offers));
   document.querySelector('#offers').items = offers;

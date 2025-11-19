@@ -80,7 +80,9 @@
       input[type="date"],
       input[type="time"] {
         accent-color: var(--color-accent);
+        
       }
+      
     .ctrl:has(input[type="time"]:focus){
         border-color: var(--color-accent);
         box-shadow: 0 0 0 .15rem rgba(201,13,48,.18);
