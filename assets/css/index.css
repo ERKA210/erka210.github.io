@@ -101,6 +101,7 @@
       accent-color: var(--color-accent); 
     }
 
+    
     .arrow{ 
       font-size:1.5rem; 
       color:var(--color-muted); 
@@ -459,7 +460,32 @@
     margin-top: 1rem;
   }
 }
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
 
+.hidden { display: none; }
+
+.modal-content {
+  width: 90%;
+  max-width: 360px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.modal-actions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+}
 @media (max-width: 22.5rem) {
   .offer-card { flex-basis: 92%; }
   .ctrl { padding: 0 .6rem; }

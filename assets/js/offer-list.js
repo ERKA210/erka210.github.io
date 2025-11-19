@@ -36,7 +36,20 @@ class OfferCard extends HTMLElement {
       if (currentX < -80) {
         card.style.transform = 'translateX(-100%)';
         card.style.opacity = '0.5';
-        setTimeout(() => alert('Confirmed ✅'), 200);
+        // zahialgiin medeelliig unshij bga hesg
+        const orderData = {
+          id: Date.now(),
+          title: card.querySelector(".offer-title").textContent,
+          items: card.querySelector(".offer-meta").textContent,
+          price: card.querySelector(".offer-price").textContent,
+          time: new Date().toLocaleString()
+        };
+        let active = JSON.parse(localStorage.getItem("activeOrders")) || [];
+        active.push(orderData);
+        localStorage.setItem("activeOrders", JSON.stringify(active));
+        setTimeout(() => {
+          window.location.href = "/delivery.html"; 
+        }, 200);
       } else if (currentX > 80) {
         card.style.transform = 'translateX(100%)';
         card.style.opacity = '0.5';
@@ -49,12 +62,10 @@ class OfferCard extends HTMLElement {
       currentX = 0;
     };
 
-    // --- Touch Events ---
     card.addEventListener('touchstart', (e) => start(e.touches[0].clientX));
     card.addEventListener('touchmove', (e) => move(e.touches[0].clientX));
     card.addEventListener('touchend', end);
 
-    // --- Mouse Events (PC) ---
     card.addEventListener('mousedown', (e) => start(e.clientX));
     document.addEventListener('mousemove', (e) => {
       if (isSwiping) move(e.clientX);
@@ -64,7 +75,6 @@ class OfferCard extends HTMLElement {
 }
 customElements.define('offer-card', OfferCard);
 
-// ---------------------
 class OffersList extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
@@ -88,14 +98,12 @@ customElements.define('offers-list', OffersList);
 
 // --- data ---
 document.addEventListener('DOMContentLoaded', () => {
-  const offers = [
-    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: ' 11/21/25• 14:00', price: '10,000₮' },
-    { thumb: 'assets/img/tor.svg', title: 'CU - 8-р байр 209', meta: '11/21/25 • 14:00', price: '5,000₮' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮' },
-  ];
-  localStorage.setItem('offers', JSON.stringify(offers));
+  let offers = JSON.parse(localStorage.getItem("offers"));
+
+  if (!offers) {
+    offers = [];  
+    localStorage.setItem("offers", JSON.stringify(offers));
+  }
+
   document.querySelector('#offers').items = offers;
 });

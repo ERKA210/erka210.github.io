@@ -6,9 +6,10 @@
   <title>NUMDelivery</title>
   <link rel="stylesheet" href="assets/style.css" />
   <link rel="stylesheet" href="assets/css/index.css" />
-  <script src="assets/components/offer-list.js"></script>
-  <script src="assets/components/cart.js"></script>
-  <script src="assets/components/my-date.js"></script>
+  <script src="assets/js/offer-list.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script src="assets/js/my-date.js"></script>
+  <script src="assets/js/modal.js"></script>
 </head>
 <body>
 <header class="site-top">
@@ -88,7 +89,7 @@
         <div class="bottom-row">
           <div class="ctrl wide">
             <span><img src="assets/img/fork.svg" alt="icon" /></span>
-            <select>
+            <select id="what">
               <option value="" selected disabled hidden>Юуг</option>
 
               <optgroup label="🥘 Идэх юм">
@@ -137,6 +138,17 @@
         </div>
       </section>
       <offers-list id="offers"></offers-list>
+      <div id="confirm-modal" class="modal hidden">
+  <div class="modal-content">
+    <h3>Захиалга баталгаажуулах уу?</h3>
+    <p id="confirm-text"></p>
+
+    <div class="modal-actions">
+      <button id="cancel-order" class="btn btn--gray">Цуцлах</button>
+      <button id="confirm-order" class="btn btn--accent">Баталгаажуулах</button>
+    </div>
+  </div>
+</div>
   </main>
 </body>
 <script>
