@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NUMDelivery</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    body {
+      font-family: var(--font-family);
+      margin: 0;
+      background: var(--color-bg-light);
+      color: var(--color-text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+      color:#111827;
+    }
+    .pay{     
+      width:500px;
+      background:var(--color-bg);
+      border-radius:18px;
+      box-shadow:var(--shadow-light);
+      padding:22px;
+    }
+    .container {
+      display: flex;
+      gap: 40px;
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 40px;
+      align-items: flex-start;
+    }
+
+    .orders {
+      flex: 1;
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 25px 30px;
+    }
+
+    .orders h2 {
+      margin-bottom: 20px;
+      color: var(--color-text);
+    }
+
+    .order-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .order-card {
+      background: var(--color-bg-light);
+      border-radius: var(--radius);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--color-border);
+      transition: var(--transition);
+    }
+
+    .order-card:hover {
+      background: var(--color-bg-light);
+      border-left: 5px solid var(--color-hover);
+    }
+
+    .order-info h3 {
+      font-size: 16px;
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    .order-info p {
+      font-size: 13px;
+      color: var(--color-muted);
+      margin: 2px 0;
+    }
+
+    /* ---------- ТӨЛБӨР ХЭСЭГ ---------- */
+    article {
+      max-width: 900px;
+      margin: 50px auto;
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 30px;
+      text-align: center;
+    }
+
+    article h2 {
+      margin-bottom: 25px;
+      color: var(--color-primary);
+      font-size: 22px;
+    }
+
+    .bank-options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+    }
+
+    .bank-options a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 180px;
+      height: 90px;
+      background: var(--color-bg-light);
+      border-radius: var(--radius);
+      border: 1px solid var(--color-border);
+      transition: var(--transition);
+      text-decoration: none;
+    }
+
+    .bank-options a:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      border-color: var(--color-primary);
+    }
+
+    .bank-options img {
+      width: 120px;
+      max-height: 60px;
+      object-fit: contain;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        flex-direction: column;
+        padding: 0 20px;
+      }
+      .bank-options a {
+        width: 45%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="pay">
+  <main class="container">
+    <section class="orders">
+      <h2>Миний захиалга</h2>
+      <div class="order-list">
+        <div class="order-card">
+          <div class="order-info">
+            <h3>GL Burger - 7-р байр 207</h3>
+            <p>XL багц</p>
+            <p>M багц</p>
+            <p>L багц</p>
+            <hr>
+            <p><b>Дүн: 10,000₮</b></p>
+          </div>
+          <img src="assets/img/tor.svg" alt="hemjee" width="60">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <article>
+    <h2>Төлбөр төлөх</h2>
+    <div class="bank-options">
+      <a href="https://www.khanbank.com/" target="_blank">
+        <img src="assets/img/Khan Bank_Logo_0.svg" alt="Хаан банк">
+      </a>
+      <a href="https://www.golomtbank.com/" target="_blank">
+        <img src="assets/img/golomtbank.svg" alt="Голомт банк">
+      </a>
+      <a href="https://www.tdbm.mn/" target="_blank">
+        <img src="assets/img/TDB logo white.png" alt="TDB банк">
+      </a>
+      <a href="https://www.statebank.mn/" target="_blank">
+        <img src="assets/img/Turiinbank.png" alt="Төрийн банк">
+      </a>
+    </div>
+  </article>
+  </div>
+</body>
+</html>
