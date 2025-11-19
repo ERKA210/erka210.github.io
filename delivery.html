@@ -453,7 +453,27 @@ footer {
         step.classList.add('active');
       }
     });
-  }
+  };
+  document.addEventListener("DOMContentLoaded", () => {
+  const list = document.querySelector(".order-list");
+
+  let active = JSON.parse(localStorage.getItem("activeOrders")) || [];
+
+  list.innerHTML = ""; // эхлээд цэвэрлэнэ
+
+  active.forEach(order => {
+    list.innerHTML += `
+      <div class="order-card">
+        <div class="order-info">
+          <h3>${order.title}</h3>
+          <p>${order.items}</p>
+          <small>${order.time}</small>
+        </div>
+        <button class="view-btn">Дэлгэрэнгүй</button>
+      </div>
+    `;
+  });
+});
 </script>
 
 </main>
