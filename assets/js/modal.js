@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ========================
-  // Элементүүд
-  // ========================
   const fromSel   = document.querySelector("#from");
   const toSel     = document.querySelector("#to");
   const dateSel   = document.querySelector("input[type='date']");
@@ -13,9 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cancelBtn = document.querySelector("#cancel-order");
   const confirmBtn = document.querySelector("#confirm-order");
 
-  // ========================
-  // Сагснаас бүтээгдэхүүн авах
-  // ========================
+
   function getCartItems() {
     const boxes = document.querySelectorAll(".item-box");
     let items = [];
@@ -30,17 +25,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return items;
   }
 
-  // ========================
-  // Сагс нийт үнэ авах
-  // ========================
   function getTotalCartPrice() {
     const totalText = document.querySelector(".total-price").textContent;
     return parseInt(totalText.replace(/[^\d]/g, ""));
   }
 
-  // ========================
-  // Захиалах → modal нээх
-  // ========================
   orderBtn.addEventListener("click", () => {
 
     const fromSelected = fromSel.selectedIndex > 0;
@@ -82,16 +71,12 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.classList.remove("hidden");
   });
 
-  // ========================
-  // Цуцлах
-  // ========================
+
   cancelBtn.addEventListener("click", () => {
     modal.classList.add("hidden");
   });
 
-  // ========================
-  // Баталгаажуулах → Offer List рүү нэмэх
-  // ========================
+
   confirmBtn.addEventListener("click", () => {
 
     const items = getCartItems();
@@ -110,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
     offers.unshift(newOrder);
     localStorage.setItem("offers", JSON.stringify(offers));
 
-    // Offer list UI update
     document.querySelector("#offers").items = offers;
 
     modal.classList.add("hidden");
