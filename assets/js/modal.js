@@ -2,8 +2,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const fromSel   = document.querySelector("#from");
   const toSel     = document.querySelector("#to");
-  const dateSel   = document.querySelector("input[type='date']");
-  const timeSel   = document.querySelector("input[type='time']");
+  const dateSel = document.querySelector("date-time-picker").shadowRoot.querySelector("input[type='date']");
+  const timeSel = document.querySelector("date-time-picker").shadowRoot.querySelector("input[type='time']");
   const orderBtn  = document.querySelector(".order-btn");
   const modal     = document.querySelector("#confirm-modal");
   const confirmText = document.querySelector("#confirm-text");
