@@ -18,24 +18,60 @@ class DateTimePicker extends HTMLElement {
   render() {
     this.shadowRoot.innerHTML = `
       <style>
+      @import url(/assets/css/style.css);
+        :root {
+          display: block;
+          width: 100%;
+        }
+        .date-time-picker {
+          display: flex;
+          gap: 10px;
+          width: 100%;
+        }
         .wrapper {
           display: flex;
           gap: 10px;
-        }
-        input {
-          padding: 8px 12px;
-          border-radius: 6px;
+          padding: 10px;
           border: 1px solid #ccc;
-          font-size: 14px;
+          border-radius: 8px;
+          transition: .25s;
+          background: #fff;
           width: 100%;
-          font-family: inherit;
+        }
+
+        input {
+          border: none;
+          outline: none;
+          background: transparent;
+          width: 100%;
+          font-size: var(--font-size-base, 14px);
+        }
+
+        /* Focus эффект — wrapper хүрээ өнгө сольдог */
+        .wrapper:has(input:focus) {
+          border-color: var(--color-accent, #d00);
+          box-shadow: 0 0 0 0.15rem rgba(201, 13, 48, 0.18);
+        }
+
+        input[type="date"],
+        input[type="time"] {
+          accent-color: var(--color-accent, #d00);
+        }
+
+
+        .wrapper.wide {
+          flex: 1 1 100%;
         }
       </style>
-
+      <div class="date-time-picker">
       <div class="wrapper">
         <input class="date" type="date">
+       </div>
+      <div class="wrapper">
         <input class="time" type="time">
       </div>
+      </div>
+     
       
     `;
   }
