@@ -460,9 +460,7 @@
     margin-top: 1rem;
   }
 }
-<<<<<<< HEAD
 
-=======
 .modal {
   position: fixed;
   inset: 0;
@@ -489,7 +487,6 @@
   display: flex;
   justify-content: space-between;
 }
->>>>>>> eed0c5d90eeeae41b4f944c98d2c4f2ff272bd93
 @media (max-width: 22.5rem) {
   .offer-card { flex-basis: 92%; }
   .ctrl { padding: 0 .6rem; }

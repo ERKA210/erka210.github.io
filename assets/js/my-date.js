@@ -19,14 +19,11 @@ class DateTimePicker extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
       @import url(/assets/css/style.css);
-        :root {
-          display: block;
-          width: 100%;
-        }
         .date-time-picker {
           display: flex;
           gap: 10px;
           width: 100%;
+          font-family: var(--font-family);
         }
         .wrapper {
           display: flex;
@@ -37,6 +34,8 @@ class DateTimePicker extends HTMLElement {
           transition: .25s;
           background: #fff;
           width: 100%;
+          width: 100%;
+          font-family: var(--font-family);
         }
 
         input {
@@ -45,6 +44,8 @@ class DateTimePicker extends HTMLElement {
           background: transparent;
           width: 100%;
           font-size: var(--font-size-base, 14px);
+          width: 100%;
+          font-family: var(--font-family);
         }
 
         /* Focus эффект — wrapper хүрээ өнгө сольдог */
