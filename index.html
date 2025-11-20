@@ -6,10 +6,10 @@
   <title>NUMDelivery</title>
   <link rel="stylesheet" href="assets/style.css" />
   <link rel="stylesheet" href="assets/css/index.css" />
-  <script src="assets/js/offer-list.js"></script>
-  <script src="assets/js/cart.js"></script>
-  <script src="assets/js/my-date.js"></script>
-  <script src="assets/js/modal.js"></script>
+  <script src="assets/js/offer-list.js" type="module"></script>
+  <script src="assets/js/cart.js" type="module"></script>
+  <script src="assets/js/my-date.js" type="module"></script>
+  <script src="assets/js/modal.js" type="module"></script>
 </head>
 <body>
 <header class="site-top">
@@ -77,14 +77,15 @@
             </select>
           </div>
 
-          <div class="ctrl">
+          <!-- <div class="ctrl">
             <input type="date" value="2025-10-23"/>
           </div>
 
           <div class="ctrl">
             <input type="time" value="11:22" />
-          </div>
+          </div> -->
           <!-- <my-date></my-date> -->
+           <date-time-picker></date-time-picker>
         </div>
         <div class="bottom-row">
           <div class="ctrl wide">
