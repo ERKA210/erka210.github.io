@@ -15,50 +15,76 @@
       justify-content:center;
       padding:32px;
       color:#111827;
+      font-family:sans-serif;
     }
+
     .card{
       width:360px;
-      border: 1px solid gray;
+      border:1px solid gray;
       background:var(--color-bg);
       border-radius:18px;
       box-shadow:var(--shadow-light);
       padding:22px;
     }
+
     .close{
       font-size:18px; 
       float:right; 
       color:var(--color-muted);
+      cursor:pointer;
     }
+
     h1{font-size:18px; margin:0 0 14px 0; font-weight:600}
     .subtitle{color:var(--color-muted); font-size:13px; margin-bottom:18px}
 
-    label.select-wrap{
+    .form-group{
+      margin-bottom:14px;
       display:flex;
-      gap:10px; 
-      margin-bottom:12px; 
-      align-items:center;
-        }
-      .country{
-      flex:0 0 140px; 
-      display:flex; 
-      align-items:center; 
-      border:1px var(--color-muted); 
-      padding:10px 12px; 
-      border-radius:10px; 
-      background: var(--color-bg-light);
+      flex-direction:column;
     }
-    .country select{ 
+
+    label{
+      margin-bottom:5px;
+      font-size:13px;
+      color:#555;
+    }
+
+    input{
+      padding:10px 12px;
+      border:1px solid #d1d5db;
+      border-radius:10px;
+      font-size:14px;
+      outline:none;
+    }
+
+    .phone-wrap{
+      display:flex;
+      gap:10px;
+    }
+
+    .country{
+      flex:0 0 130px;
+      display:flex;
+      align-items:center;
+      border:1px solid var(--color-muted);
+      padding:8px 10px;
+      border-radius:10px;
+      background:var(--color-bg-light);
+    }
+
+    .country select{
+      width:100%;
       border:0;
-      outline:0;
-      font-size:var(--font-size-base);
-      background:transparent }
+      background:transparent;
+      outline:none;
+      font-size:14px;
+    }
+
     .phone{
-      flex:1; 
-      display:block; 
-      border:1px var(--color-muted); 
-      padding:10px; 
-      border-radius:10px; 
-      font-size:var(--font-size-base);
+      flex:1;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid #d1d5db;
     }
 
     .continue-btn{
@@ -66,67 +92,99 @@
       margin-top:12px; 
       padding:12px 14px; 
       background:var(--color-accent); 
-      color:white; border:0; 
+      color:white; 
+      border:0; 
       border-radius:10px; 
       font-weight:600; 
       cursor:pointer; 
       box-shadow:var(--shadow-card);
     }
+
     .or{display:flex; align-items:center; gap:10px; margin:18px 0; color:var(--color-muted); font-size:13px}
     .or::before, .or::after{content:""; flex:1; height:1px; background:#eef2f6}
 
     .social{
       display:grid; gap:10px;
     }
-    .social img{
-      width:30px; height:30px;
-    }
-    .btn-social{
-      display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; border:1px var(--color-border); background: var(--color-bg); cursor:pointer; font-weight:600; font-size:14px;
-    }
-    .btn-social svg{width:18px;height:18px}
-    .btn-email{padding:10px 12px}
 
-    .privacy{font-size:11px;color:var(--color-muted); margin-top:10px}
+    .btn-social{
+      display:flex; align-items:center; gap:12px;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--color-border);
+      background:var(--color-bg);
+      cursor:pointer;
+      font-weight:600;
+      font-size:14px;
+    }
+
+    .btn-social img{
+      width:30px;
+      height:30px;
+    }
+
+    .privacy{
+      font-size:11px;
+      color:var(--color-muted);
+      margin-top:10px;
+    }
 
     @media (max-width:420px){
       .card{width:92vw}
-      .country{flex-basis:120px}
+      .country{flex-basis:110px}
     }
   </style>
 </head>
 <body>
   <div class="card" role="dialog" aria-labelledby="login-title">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <div style="width:18px"></div>
-      <div style="text-align:center"><strong id="login-title">Нэвтрэх эсвэл бүртгүүлэх</strong></div>
-      <div class="close" aria-hidden="true">✕</div>
+      <strong id="login-title">Нэвтрэх эсвэл бүртгүүлэх</strong>
+      <div class="close">✕</div>
     </div>
 
-    <div class="subtitle">Бид таны дугаарыг баталгаажуулахын тулд утсаар залгах эсвэл мессеж илгээх болно.</div>
+    <div class="subtitle">
+      Бид таны дугаарыг баталгаажуулахын тулд утсаар залгах эсвэл мессеж илгээх болно.
+    </div>
 
     <form onsubmit="event.preventDefault(); alert('Continue clicked')">
-      <div style="display:flex; gap:10px; margin-bottom:8px">
-        <div class="country">
-          <select name="country" aria-label="Country code">
-            <option value="+976">Монгол (+976)</option>
-          </select>
+
+      <div class="form-group">
+        <label for="name">Нэр</label>
+        <input id="name" name="name" type="text" placeholder="Нэр" required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Утасны дугаар</label>
+        <div class="phone-wrap">
+          <div class="country">
+            <select name="country">
+              <option value="+976">Монгол (+976)</option>
+            </select>
+          </div>
+          <input id="phone" class="phone" type="tel" name="phone" required placeholder="Phone number">
         </div>
-        <input id="phone" class="phone" type="tel" name="phone" placeholder="Phone number" required aria-label="Phone number">
+      </div>
+
+      <div class="form-group">
+        <label for="id">ID</label>
+        <input id="id" name="id" type="text" placeholder="ID" required>
       </div>
 
       <button class="continue-btn" type="submit">Нэвтрэх</button>
 
       <div class="privacy">Нууцлалын бодлого</div>
 
-      <div class="or" aria-hidden="true">эсвэл</div>
+      <div class="or">эсвэл</div>
 
       <div class="social">
-        <button type="button" class="btn-social" onclick="alert('Google')">
-        <img src="assets/img/num-logo.svg" alt="num-logo">
+        <button type="button" class="btn-social">
+          <img src="assets/img/num-logo.svg" alt="num-logo">
           SISI-ээр үргэлжлүүлэх
         </button>
       </div>
+
     </form>
   </div>
 </body>
