@@ -26,8 +26,8 @@
       display:flex; 
       flex-wrap:wrap; 
       align-items:center;
-      gap: 0.8rem; 
-      justify-content:center;
+      gap: 0.5rem; 
+      justify-content:space-between;
     }
 
     .bottom-row{ 
@@ -219,7 +219,7 @@
 }
 
 .swipe-bg.delete .bg-right {
-  background: #d9534f; /* Улаан */
+  background: #d9534f; 
 }
 .swipe-bg.delete .bg-left {
   background: transparent;
@@ -387,10 +387,10 @@
   font-weight: 700;
   font-size: 1.3rem;
 }
-@media (max-width: 64rem) {
+@media (max-width: 54rem) {
   main { padding-top: 4.75rem; }
   .filter-section { margin: 1rem; padding: 1rem 1.25rem; gap: .75rem; }
-  .middle-row { gap: .6rem; }
+  .middle-row { gap: 0.6rem; }
   .offers-container { margin: 1rem; padding: .875rem; }
   .offers-row { gap: .875rem; }
   .offers-row > offer-card { 
@@ -399,7 +399,7 @@
   }
 }
 
-@media (max-width: 42rem) {
+@media (max-width: 30rem) {
   main { padding-top: 4.25rem; padding-bottom: 4rem; }
   .filter-section { margin: .75rem; padding: .875rem 1rem; gap: .75rem; }
   .top-row { justify-content: flex-end; }
@@ -725,7 +725,7 @@
 }
 
 .swipe-bg.delete .bg-right {
-  background: #d9534f; /* Улаан */
+  background: #d9534f; 
 }
 .swipe-bg.delete .bg-left {
   background: transparent;

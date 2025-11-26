@@ -58,7 +58,6 @@ class ShCart extends HTMLElement {
         this.cartBadge = this.querySelector(".cart-icon span");
         this.foodSelect = document.querySelector("#what") || document.querySelector(".bottom-row select");
         this.deliveryImgEl = this.querySelector(".delivery-box img");
-        // ensure container exists
         if (!this.cartItemsContainer) {
             const cc = this.querySelector(".cart-content");
             if (cc) {

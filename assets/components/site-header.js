@@ -42,7 +42,7 @@ class SiteHeader extends HTMLElement {
           </a>
         </nav>
         <div class="header-actions">
-          <button class="btn btn--accent header-driver-btn">Хүргэгч болох</button>
+          <button>Хүргэгч болох</button>
         </div>
       </header>
     `;
