@@ -249,6 +249,10 @@
   position: relative;
 
 }
+.cart-content{
+  display: flex;
+  justify-content: space-between;
+}
 .cart-content > div:first-child {
   max-height: 15rem;          
   overflow-y: auto;
