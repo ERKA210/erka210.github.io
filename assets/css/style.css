@@ -95,6 +95,9 @@ main {
   transform: translateY(0);
 }
 @media (max-width: 54rem){
+  .site-top .brand-logo{
+    height: 3rem;
+  }
   .top-menu{
     position: fixed;
     left: 0; right: 0; bottom: 0;
