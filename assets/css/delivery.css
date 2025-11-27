@@ -335,11 +335,19 @@ person-detail {
 
   .orders {
     grid-area: ord;
+    display: flex;
+    flex-wrap: wrap;
     width: 100%;
     padding: 0.8rem 1rem;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
     box-shadow: var(--shadow-card);
+  }
+  d-orders {
+    width: 45%;
+    height: 45%;
+    gap: 1ch;
+
   }
 
   h2 {
@@ -392,10 +400,6 @@ person-detail {
     width: 26px;
     height: 26px;
     margin-top: 0.4rem;
-  }
-
-  .site-top .brand-logo {
-    height: 2rem;
   }
 
   .step {
