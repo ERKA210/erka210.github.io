@@ -44,6 +44,8 @@ class OfferModal extends HTMLElement {
           <p id="meta"></p>
           <p id="sub"></p>
           <p id="price"></p>
+          <button class="delete">Устгах</button>
+          <button class="confirm">Хүргэх</button>
         </div>
       </div>
     `;
