@@ -39,7 +39,7 @@ class OrderConfirm extends HTMLElement {
           <div id="confirm-text"></div>
           <div class="buttons">
             <button id="cancel-order">Цуцлах</button>
-            <button id="confirm-order">Батлах</button>
+            <button id="confirm-order">Баталгаажуулах</button>
           </div>
         </div>
       </div>
