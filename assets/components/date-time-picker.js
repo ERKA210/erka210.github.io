@@ -18,23 +18,33 @@ class DateTimePicker extends HTMLElement {
   render() {
     this.shadowRoot.innerHTML = `
       <style>
-      @import url(/assets/css/style.css);
+        @import url(/assets/css/style.css);
+
+        :host {
+          display: flex;
+          gap: 0.5rem;
+          flex: 1 1 auto;
+        }
+
         .date-time-picker {
           display: flex;
-          gap: 10px;
+          gap: 0.5rem;
           width: 100%;
           font-family: var(--font-family);
         }
+      
         .wrapper {
           display: flex;
-          gap: 10px;
-          padding: 10px;
-          border: 1px solid #ccc;
-          border-radius: 8px;
-          transition: .25s;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0 0.75rem;
+          height: 2.75rem;
+          border: 0.0625rem solid var(--color-border);
+          border-radius: var(--radius);
+          transition: all 0.25s ease;
           background: #fff;
-          width: 100%;
-          width: 100%;
+          flex: 1 1 0;
+          min-width: 0;
           font-family: var(--font-family);
         }
 
@@ -43,12 +53,11 @@ class DateTimePicker extends HTMLElement {
           outline: none;
           background: transparent;
           width: 100%;
-          font-size: var(--font-size-base, 14px);
-          width: 100%;
+          font-size: var(--font-size-base, 0.875rem);
           font-family: var(--font-family);
+          cursor: pointer;
         }
 
-        /* Focus эффект — wrapper хүрээ өнгө сольдог */
         .wrapper:has(input:focus) {
           border-color: var(--color-accent, #d00);
           box-shadow: 0 0 0 0.15rem rgba(201, 13, 48, 0.18);
@@ -59,21 +68,34 @@ class DateTimePicker extends HTMLElement {
           accent-color: var(--color-accent, #d00);
         }
 
+        input::-webkit-calendar-picker-indicator {
+          cursor: pointer;
+        }
 
-        .wrapper.wide {
-          flex: 1 1 100%;
+        @media (max-width: 54rem) {
+          :host {
+            gap: 0.5rem;
+          }
+          
+          .date-time-picker {
+            gap: 0.5rem;
+          }
+          
+          .wrapper {
+            padding: 0 0.625rem;
+            gap: 0.375rem;
+          }
         }
       </style>
-      <div class="date-time-picker">
-      <div class="wrapper">
-        <input class="date" type="date">
-       </div>
-      <div class="wrapper">
-        <input class="time" type="time">
-      </div>
-      </div>
-     
       
+      <div class="date-time-picker">
+        <div class="wrapper">
+          <input class="date" type="date" aria-label="Огноо сонгох">
+        </div>
+        <div class="wrapper">
+          <input class="time" type="time" aria-label="Цаг сонгох">
+        </div>
+      </div>
     `;
   }
 
