@@ -60,8 +60,8 @@ class OfferModal extends HTMLElement {
     this.shadowRoot.getElementById('thumb').src = data.thumb || '';
     this.shadowRoot.getElementById('title').textContent = data.title || '';
     this.shadowRoot.getElementById('meta').textContent = data.meta || '';
-    this.shadowRoot.getElementById('sub').innerHTML = data.sub.map(e=>`div>${e.name}</div>`).join('') || '';
-    this.shadowRoot.getElementById('price').textContent = data.price || '';
+    this.shadowRoot.getElementById('sub').innerHTML = data.sub.map(e=>`<div>${e.name}: ${e.price}</div>`).join('') || '',
+    this.shadowRoot.getElementById('price').textContent =  `Нийт үнэ: ${data.price}` || '';
     this.modal.style.display = 'flex';
   }
 }

@@ -14,11 +14,18 @@ class OfferCard extends HTMLElement {
     `;
     this.addEventListener('click', () => {
       const modal = document.querySelector('offer-modal');
+      const subRaw = this.getAttribute('sub');
+      let sub = [];
+        try {
+          sub = JSON.parse(subRaw);  
+        } catch (e) {
+          sub = []; 
+        }
       modal.show({
         thumb: this.getAttribute('thumb'),
         title: this.getAttribute('title'),
         meta: this.getAttribute('meta'),
-        sub: this.getAttribute('sub'),
+        sub,
         price: this.getAttribute('price')
       });
     });
@@ -41,7 +48,7 @@ class OffersList extends HTMLElement {
     row.innerHTML = '';
     let content = '';
     list.forEach(item => {
-      content += `<offer-card thumb="${item.thumb}" title="${item.title}" meta="${item.meta}" sub="${item.sub}" price="${item.price}" ></offer-card>`;
+      content += `<offer-card thumb="${item.thumb}" title="${item.title}" meta="${item.meta}" sub='${JSON.stringify(item.sub)}' price="${item.price}" ></offer-card>`;
     });
     row.innerHTML = content;
   }
@@ -51,12 +58,34 @@ customElements.define('offers-list', OffersList);
 // --- data ---
 document.addEventListener('DOMContentLoaded', () => {
   const offers = [
-    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮', sub: 'Нэмэлт мэдээлэл' },
-    { thumb: 'assets/img/tor.svg', title: 'CU - 8-р байр 209', meta: '11/21/25 • 14:00', price: '5,000₮', sub: 'Нэмэлт мэдээлэл' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮', sub: 'Нэмэлт мэдээлэл' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮', sub: 'Нэмэлт мэдээлэл' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮', sub: 'Нэмэлт мэдээлэл' },
-    { thumb: 'assets/img/box.svg', title: 'GL burger - 7-р байр 207', meta: '11/21/25 • 14:00', price: '10,000₮', sub: 'Нэмэлт мэдээлэл' },
+    { thumb: 'assets/img/box.svg', 
+      title: 'GL burger - 7-р байр 207', 
+      meta: '11/21/25 • 14:00', 
+      price: '10,000₮', 
+      sub: [
+      { name: "Бууз", price: "5000₮" },
+      { name: "Сүү", price: "2000₮" },] },
+      { thumb: 'assets/img/document.svg', 
+      title: 'GL burger - 7-р байр 207', 
+      meta: '11/21/25 • 14:00', 
+      price: '10,000₮', 
+      sub: [
+      { name: "Бууз", price: "5000₮" },
+      { name: "Сүү", price: "2000₮" },] },
+      { thumb: 'assets/img/tor.svg', 
+      title: 'GL burger - 7-р байр 207', 
+      meta: '11/21/25 • 14:00', 
+      price: '10,000₮', 
+      sub: [
+      { name: "Бууз", price: "5000₮" },
+      { name: "Сүү", price: "2000₮" },] },
+      { thumb: 'assets/img/tor.svg', 
+      title: 'GL burger - 7-р байр 207', 
+      meta: '11/21/25 • 14:00', 
+      price: '10,000₮', 
+      sub: [
+      { name: "Бууз", price: "5000₮" },
+      { name: "Сүү", price: "2000₮" },] },
   ];
 
   localStorage.setItem('offers', JSON.stringify(offers));
