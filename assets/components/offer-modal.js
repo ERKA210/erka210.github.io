@@ -35,13 +35,41 @@ class OfferModal extends HTMLElement {
           max-width: 100%;
           margin-bottom: 1rem;
         }
+        .delete{
+          background: #fff;
+          color: #484646ff;
+          border-radius: 8px;
+          padding: 0.625rem 1.25rem;
+          border: none;
+        }
+        .confirm{
+            padding: 0.625rem 1.25rem;
+            background: var(--color-accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;}
+          .information{
+          display: flex;
+          wrapper; wrap;
+          }
+
       </style>
       <div class="modal">
         <div class="modal-content">
           <span class="close-btn">&times;</span>
-          <img id="thumb" src="" alt="thumb"/>
+          <div class="information">
+          <div>
           <h2 id="title"></h2>
           <p id="meta"></p>
+          </div>
+          <img id="thumb" src="" alt="thumb"/>
+          </div>
+          <div>Барааны жагсаалт: </div>
           <p id="sub"></p>
           <p id="price"></p>
           <button class="delete">Устгах</button>
