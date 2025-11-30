@@ -8,7 +8,7 @@
 body {
   background: var(--color-bg);
   color: var(--color-text);
-  margin-top: 6rem;
+  margin-top: 3.5rem;
   line-height: 1.6;
 }
 
@@ -71,11 +71,16 @@ body {
   background: var(--color-accent);
   color: var(--color-bg);
   border: none;
-  padding: 8px 18px;
+  padding: 4px 9px;
   border-radius: var(--radius);
   cursor: pointer;
   font-weight: var(--font-weight-bold);
   transition: var(--transition);
+  svg {
+      width: 3ch;
+      height: 3ch;
+      object-fit: cover;
+    }
 }
 
 .view-btn:hover {
@@ -322,13 +327,12 @@ person-detail {
   .details {
     grid-area: det;
     padding: 1rem;
-    height: min-content;
+    height: max-content;
   }
 
   .order-step {
     grid-area: stp;
     padding: 1rem;
-    height: min-content;
     margin-top: 0;
     margin-bottom: 0;
   }
@@ -342,6 +346,7 @@ person-detail {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
     box-shadow: var(--shadow-card);
+    gap: 1ch;
   }
   d-orders {
     width: 45%;
@@ -365,7 +370,6 @@ person-detail {
   }
 
   .order-card {
-    padding: 0.7rem 0.9rem;
     border-radius: var(--radius);
     display: flex;
     justify-content: space-between;
@@ -412,5 +416,9 @@ person-detail {
 
   .body {
     margin-top: 1rem;
+  }
+
+  .order-progress{
+    align-items: center;
   }
 }

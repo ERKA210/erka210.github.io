@@ -8,7 +8,7 @@ class PersonDetail extends HTMLElement {
         this.type=this.getAttribute("type") ?? "medium";
 
         this.innerHTML=`
-        <p style="font-weight: bold; font-size: 1.5rem;">${this.title}</p>
+        <p style="font-weight: bold; font-size: 1rem;">${this.title}</p>
         <div class="delivery ${this.type=="medium" ? "" : "big"}">
           <img src="assets/img/profile.jpg" alt="Хүргэгчийн зураг">
           <div class="delivery-info">

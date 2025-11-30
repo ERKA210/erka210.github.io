@@ -63,6 +63,7 @@
       <d-orders header="GL Burger - 7-р байр 207" detail="3 ширхэг • 10,000₮"></d-orders>
       <d-orders header="CU - 8-р байр 209" detail="1 ширхэг • 5,000₮"></d-orders>
       <d-orders header="CU - 4-р байр 229" detail="1 ширхэг • 4,000₮"></d-orders>
+      <d-orders header="CU - 4-р байр 229" detail="1 ширхэг • 4,000₮"></d-orders>
     </section>
 
     <section class="details">
@@ -70,7 +71,7 @@
       <div class="detail-header">
         <p><strong>GS25</strong> → <strong>МУИС 7-р байр</strong></p>
         <p class="date">2025.10.08 • 09:36</p>
-        <person-detail title="Zahialgiin medeelel" type="big" ></person-detail>
+        <person-detail title="Захиалагчийн мэдээлэл" type="big" ></person-detail>
       </div>
       </div>
     </section>
@@ -91,6 +92,43 @@
       });
     })();
   </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const raw = localStorage.getItem('activeOrder');
+    if (!raw) return;
+
+    let order;
+    try {
+      order = JSON.parse(raw);
+    } catch (e) {
+      console.error('activeOrder parse алдаа', e);
+      return;
+    }
+
+    // 1. Delivery-ийн эхний карт (d-orders) -ийг өөрчлөх
+    const firstOrder = document.querySelector('d-orders');
+    if (firstOrder && order.from && order.to) {
+      firstOrder.setAttribute('header', `${order.from} → ${order.to}`);
+      firstOrder.setAttribute('detail', `${order.item || ''}`);
+    }
+
+    // 2. Баруун талын "Захиалгын дэлгэрэнгүй" route текст солих
+    const detailRouteP = document.querySelector('.detail-header p');
+    if (detailRouteP && order.from && order.to) {
+      detailRouteP.innerHTML = `<strong>${order.from}</strong> → <strong>${order.to}</strong>`;
+    }
+
+    // 3. Огноо / цаг
+    const dateEl = document.querySelector('.detail-header .date');
+    if (dateEl && order.createdAt) {
+      const dt = new Date(order.createdAt);
+      const pad = (n) => n.toString().padStart(2, '0');
+      const formatted = `${dt.getFullYear()}.${pad(dt.getMonth()+1)}.${pad(dt.getDate())} • ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+      dateEl.textContent = formatted;
+    }
+  });
+</script>
+
 </body>
 
 </html>
