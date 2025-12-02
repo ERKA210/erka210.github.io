@@ -87,41 +87,41 @@
     })();
   </script>
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const raw = localStorage.getItem('activeOrder');
-    if (!raw) return;
+    document.addEventListener('DOMContentLoaded', () => {
+      const raw = localStorage.getItem('activeOrder');
+      if (!raw) return;
 
-    let order;
-    try {
-      order = JSON.parse(raw);
-    } catch (e) {
-      console.error('activeOrder parse алдаа', e);
-      return;
-    }
+      let order;
+      try {
+        order = JSON.parse(raw);
+      } catch (e) {
+        console.error('activeOrder parse алдаа', e);
+        return;
+      }
 
-    // 1. Delivery-ийн эхний карт (d-orders) -ийг өөрчлөх
-    const firstOrder = document.querySelector('d-orders');
-    if (firstOrder && order.from && order.to) {
-      firstOrder.setAttribute('header', `${order.from} → ${order.to}`);
-      firstOrder.setAttribute('detail', `${order.item || ''}`);
-    }
+      // 1. Delivery-ийн эхний карт (d-orders) -ийг өөрчлөх
+      const firstOrder = document.querySelector('d-orders');
+      if (firstOrder && order.from && order.to) {
+        firstOrder.setAttribute('header', `${order.from} → ${order.to}`);
+        firstOrder.setAttribute('detail', `${order.item || ''}`);
+      }
 
-    // 2. Баруун талын "Захиалгын дэлгэрэнгүй" route текст солих
-    const detailRouteP = document.querySelector('.detail-header p');
-    if (detailRouteP && order.from && order.to) {
-      detailRouteP.innerHTML = `<strong>${order.from}</strong> → <strong>${order.to}</strong>`;
-    }
+      // 2. Баруун талын "Захиалгын дэлгэрэнгүй" route текст солих
+      const detailRouteP = document.querySelector('.detail-header p');
+      if (detailRouteP && order.from && order.to) {
+        detailRouteP.innerHTML = `<strong>${order.from}</strong> → <strong>${order.to}</strong>`;
+      }
 
-    // 3. Огноо / цаг
-    const dateEl = document.querySelector('.detail-header .date');
-    if (dateEl && order.createdAt) {
-      const dt = new Date(order.createdAt);
-      const pad = (n) => n.toString().padStart(2, '0');
-      const formatted = `${dt.getFullYear()}.${pad(dt.getMonth()+1)}.${pad(dt.getDate())} • ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
-      dateEl.textContent = formatted;
-    }
-  });
-</script>
+      // 3. Огноо / цаг
+      const dateEl = document.querySelector('.detail-header .date');
+      if (dateEl && order.createdAt) {
+        const dt = new Date(order.createdAt);
+        const pad = (n) => n.toString().padStart(2, '0');
+        const formatted = `${dt.getFullYear()}.${pad(dt.getMonth() + 1)}.${pad(dt.getDate())} • ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+        dateEl.textContent = formatted;
+      }
+    });
+  </script>
 
 </body>
 

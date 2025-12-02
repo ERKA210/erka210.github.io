@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="mn">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NUMDelivery</title>
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="assets/css/index.css" />
+  <link rel="stylesheet" href="assets/css/delivery.css">
+  <link rel="stylesheet" href="assets/css/order.css">
+  <link rel="stylesheet" href="assets/css/pay.css">
+  <link rel="stylesheet" href="assets/css/login.css">
   <script src="assets/components/offer-list.js" type="module"></script>
   <script src="assets/components/sh-cart.js" type="module"></script>
   <script src="assets/components/date-time-picker.js" type="module"></script>
@@ -13,92 +18,66 @@
   <script src="assets/components/offer-modal.js" type="module"></script>
   <script src="assets/components/site-header.js" type="module"></script>
   <script src="assets/components/order-form.js" type="module"></script>
+  <script src="assets/components/num-router.js" type="module"></script>
+  <script src="assets/pages/home-page.js" type="module"></script>
+  <script src="assets/pages/delivery-page.js" type="module"></script>
+  <script src="assets/pages/orders-page.js" type="module"></script>
+  <script src="assets/pages/profile-page.js" type="module"></script>
+  <script src="assets/pages/pay-page.js" type="module"></script>
+  <script src="assets/pages/login-page.js" type="module"></script>
+
 </head>
+
 <body>
-<site-header></site-header>
+  <site-header></site-header>
+
   <main>
-    <order-form>
-      <section class="filter-section">
-        <div class="middle-row">
-          <div class="ctrl">
-            <span><img src="assets/img/map_pin.svg" alt="icon"/></span>
-            <select id="from">
-              <option value="0" selected disabled hidden>Хаанаас</option>
-              <option value="1">CU</option>
-              <option value="2">GS25</option>
-              <option value="3">GL Burger</option>
-              <option value="4">Зөгийн үүр зоогийн газар</option>
-              <option value="5">Дэлгэрэх</option>
-          </select>
-          </div>
-
-          <span><img src="assets/img/arrow.svg" alt="icon"/></span>
-
-          <div class="ctrl">
-            <span><img src="assets/img/map_pin.svg" alt="icon"/></span>
-            <select id="to"> 
-              <option value="" selected disabled hidden>Хаашаа</option>
-            <option>МУИС 1-р байр</option>
-            <option>МУИС 2-р байр</option>
-            <option>МУИС 3-р байр</option>
-            <option>МУИС 4-р байр</option>
-            </select>
-          </div>
-
-
-           <date-time-picker></date-time-picker>
-        </div>
-        <div class="bottom-row">
-          <div class="ctrl wide">
-            <span><img src="assets/img/fork.svg" alt="icon" /></span>
-            <select id="what">
-              <option value="" selected disabled hidden>Юуг</option>
-
-              <optgroup label="🥘 Идэх юм">
-                <option>Кимбаб</option>
-                <option>Бургер</option>
-                <option>Бууз</option>
-                <option>Салад</option>
-              </optgroup>
-
-              <optgroup label="🥤 Уух юм">
-                <option>Кола 0.5л</option>
-                <option>Хар цай</option>
-                <option>Кофе</option>
-                <option>Жүүс 0.33л</option>
-              </optgroup>
-            </select>
-          </div>
-        </div>
-        <sh-cart class="cart"></sh-cart>
-        <div class="top-row">
-          <button class="btn btn--accent order-btn">Захиалах</button>
-        </div>
+    <num-router>
+      <section data-route="home">
+        <home-page></home-page>
       </section>
-      <offers-list id="offers"></offers-list>
-      <offer-modal></offer-modal>
-      <div id="confirm-modal" class="modal hidden">
-        <div class="modal-content">
-          <h3>Захиалга баталгаажуулах уу?</h3>
-          <p id="confirm-text"></p>
 
-          <div class="modal-actions">
-            <button id="cancel-order" class="btn btn--gray">Цуцлах</button>
-            <button id="confirm-order" class="btn btn--accent">Баталгаажуулах</button>
-          </div>
-        </div>
-      </div>
-    </order-form>
+      <section data-route="delivery" hidden>
+        <delivery-page></delivery-page>
+      </section>
+
+      <section data-route="orders" hidden>
+        <orders-page></orders-page>
+      </section>
+
+      <section data-route="profile" hidden>
+        <profile-page></profile-page>
+      </section>
+
+      <section data-route="pay" hidden>
+        <pay-page></pay-page>
+      </section>
+
+      <section data-route="login" hidden>
+        <login-page></login-page>
+      </section>
+    </num-router>
   </main>
+
 </body>
 <script>
-(function(){
-  var path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-  document.querySelectorAll('.top-menu a').forEach(function(a){
-    var href = (a.getAttribute('href')||'#').toLowerCase();
-    var active = (path === href) || (href === '#' && path === 'index.html');
-    a.classList.toggle('is-active', active);
-  });
-})();
+  function updateActiveLink() {
+    const hash = location.hash || '#home';
+
+    document.querySelectorAll('.top-menu a').forEach(a => {
+      const href = a.getAttribute('href');
+      a.classList.toggle('is-active', href === hash);
+    });
+
+    // Хоосон hash-тай орж ирвэл #home болгож өгөх (optional)
+    if (!location.hash) {
+      history.replaceState(null, '', '#home');
+    }
+  }
+
+  window.addEventListener('hashchange', updateActiveLink);
+  document.addEventListener('DOMContentLoaded', updateActiveLink);
 </script>
+
+
 </html>
