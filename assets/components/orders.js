@@ -1,22 +1,34 @@
-class Order extends HTMLElement {
-    constructor(){
-        super();
+// assets/components/orders.js
+class DOrders extends HTMLElement {
+  connectedCallback() {
+    const isActive = this.hasAttribute('data-active');
+    let header = this.getAttribute('header') || '';
+    let detail = this.getAttribute('detail') || '';
+
+    if (isActive) {
+      const raw = localStorage.getItem('activeOrder');
+      if (raw) {
+        try {
+          const order = JSON.parse(raw);
+          if (order.from && order.to) {
+            header = `${order.from} → ${order.to}`;
+          }
+          if (order.item) {
+            detail = `${order.item}`;
+          }
+        } catch (e) {
+          console.error('activeOrder parse алдаа', e);
+        }
+      }
     }
 
-    connectedCallback(){
-        this.header = this.getAttribute("header") ?? "header";
-        this.detail = this.getAttribute("detail") ?? "Tailbar baihgui";
-        this.render();
-    }
-
-    render(){
-        this.innerHTML = `
-        <div class="order-card">
-            <div class="order-info">
-                <h3>${this.header}</h3>
-                <p>${this.detail}</p>
-            </div>
-            <button class="view-btn"><svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 24 24">
+    this.innerHTML = `
+      <article class="order-card">
+        <div class="order-info">
+          <h3>${header}</h3>
+          <p>${detail}</p>
+        </div>
+        <button class="view-btn"><svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 24 24">
   <title>i</title>
   <g id="Complete">
     <g id="expand">
@@ -29,19 +41,9 @@ class Order extends HTMLElement {
     </g>
   </g>
 </svg></button>
-        </div>
-        `;
-        
-    }
-
-    disconnectedCallback(){}
-
-    attributeChangedCallback(name, oldVal, newVal) {
-    }
-
-    adoptedCallback() {
-    }
-
+      </article>
+    `;
+  }
 }
 
-window.customElements.define('d-orders', Order);
+customElements.define('d-orders', DOrders);

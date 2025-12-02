@@ -17,6 +17,7 @@
 <body>
 <site-header></site-header>
   <main>
+    <order-form>
       <section class="filter-section">
         <div class="middle-row">
           <div class="ctrl">
@@ -77,16 +78,17 @@
       <offers-list id="offers"></offers-list>
       <offer-modal></offer-modal>
       <div id="confirm-modal" class="modal hidden">
-  <div class="modal-content">
-    <h3>Захиалга баталгаажуулах уу?</h3>
-    <p id="confirm-text"></p>
+        <div class="modal-content">
+          <h3>Захиалга баталгаажуулах уу?</h3>
+          <p id="confirm-text"></p>
 
-    <div class="modal-actions">
-      <button id="cancel-order" class="btn btn--gray">Цуцлах</button>
-      <button id="confirm-order" class="btn btn--accent">Баталгаажуулах</button>
-    </div>
-  </div>
-</div>
+          <div class="modal-actions">
+            <button id="cancel-order" class="btn btn--gray">Цуцлах</button>
+            <button id="confirm-order" class="btn btn--accent">Баталгаажуулах</button>
+          </div>
+        </div>
+      </div>
+    </order-form>
   </main>
 </body>
 <script>
