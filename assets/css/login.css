@@ -1,4 +1,4 @@
-    html,
+login-page {
     body {
         height: 100%;
     }
@@ -160,3 +160,4 @@
             flex-basis: 110px
         }
     }
+}
