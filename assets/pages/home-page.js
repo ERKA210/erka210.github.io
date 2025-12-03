@@ -6,6 +6,7 @@ class HomePage extends HTMLElement {
 
   render() {
     this.innerHTML = `
+      <link rel="stylesheet" href="assets/css/index.css" />
       <section class="filter-section">
         <div class="middle-row">
           <div class="ctrl">
@@ -87,7 +88,7 @@ class HomePage extends HTMLElement {
     if (!orderBtn) return;
 
     const fromSel = this.querySelector('#from');
-    const toSel   = this.querySelector('#to');
+    const toSel = this.querySelector('#to');
     const whatSel = this.querySelector('#what');
 
     orderBtn.addEventListener('click', () => {
@@ -98,7 +99,7 @@ class HomePage extends HTMLElement {
 
       const activeOrder = {
         from: fromSel.options[fromSel.selectedIndex].text,
-        to:   toSel.options[toSel.selectedIndex].text,
+        to: toSel.options[toSel.selectedIndex].text,
         item: whatSel.options[whatSel.selectedIndex].text,
         createdAt: new Date().toISOString(),
       };

@@ -6,15 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NUMDelivery</title>
   <link rel="stylesheet" href="assets/css/style.css" />
-  <link rel="stylesheet" href="assets/css/index.css" />
-  <link rel="stylesheet" href="assets/css/delivery.css">
-  <link rel="stylesheet" href="assets/css/order.css">
-  <link rel="stylesheet" href="assets/css/pay.css">
-  <link rel="stylesheet" href="assets/css/login.css">
   <script src="assets/components/offer-list.js" type="module"></script>
   <script src="assets/components/sh-cart.js" type="module"></script>
   <script src="assets/components/date-time-picker.js" type="module"></script>
   <script src="assets/js/modal.js" type="module"></script>
+  <script type="module" src="./assets/components/d-orders.js"></script>
+  <script type="module" src="./assets/components/del-order-details.js"></script>
+  <script type="module" src="./assets/components/del-order-progress.js"></script>
   <script src="assets/components/offer-modal.js" type="module"></script>
   <script src="assets/components/site-header.js" type="module"></script>
   <script src="assets/components/order-form.js" type="module"></script>
@@ -69,7 +67,6 @@
       a.classList.toggle('is-active', href === hash);
     });
 
-    // Хоосон hash-тай орж ирвэл #home болгож өгөх (optional)
     if (!location.hash) {
       history.replaceState(null, '', '#home');
     }

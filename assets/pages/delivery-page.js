@@ -1,4 +1,7 @@
 class DeliveryPage extends HTMLElement {
+  constructor() {
+    super();
+  }
   connectedCallback() {
     this.render();
     this.applyActiveOrder();
@@ -6,6 +9,432 @@ class DeliveryPage extends HTMLElement {
 
   render() {
     this.innerHTML = `
+      <style>
+      * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  margin-top: 3.5rem;
+  line-height: 1.6;
+}
+
+.navbar {
+  background: var(--color-bg);
+  box-shadow: var(--shadow-light);
+  padding: 15px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.orders {
+  grid-area: ord;
+  flex: 1;
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 25px 30px;
+}
+
+.orders h2 {
+  margin-bottom: 20px;
+  color: var(--color-text);
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.order-card {
+  background: var(--color-bg-light);
+  border-radius: var(--radius);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  transition: var(--transition);
+}
+
+.order-card:hover {
+  background: var(--color-bg);
+  border-left: 4px solid var(--color-accent);
+}
+
+.order-info h3 {
+  font-size: 16px;
+  color: var(--color-text);
+}
+
+.order-info p {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.view-btn {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  padding: 4px 9px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: var(--font-weight-bold);
+  transition: var(--transition);
+  svg {
+      width: 3ch;
+      height: 3ch;
+      object-fit: cover;
+    }
+}
+
+.view-btn:hover {
+  background: --color-hover;
+}
+
+.details {
+  grid-area: det;
+  flex: 1.5;
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 30px;
+}
+
+.order-step {
+  grid-area: stp;
+  flex: 0.8;
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 30px;
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+
+.details h2 {
+  margin-bottom: 15px;
+}
+
+.order-progress {
+  position: relative;
+  padding-left: 32px;
+  margin-top: 10px;
+}
+
+.order-progress::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #f1f1f1;
+}
+
+.detail-header {
+  background: var(--color-bg-light);
+  padding: 15px 20px;
+  border-radius: var(--radius);
+  margin-bottom: 25px;
+  border: 1px solid var(--color-border);
+}
+
+.date {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  margin-top: 50px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 100px;
+  color: var(--color-muted);
+}
+
+.step-indicator {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-bg-light);
+  border: 2px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.step-indicator svg {
+  width: 10px;
+  height: 10px;
+  opacity: 0;
+}
+
+.step.active .step-indicator svg {
+  opacity: 1;
+}
+
+.step.active .step-indicator svg path {
+  fill: var(--color-bg);
+}
+
+.step-label {
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.step-desc {
+  font-size: 13px;
+  visibility: hidden;
+}
+
+.step.active {
+  color: var(--color-text);
+}
+
+.step.active .step-indicator {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.step.active .step-indicator svg path {
+  fill: var(--color-bg);
+}
+
+.step.completed {
+  color: var(--color-text);
+}
+
+.step.completed .step-indicator {
+  background: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+.step.active .step-desc {
+  visibility: inherit;
+}
+
+.next-btn {
+  margin-top: 30px;
+  padding: 12px 40px;
+  margin-left: 32px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: var(--transition);
+}
+
+
+
+footer {
+  background: var(--color-bg);
+  text-align: center;
+  padding: 20px 0;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+}
+
+
+
+person-detail {
+
+  .delivery {
+    align-items: center;
+    gap: 20px;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius);
+    padding: 15px;
+
+
+    img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+  .big img {
+      width: 15ch;
+      aspect-ratio: 1 / 1; 
+  }
+}
+
+
+
+
+.delivery-info h3 {
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.delivery-info p {
+  font-size: 14px;
+  color: var(--color-muted);
+}
+
+.next-btn {
+  margin-top: 30px;
+  padding: 12px 40px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: var(--transition);
+}
+
+.next-btn:hover {
+  background: var(--color-hover);
+}
+
+.container {
+
+  display: grid;
+  grid-template: 'ord ord stp'
+    'det det stp';
+  gap: 30px;
+  max-width: 1300px;
+  margin: 40px auto;
+  padding: 0 30px;
+}
+
+
+@media (max-width: 42rem) {
+
+  .container {
+    display: grid;
+    grid-template-areas:
+      "det stp"
+      "ord ord";
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 1.2rem;
+    width: 100%;
+    padding: 0 1rem;
+    margin: 0;
+  }
+
+  .details {
+    grid-area: det;
+    padding: 1rem;
+    height: max-content;
+  }
+
+  .order-step {
+    grid-area: stp;
+    padding: 1rem;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .orders {
+    grid-area: ord;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 0.8rem 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    box-shadow: var(--shadow-card);
+    gap: 1ch;
+  }
+  d-orders {
+    width: 45%;
+    height: 45%;
+    gap: 1ch;
+
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  p {
+    font-size: 0.7rem;
+  }
+
+  .order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .order-card {
+    border-radius: var(--radius);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .order-info h3 {
+    font-size: 0.9rem;
+  }
+
+  .order-info small {
+    font-size: 0.78rem;
+  }
+
+  .delivery {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.4rem;
+  }
+
+  .delivery img {
+    width: 6.5rem;
+    height: 6.5rem;
+  }
+
+  .steps span {
+    gap: 10px;
+  }
+
+  .steps img {
+    width: 26px;
+    height: 26px;
+    margin-top: 0.4rem;
+  }
+
+  .step {
+    margin-bottom: 0;
+  }
+
+  .step-desc {
+    display: none;
+  }
+
+  .body {
+    margin-top: 1rem;
+  }
+
+  .order-progress{
+    align-items: center;
+  }
+}
+      </style>
       <div class="container">
         <section class="orders">
           <h2>Миний идэвхтэй хүргэлт</h2>

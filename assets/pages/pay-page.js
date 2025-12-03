@@ -1,6 +1,7 @@
 class PayPage extends HTMLElement {
   connectedCallback() {
-    this.innerHTML = `
+    this.innerHTML = `    
+      <link rel="stylesheet" href="assets/css/pay.css">
       <div class="pay">
         <main class="container">
           <section class="orders">

@@ -6,6 +6,8 @@ class OrdersPage extends HTMLElement {
 
   render() {
     this.innerHTML = `
+    
+  <link rel="stylesheet" href="assets/css/order.css">
       <main class="container">
         <section class="orders">
           <h2>Миний захиалга</h2>

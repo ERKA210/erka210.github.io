@@ -1,6 +1,7 @@
 class LoginPage extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
+      <link rel="stylesheet" href="assets/css/login.css">
       <div class="card" role="dialog" aria-labelledby="login-title">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div style="width:18px"></div>
