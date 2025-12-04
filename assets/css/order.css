@@ -22,14 +22,14 @@ orders-page {
     margin-left: 5%;
     align-items: flex-start;
     justify-content: center;
+    margin-top: 5rem;
   }
 
   .orders {
     flex: 0.8;
     background: var(--color-bg);
     border-radius: var(--radius-lg);
-    box-shadow: 0 5px 10px 15px rgba(0, 0, 0, 0.08);
-    ;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
     padding: 25px 30px;
   }
 
