@@ -7,7 +7,9 @@ home-page {
   }
 
   .filter-section {
-    margin: 2rem;
+    margin-top: 6rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
     background: var(--color-bg);
     border: 0.0625rem solid var(--color-border);
     border-radius: var(--radius-lg);
