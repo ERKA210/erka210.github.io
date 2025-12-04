@@ -1,112 +1,96 @@
-class OfferModal extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: "open" });
-  }
-
+class OfferCard extends HTMLElement {
   connectedCallback() {
-    this.shadowRoot.innerHTML = `
-      <style>
-        dialog {
-          border: none;
-          border-radius: 10px;
-          padding: 1.5rem;
-          max-width: 400px;
-          width: 90%;
-        }
-
-        dialog::backdrop {
-          background: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-          position: relative;
-        }
-
-        .close-btn {
-          position: absolute;
-          top: 0.5rem;
-          right: 1rem;
-          cursor: pointer;
-          font-size: 1.5rem;
-        }
-
-        img {
-          max-width: 100px;
-          margin-left: 1rem;
-        }
-
-        .information {
-          display: flex;
-          gap: 1rem;
-        }
-
-        .delete{
-          background: #fff;
-          color: #484646ff;
-          border-radius: 8px;
-          padding: 0.625rem 1.25rem;
-          border: 1px solid #ccc;
-          cursor: pointer;
-        }
-
-        .confirm{
-          padding: 0.625rem 1.25rem;
-          background: var(--color-accent, #007aff);
-          color: #fff;
-          border: none;
-          border-radius: 8px;
-          font-size: 0.875rem;
-          font-weight: 500;
-          cursor: pointer;
-        }
-      </style>
-
-      <dialog>
-        <div class="modal-content">
-          <span class="close-btn">&times;</span>
-
-          <div class="information">
-            <div>
-              <h2 id="title"></h2>
-              <p id="meta"></p>
-            </div>
-            <img id="thumb" src="" alt="thumb"/>
-          </div>
-
-          <div>Барааны жагсаалт:</div>
-          <p id="sub"></p>
-          <p id="price"></p>
-
-          <button class="delete">Устгах</button>
-          <button class="confirm">Хүргэх</button>
+    this.innerHTML = `
+      <article class="offer-card">
+        <div class="offer-thumb">
+          <img src="${this.getAttribute('thumb') || 'assets/img/box.svg'}" alt="icon"/>
         </div>
-      </dialog>
+        <div class="offer-info">
+          <div class="offer-title">${this.getAttribute('title') || ''}</div>
+          <div class="offer-meta">${this.getAttribute('meta') || ''}</div>
+        </div>
+        <div class="offer-price">${this.getAttribute('price') || ''}</div>
+      </article>
     `;
-
-    this.dialog = this.shadowRoot.querySelector("dialog");
-
-    // Close button
-    this.shadowRoot.querySelector(".close-btn").addEventListener("click", () => {
-      this.dialog.close();
+    this.addEventListener('click', () => {
+      const modal = document.querySelector('offer-modal');
+      const subRaw = this.getAttribute('sub');
+      let sub = [];
+        try {
+          sub = JSON.parse(subRaw);  
+        } catch (e) {
+          sub = []; 
+        }
+      modal.show({
+        thumb: this.getAttribute('thumb'),
+        title: this.getAttribute('title'),
+        meta: this.getAttribute('meta'),
+        sub,
+        price: this.getAttribute('price')
+      });
     });
-  }
-
-  show(data) {
-    this.shadowRoot.getElementById("thumb").src = data.thumb || "";
-    this.shadowRoot.getElementById("title").textContent = data.title || "";
-    this.shadowRoot.getElementById("meta").textContent = data.meta || "";
-
-    this.shadowRoot.getElementById("sub").innerHTML =
-      (data.sub || [])
-        .map(e => `<div>${e.name}: ${e.price}</div>`)
-        .join("");
-
-    this.shadowRoot.getElementById("price").textContent =
-      `Нийт үнэ: ${data.price}`;
-
-    this.dialog.showModal();
   }
 }
 
-customElements.define("offer-modal", OfferModal);
+customElements.define('offer-card', OfferCard);
+
+class OffersList extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `
+      <section class="offers-container">
+        <div class="offers-row"></div>
+      </section>
+    `;
+  }
+
+  set items(list) {
+    const row = this.querySelector('.offers-row');
+    row.innerHTML = '';
+    let content = '';
+    list.forEach(item => {
+      content += `<offer-card thumb="${item.thumb}" title="${item.title}" meta="${item.meta}" sub='${JSON.stringify(item.sub)}' price="${item.price}" ></offer-card>`;
+    });
+    row.innerHTML = content;
+  }
+}
+customElements.define('offers-list', OffersList);
+
+// --- data ---
+document.addEventListener('DOMContentLoaded', () => {
+  const offers = [
+    { thumb: 'assets/img/box.svg', 
+      title: 'GL burger - 7-р байр 207', 
+      meta: '11/21/25 • 14:00', 
+      price: '10,000₮', 
+      sub: [
+      { name: "Бууз", price: "5000₮" },
+      { name: "Сүү", price: "2000₮" },] },
+      { thumb: 'assets/img/document.svg', 
+      title: 'GL burger - 7-р байр 207', 
+      meta: '11/21/25 • 14:00', 
+      price: '10,000₮', 
+      sub: [
+      { name: "Бууз", price: "5000₮" },
+      { name: "Сүү", price: "2000₮" },] },
+      { thumb: 'assets/img/tor.svg', 
+      title: 'GL burger - 7-р байр 207', 
+      meta: '11/21/25 • 14:00', 
+      price: '10,000₮', 
+      sub: [
+      { name: "Бууз", price: "5000₮" },
+      { name: "Сүү", price: "2000₮" },] },
+      { thumb: 'assets/img/tor.svg', 
+      title: 'GL burger - 7-р байр 207', 
+      meta: '11/21/25 • 14:00', 
+      price: '10,000₮', 
+      sub: [
+      { name: "Бууз", price: "5000₮" },
+      { name: "Сүү", price: "2000₮" },] },
+  ];
+
+  localStorage.setItem('offers', JSON.stringify(offers));
+  const offerList = document.querySelector('#offers');
+  if (offerList) {
+    offerList.items = offers;
+  }
+});
