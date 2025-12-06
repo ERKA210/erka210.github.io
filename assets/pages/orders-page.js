@@ -15,11 +15,11 @@ class OrdersPage extends HTMLElement {
             <div class="order-card">
               <div class="order-info">
                 <h3 class="order-title">GL Burger - 7-р байр 207</h3>
-                <p>XLбагц: 10000₮</p>
-                <p>Mбагц: 8000₮</p>
-                <p>Lбагц: 9000₮</p>
-                <hr>
-                <p class="order-total">Дүн: 37,000₮</p>
+                <h4>2025.10.08 • 09:36</h4>
+                <p style=margin-top: 2rem>Бургер: 7,000₮</p>
+                <p>Кимбаб: 5,500₮</p>
+                <p>Кола: 2,500₮</p>
+                <p class="order-total">Дүн: 15,000₮</p>
               </div>
               <img src="assets/img/tor.svg" alt="hemjee">
             </div>
