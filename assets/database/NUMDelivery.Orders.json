@@ -1,0 +1,27 @@
+[{
+  "_id": {
+    "$oid": "69271970bb437cfd566f3528"
+  },
+  "order_id": "ORD001",
+  "user_student_id": "23B1NUM0001",
+  "address_label": "МУИС1",
+  "status": "pending"
+},
+{
+  "_id": {
+    "$oid": "69271970bb437cfd566f3529"
+  },
+  "order_id": "ORD002",
+  "user_student_id": "23B1NUM0002",
+  "address_label": "МУИС2",
+  "status": "delivered"
+},
+{
+  "_id": {
+    "$oid": "69271970bb437cfd566f352a"
+  },
+  "order_id": "ORD003",
+  "user_student_id": "23B1NUM0003",
+  "address_label": "МУИС3",
+  "status": "cancelled"
+}]

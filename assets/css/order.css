@@ -154,7 +154,6 @@ orders-page {
     margin-top: 1rem;
     padding: 10px;
     border-radius: var(--radius);
-    background: var(--color-bg-light);
     color: var(--color-muted);
     border-left: 4px solid transparent;
     transition: var(--transition);
@@ -269,6 +268,47 @@ orders-page {
     transition: background 0.3s ease, transform 0.2s ease;
     color: #ffffff;
   }
+  .modal {
+  display: none; 
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: -10px;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+.modal *{
+  margin-top: 1rem;
+}
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 400px;
+  height: 300px;
+  margin: 120px auto;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.close {
+  float: right;
+  cursor: pointer;
+  font-size: 24px;
+}
+.close h3{
+  margin-right: 0;
+}
+#openModal{
+  border: none;
+  border-radius: var(--radius);
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  width: 80%;
+  height: 2rem;
+  margin-left: 10%;
+}
 
   .delivery {
     display: flex;

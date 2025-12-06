@@ -1,0 +1,27 @@
+[{
+  "_id": {
+    "$oid": "6927199abb437cfd566f3535"
+  },
+  "order_id": "ORD001",
+  "product": "Шоколад",
+  "quantity": 2,
+  "price": 2500
+},
+{
+  "_id": {
+    "$oid": "6927199abb437cfd566f3536"
+  },
+  "order_id": "ORD002",
+  "product": "Ус 500мл",
+  "quantity": 1,
+  "price": 1200
+},
+{
+  "_id": {
+    "$oid": "6927199abb437cfd566f3537"
+  },
+  "order_id": "ORD003",
+  "product": "Chicken Bucket",
+  "quantity": 1,
+  "price": 19900
+}]

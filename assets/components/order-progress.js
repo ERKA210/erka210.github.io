@@ -7,7 +7,6 @@ class OrderProgress extends HTMLElement {
         this.render();
     }
 
-    // ---- Захиалгын идэвхтэй алхам солих функц ----
     setStep(stepNumber) {
         const steps = this.querySelectorAll(".step");
 
@@ -21,7 +20,6 @@ class OrderProgress extends HTMLElement {
         });
     }
 
-    // ---- Component template ----
     render() {
         this.innerHTML = `
         <section class="details">

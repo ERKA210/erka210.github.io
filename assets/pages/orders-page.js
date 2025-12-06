@@ -69,12 +69,45 @@ class OrdersPage extends HTMLElement {
             </div>
           </div>
 
-          <rating-stars max="5" color="orange" size="28px"></rating-stars>
-          <input type="text" placeholder="Сэтгэгдэл үлдээнэ үү...">
-          <button class="submit">Илгээх</button>
+<button id="openModal">Бараа хүлээж авсан</button>
+
+<div id="ratingModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+
+    <h3>Сэтгэгдэл үлдээнэ үү...</h3>
+
+    <rating-stars max="5" color="orange" size="28px"></rating-stars>
+
+    <input type="text" id="comment" placeholder="Сэтгэгдэл үлдээнэ үү...">
+
+    <button class="submit" id="sendBtn">Илгээх</button>
+  </div>
+</div>
+
         </section>
       </main>
     `;
+const modal = document.getElementById("ratingModal");
+const openBtn = document.getElementById("openModal");
+const closeBtn = document.querySelector(".close");
+
+openBtn.onclick = () => modal.style.display = "block";
+closeBtn.onclick = () => modal.style.display = "none";
+
+window.onclick = (e) => {
+  if (e.target === modal) modal.style.display = "none";
+};
+
+document.getElementById("sendBtn").onclick = () => {
+  const rating = document.querySelector("rating-stars").getAttribute("value");
+  const comment = document.getElementById("comment").value;
+
+  console.log("Rating:", rating);
+  console.log("Comment:", comment);
+
+  modal.style.display = "none";
+};
 
     const ratingEl = this.querySelector('rating-stars');
     if (ratingEl) {

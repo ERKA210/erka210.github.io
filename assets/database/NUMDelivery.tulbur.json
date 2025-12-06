@@ -1,0 +1,27 @@
+[{
+  "_id": {
+    "$oid": "69271a44bb437cfd566f354d"
+  },
+  "order_id": "ORD001",
+  "amount": 5000,
+  "method": "qpay",
+  "status": "paid"
+},
+{
+  "_id": {
+    "$oid": "69271a44bb437cfd566f354e"
+  },
+  "order_id": "ORD002",
+  "amount": 1200,
+  "method": "card",
+  "status": "paid"
+},
+{
+  "_id": {
+    "$oid": "69271a44bb437cfd566f354f"
+  },
+  "order_id": "ORD003",
+  "amount": 19900,
+  "method": "cash",
+  "status": "refunded"
+}]

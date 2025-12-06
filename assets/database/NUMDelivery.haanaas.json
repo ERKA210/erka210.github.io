@@ -1,0 +1,21 @@
+[{
+  "_id": {
+    "$oid": "69271a2fbb437cfd566f3549"
+  },
+  "name": "CU",
+  "category": "Convenience Store"
+},
+{
+  "_id": {
+    "$oid": "69271a2fbb437cfd566f354a"
+  },
+  "name": "GS25",
+  "category": "Convenience Store"
+},
+{
+  "_id": {
+    "$oid": "69271a2fbb437cfd566f354b"
+  },
+  "name": "KFC",
+  "category": "Fast Food"
+}]
