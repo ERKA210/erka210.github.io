@@ -138,12 +138,16 @@ class ShCart extends HTMLElement {
         const boxes = [...(this.cartItemsContainer ? this.cartItemsContainer.querySelectorAll(".item-box") : [])];
         let itemsTotal = 0;
         let totalQty = 0;
+        const items = [];
 
         boxes.forEach(box => {
             const qty = parseInt(box.dataset.qty || (box.querySelector("p")?.textContent.match(/(\d+)/)||[0,1])[1], 10) || 1;
             const base = parseInt(box.dataset.price || (this.parsePrice(box.querySelector(".price").textContent) / Math.max(qty,1)), 10) || 0;
             itemsTotal += base * qty;
             totalQty += qty;
+
+            const name = box.querySelector("b")?.textContent?.trim() || "";
+            items.push({ name, qty, price: base * qty });
         });
 
         let deliveryFee = 0;
@@ -176,6 +180,15 @@ class ShCart extends HTMLElement {
         }
 
         this.style.display = totalQty === 0 ? "none" : "block";
+
+        // cache summary for external usage
+        this.summary = {
+            items,
+            itemsTotal,
+            deliveryFee,
+            total: totalWithDelivery,
+            totalQty
+        };
     }
 
     parsePrice(str) {
@@ -184,6 +197,10 @@ class ShCart extends HTMLElement {
 
     formatPrice(n) {
         return Number(n).toLocaleString('mn-MN') + '₮';
+    }
+
+    getSummary() {
+        return this.summary || { items: [], itemsTotal: 0, deliveryFee: 0, total: 0, totalQty: 0 };
     }
 
     escapeAttr(s) {

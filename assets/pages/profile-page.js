@@ -1,51 +1,378 @@
 class ProfilePage extends HTMLElement {
   connectedCallback() {
+    this.profileData = this.loadProfileData();
+    const activeOrders = this.getActiveOrders();
+    const activeOrdersMarkup = this.buildActiveOrdersMarkup(activeOrders);
+    const reviews = this.getReviews();
+    const reviewsMarkup = this.buildReviewsMarkup(reviews.slice(0, 3));
+    const reviewsModalMarkup = this.buildReviewsMarkup(reviews);
+    const orderHistory = this.getOrderHistory();
+    const deliveryHistory = this.getDeliveryHistory();
+
     this.innerHTML = `
-      <div id="page">
-        <main></main>
-        <div class="profile">
-          <img src="assets/img/profile.jpg" alt="profile">
+      <section class="profile-page">
+        <div class="profile-hero">
+          <div class="profile-hero__content">
+            <div class="avatar-wrap">
+              <img src="${this.profileData.avatar || 'assets/img/profile.jpg'}" alt="Профайл зураг" class="avatar profile-avatar" />
+            </div>
+
+            <div class="profile-meta">
+              <div class="hero-info hero-info--stack">
+                <div><span class="label">Нэр:</span><strong class="profile-name">${this.profileData.name}</strong></div>
+                <div><span class="label">Утас:</span><strong class="profile-phone">${this.profileData.phone}</strong></div>
+                <div><span class="label">ID:</span><strong class="profile-id">${this.profileData.id}</strong></div>
+                <div><span class="label">Имэйл:</span><strong class="profile-email">${this.profileData.email}</strong></div>
+              </div>
+
+              <div class="hero-actions">
+                <button class="btn primary" data-modal-open="ordersModal" id="openOrderBtn">Миний захиалга</button>
+                <button class="btn ghost" data-modal-open="deliveryModal" id="openDeliveryBtn">Миний хүргэлт</button>
+              </div>
+            </div>
+
+            <div class="hero-stats">
+              <div class="stat-card">
+                <p>Нийт захиалга</p>
+                <strong>26</strong>
+                <small>Сүүлийн 30 хоногт 5</small>
+              </div>
+              <div class="stat-card">
+                <p>Дундаж үнэлгээ</p>
+                <div class="stars" aria-label="4.8 од">
+                  <span>★</span><span>★</span><span>★</span><span>★</span><span class="dim">★</span>
+                </div>
+                <small>4.8 / 5</small>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="main-content">
-          <div class="profile-container">
-            <article class="main-profile">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>Миний профайл</h3>
-                <img src="assets/img/edit_icon.png" alt="edit" style="width: 24px; height: 24px; cursor: pointer;">
+        <div class="profile-grid">
+          <article class="profile-card reviews">
+            <header>
+              <div>
+                <p class="eyebrow">Сэтгэгдэл</p>
               </div>
+              <button class="ghost-btn small open-reviews">Бүгдийг харах</button>
+            </header>
 
-              <div class="profile-info">
-                <p><span>Нэр:</span> Чигцалмаа</p>
-                <p><span>Дугаар:</span> 99001234</p>
-                <p><span>ID:</span> 23B1NUM0245</p>
-              </div>
+            <div class="review-list">${reviewsMarkup}</div>
+          </article>
+        </div>
+      </section>
 
-              <div class="rating">
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-              </div>
-
-              <div class="actions">
-                <button class="btn" id="openOrderBtn">Миний захиалга</button>
-                <button class="btn" id="openDeliveryBtn">Миний хүргэлт</button>
-              </div>
-            </article>
-          </div>
-
-          <footer>
-            <div class="footer-head">
-              <h3 style="color: #c90d30;">Сэтгэгдэл</h3>
-              <h4>See more</h4>
+      <div class="modal-backdrop" data-modal="profileModal">
+        <div class="modal-card">
+          <header class="modal-header">
+            <div>
+              <p class="eyebrow">Профайл засах</p>
+              <h3>Мэдээллээ шинэчлэх</h3>
             </div>
-            <section>
-              <!-- энд profile.html дээр байсан review-үүдийг COPY хийж болно -->
-              <div><h4>Бат</h4><p>Үнэхээр найдвартай хүргэгч байна.</p><p><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span style="color: orange;">★</span><span>★</span></p></div>
-              <!-- ... бусдыг нь бас нэмээрэй ... -->
-            </section>
-          </footer>
+            <button class="icon-btn close-modal" data-close="profileModal">×</button>
+          </header>
+          <form id="profileForm" class="modal-body">
+            <label>
+              <span>Нэр</span>
+              <input type="text" name="name" required />
+            </label>
+            <label>
+              <span>Утас</span>
+              <input type="tel" name="phone" required />
+            </label>
+            <label>
+              <span>Имэйл</span>
+              <input type="email" name="email" required />
+            </label>
+            <label>
+              <span>ID</span>
+              <input type="text" name="id" />
+            </label>
+            <label>
+              <span>Зураг (URL)</span>
+              <input type="url" name="avatar" placeholder="assets/img/profile.jpg" />
+            </label>
+            <div class="modal-actions">
+              <button type="button" class="btn ghost close-modal" data-close="profileModal">Болих</button>
+              <button type="submit" class="btn primary">Хадгалах</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="modal-backdrop" data-modal="reviewsModal">
+        <div class="modal-card">
+          <header class="modal-header">
+            <div>
+              <p class="eyebrow">Сэтгэгдлүүд</p>
+            </div>
+            <button class="icon-btn close-modal" data-close="reviewsModal">×</button>
+          </header>
+          <div class="modal-body review-list modal-scroll">
+            ${reviewsModalMarkup}
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-backdrop" data-modal="ordersModal">
+        <div class="modal-card">
+          <header class="modal-header">
+            <div>
+              <h3 class="modal-title">Миний захиалга</h3>
+            </div>
+            <button class="icon-btn close-modal" data-close="ordersModal">×</button>
+          </header>
+          <div class="modal-body modal-scroll history-list">
+            ${this.buildHistoryMarkup(orderHistory, 'Захиалга байхгүй')}
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-backdrop" data-modal="deliveryModal">
+        <div class="modal-card">
+          <header class="modal-header">
+            <div>
+              <h3 class="modal-title">Миний хүргэлт</h3>
+            </div>
+            <button class="icon-btn close-modal" data-close="deliveryModal">×</button>
+          </header>
+          <div class="modal-body modal-scroll history-list">
+            ${this.buildHistoryMarkup(deliveryHistory, 'Хүргэлт байхгүй')}
+          </div>
         </div>
       </div>
     `;
+
+    this.bindProfileData();
+    this.attachNavigation();
+    this.attachModalHandlers();
+  }
+
+  loadProfileData() {
+    try {
+      const raw = localStorage.getItem('profileData');
+      if (raw) {
+        return JSON.parse(raw);
+      }
+    } catch (err) {
+      console.error('profileData уншихад алдаа гарлаа', err);
+    }
+    return {
+      name: 'Чигцалмаа',
+      phone: '99001234',
+      email: 'student@num.edu.mn',
+      id: '23b1num0245',
+      avatar: 'assets/img/profile.jpg',
+    };
+  }
+
+  saveProfileData(data) {
+    localStorage.setItem('profileData', JSON.stringify(data));
+  }
+
+  getActiveOrders() {
+    try {
+      const raw = localStorage.getItem('activeOrder');
+      if (!raw) return [];
+
+      const parsed = JSON.parse(raw);
+
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed && typeof parsed === 'object') return [parsed];
+
+      return [];
+    } catch (err) {
+      console.error('activeOrder уншихад алдаа гарлаа', err);
+      return [];
+    }
+  }
+
+  getReviews() {
+    return [
+      { name: 'Бат', text: 'Үнэхээр найдвартай хүргэгч байна.', stars: '★★★★☆' },
+      { name: 'Сувдаа', text: 'Хугацаандаа авчирсан, харилцаа эелдэг.', stars: '★★★★★' },
+      { name: 'Ганболд', text: 'Захиалгаа шалгахад ойлгомжтой байлаа.', stars: '★★★★☆' },
+      { name: 'Тэмүүжин', text: 'Замын мэдээлэл тодорхой, хурдтай.', stars: '★★★★☆' },
+    ];
+  }
+
+  getOrderHistory() {
+    try {
+      const raw = localStorage.getItem('orderHistory');
+      if (raw) return JSON.parse(raw);
+    } catch (e) {
+      console.error('orderHistory алдаа', e);
+    }
+    return [
+      { title: 'GL burger - 7-р байр 207', detail: '11/21/25 · 14:00', price: '10,000₮' },
+      { title: 'CU → МУИС 1-р байр', detail: '04/02/24 · 12:30', price: '8,500₮' },
+    ];
+  }
+
+  getDeliveryHistory() {
+    try {
+      const raw = localStorage.getItem('deliveryHistory');
+      if (raw) return JSON.parse(raw);
+    } catch (e) {
+      console.error('deliveryHistory алдаа', e);
+    }
+    return [
+      { title: 'МУИС 2-р байр → Сүхбаатар', detail: '03/28/24 · 10:15', price: '5,000₮' },
+      { title: 'GL Burger → МУИС 4-р байр', detail: '03/25/24 · 14:45', price: '12,000₮' },
+    ];
+  }
+
+  buildActiveOrdersMarkup(orders) {
+    if (!orders.length) {
+      return '<span class="pill pill--muted">Идэвхтэй захиалга алга</span>';
+    }
+    return orders.map((order) => {
+      const route = [order.from, order.to].filter(Boolean).join(' → ');
+      const item = order.item ? ` · ${order.item}` : '';
+      return `<span class="pill pill--order">${route || 'Шинэ захиалга'}${item}</span>`;
+    }).join('');
+  }
+
+  buildReviewsMarkup(list) {
+    return list.map((r) => `
+      <div class="review">
+        <div>
+          <h4>${r.name}</h4>
+          <p>${r.text}</p>
+        </div>
+        <span class="stars">${r.stars}</span>
+      </div>
+    `).join('');
+  }
+
+  buildHistoryMarkup(list, emptyText) {
+    if (!list.length) {
+      return `<p class="muted">${emptyText}</p>`;
+    }
+    return list.map((item, idx) => {
+      const icon = this.getHistoryIcon(idx);
+      return `
+      <div class="history-card">
+        <div class="history-icon" aria-hidden="true">
+          <img src="${icon}" alt="">
+        </div>
+        <div class="history-info">
+          <h4>${item.title}</h4>
+          <p class="muted">${item.detail}</p>
+        </div>
+        <div class="history-price">${item.price || ''}</div>
+      </div>
+    `;
+    }).join('');
+  }
+
+  getHistoryIcon(idx = 0) {
+    const icons = [
+      'assets/img/document.svg',
+      'assets/img/tor.svg',
+      'assets/img/box.svg',
+    ];
+    return icons[idx % icons.length];
+  }
+
+
+
+  bindProfileData() {
+    const { name, phone, email, id, avatar } = this.profileData;
+    const nameEls = this.querySelectorAll('.profile-name');
+    nameEls.forEach((el) => { el.textContent = name; });
+
+    const phoneEl = this.querySelector('.profile-phone');
+    if (phoneEl) phoneEl.textContent = phone;
+
+    const emailEl = this.querySelector('.profile-email');
+    if (emailEl) emailEl.textContent = email;
+
+    const idEl = this.querySelector('.profile-id');
+    if (idEl) idEl.textContent = id;
+
+    const avatarEl = this.querySelector('.profile-avatar');
+    if (avatarEl) avatarEl.src = avatar || 'assets/img/profile.jpg';
+
+    const form = this.querySelector('#profileForm');
+    if (form) {
+      form.name.value = name;
+      form.phone.value = phone;
+      form.email.value = email;
+      form.id.value = id;
+      form.avatar.value = avatar || '';
+    }
+  }
+
+  attachNavigation() {
+    const navButtons = this.querySelectorAll('[data-nav]');
+    navButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-nav');
+        if (target) {
+          location.hash = target;
+        }
+      });
+    });
+  }
+
+  attachModalHandlers() {
+    const editBtn = this.querySelector('#editProfileBtn');
+    if (editBtn) {
+      editBtn.addEventListener('click', () => this.toggleModal('profileModal', true));
+    }
+
+    this.querySelectorAll('[data-modal-open]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-modal-open');
+        this.toggleModal(id, true);
+      });
+    });
+
+    const reviewBtn = this.querySelector('.open-reviews');
+    if (reviewBtn) {
+      reviewBtn.addEventListener('click', () => this.toggleModal('reviewsModal', true));
+    }
+
+    this.querySelectorAll('.close-modal').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-close');
+        this.toggleModal(id, false);
+      });
+    });
+
+    this.querySelectorAll('.modal-backdrop').forEach((backdrop) => {
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) {
+          const id = backdrop.getAttribute('data-modal');
+          this.toggleModal(id, false);
+        }
+      });
+    });
+
+    const form = this.querySelector('#profileForm');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.profileData = {
+          ...this.profileData,
+          name: form.name.value.trim(),
+          phone: form.phone.value.trim(),
+          email: form.email.value.trim(),
+          id: form.id.value.trim(),
+          avatar: form.avatar.value.trim() || 'assets/img/profile.jpg',
+        };
+        this.saveProfileData(this.profileData);
+        this.bindProfileData();
+        this.toggleModal('profileModal', false);
+      });
+    }
+  }
+
+  toggleModal(id, open) {
+    const modal = this.querySelector(`[data-modal="${id}"]`);
+    if (!modal) return;
+    modal.classList.toggle('open', open);
   }
 }
 
