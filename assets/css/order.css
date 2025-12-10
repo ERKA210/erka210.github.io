@@ -492,4 +492,13 @@ orders-page {
       align-items: stretch;
     }
   }
+
 }
+  @media screen { min-width: 460px;
+    .details {
+      padding: 30px;
+      width: 27rem;
+    }
+    
+  }
+  
