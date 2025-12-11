@@ -42,7 +42,7 @@ app.get('/api/orders', (req, res) => {
   ]);
 })
 
-app.get('/api/product', (req, res) => {
+app.get('/api/products', (req, res) => {
   res.json([
     { id: 1, name: "Кимбаб", price: 5000 },
     { id: 2, name: "Бургер", price: 8000 },
