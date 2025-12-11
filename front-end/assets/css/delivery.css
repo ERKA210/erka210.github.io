@@ -352,6 +352,10 @@ delivery-page {
       gap: 1ch;
     }
 
+    .orders h2 {
+      display: none;
+    }
+    
     d-orders {
       width: 45%;
       height: 45%;
