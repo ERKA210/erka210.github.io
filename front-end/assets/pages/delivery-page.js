@@ -12,16 +12,13 @@ class DeliveryPage extends HTMLElement {
     <link rel="stylesheet" href="assets/css/delivery.css">
       <div class="container">
         <section class="orders">
-          <h2>Миний идэвхтэй хүргэлт</h2>
           <d-orders data-active="true"
                     header="GL Burger - 7-р байр 207"
                     detail="3 ширхэг • 10,000₮"></d-orders>
         </section>
 
         <section class="details">
-          <h2>Захиалгын дэлгэрэнгүй</h2>
           <del-order-details></del-order-details>
-          <person-detail></person-detail>
         </section>
 
         <section class="order-step">
