@@ -1,0 +1,23 @@
+{
+  "name": "fixed_repo",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/ERKA210/erka210.github.io#readme",
+  "bugs": {
+    "url": "https://github.com/ERKA210/erka210.github.io/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ERKA210/erka210.github.io.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
