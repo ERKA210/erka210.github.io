@@ -1,8 +1,7 @@
 login-page {
-    body {
-        height: 100%;
-    }
-
+    display: flex;
+    justify-content: center;
+    margin-top: 12ch;
     body {
         margin: 0;
         background: var(--color-bg);
@@ -15,7 +14,7 @@ login-page {
     }
 
     .card {
-        width: 360px;
+        width: 60ch;
         border: 1px solid gray;
         background: var(--color-bg);
         border-radius: 18px;

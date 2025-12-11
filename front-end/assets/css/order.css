@@ -494,7 +494,7 @@ orders-page {
   }
 
 }
-  @media screen { min-width: 460px;
+  @media screen and (min-width: 460px) {
     .details {
       padding: 30px;
       width: 27rem;
