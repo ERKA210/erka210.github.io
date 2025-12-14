@@ -82,13 +82,8 @@ class HomePage extends HTMLElement {
         <div class="middle-row">
           <div class="ctrl">
             <span><img src="assets/img/map_pin.svg" alt="icon"/></span>
-            <select id="from">
-              <option value="0" selected disabled hidden>Хаанаас</option>
-              <option value="1">CU</option>
-              <option value="2">GS25</option>
-              <option value="3">GL Burger</option>
-              <option value="4">Зөгийн үүр зоогийн газар</option>
-              <option value="5">Дэлгэрэх</option>
+            <select id="fromPlace">
+              <option value="" disabled selected hidden>Хаанаас</option>
             </select>
           </div>
 
@@ -96,12 +91,8 @@ class HomePage extends HTMLElement {
 
           <div class="ctrl">
             <span><img src="assets/img/map_pin.svg" alt="icon"/></span>
-            <select id="to">
-              <option value="" selected disabled hidden>Хаашаа</option>
-              <option>МУИС 1-р байр</option>
-              <option>МУИС 2-р байр</option>
-              <option>МУИС 3-р байр</option>
-              <option>МУИС 4-р байр</option>
+            <select id="toPlace">
+              <option value="" disabled selected hidden>Хаашаа</option>
             </select>
           </div>
 
@@ -112,21 +103,7 @@ class HomePage extends HTMLElement {
           <div class="ctrl wide">
             <span><img src="assets/img/fork.svg" alt="icon" /></span>
             <select id="what">
-              <option value="" selected disabled hidden>Юуг</option>
-
-              <optgroup label="🥘 Идэх юм">
-                <option>Кимбаб</option>
-                <option>Бургер</option>
-                <option>Бууз</option>
-                <option>Салад</option>
-              </optgroup>
-
-              <optgroup label="🥤 Уух юм">
-                <option>Кола 0.5л</option>
-                <option>Хар цай</option>
-                <option>Кофе</option>
-                <option>Жүүс 0.33л</option>
-              </optgroup>
+              <option value="" disabled selected hidden>Юуг</option>
             </select>
           </div>
         </div>
@@ -237,5 +214,20 @@ class HomePage extends HTMLElement {
     location.hash = '#delivery';
   }
 }
+
+const API = "http://localhost:3001";
+
+async function loadPlaces() {
+  const from = await fetch(`${API}/api/from-places`).then(r=>r.json());
+  const to = await fetch(`${API}/api/to-places`).then(r=>r.json());
+
+  const fromSel = document.querySelector("#fromPlace");
+  const toSel = document.querySelector("#toPlace");
+
+  fromSel.innerHTML = from.map(p => `<option value="${p.id}">${p.name}${p.detail ? " - "+p.detail : ""}</option>`).join("");
+  toSel.innerHTML = to.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
+}
+
+loadPlaces();
 
 customElements.define('home-page', HomePage);

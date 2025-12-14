@@ -1,4 +1,7 @@
 import express from 'express';
+import cors from "cors";
+import pkg from "pg";
+const { Pool } = pkg;
 
 const app = express()
 const port = 3000
@@ -9,53 +12,141 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.get('/api/orders', (req, res) => {
-  res.json([
-    { thumb: 'assets/img/box.svg', 
-      title: 'GL burger - 7-р байр 207', 
-      meta: '11/21/25 • 14:00', 
-      price: '10,000₮', 
-      sub: [
-      { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" },] },
-      { thumb: 'assets/img/document.svg', 
-      title: 'GL burger - 7-р байр 207', 
-      meta: '11/21/25 • 14:00', 
-      price: '10,000₮', 
-      sub: [
-      { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" },] },
-      { thumb: 'assets/img/tor.svg', 
-      title: 'GL burger - 7-р байр 207', 
-      meta: '11/21/25 • 14:00', 
-      price: '10,000₮', 
-      sub: [
-      { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" },] },
-      { thumb: 'assets/img/tor.svg', 
-      title: 'GL burger - 7-р байр 207', 
-      meta: '11/21/25 • 14:00', 
-      price: '10,000₮', 
-      sub: [
-      { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" },] },
-  ]);
-})
+const pool = new Pool({
+  host: "127.0.0.1",
+  port: 55432,
+  user: "numd_admin",
+  password: "qwer1234",
+  database: "numdelivery",
+});
 
-app.get('/api/products', (req, res) => {
-  res.json([
-    { id: 1, name: "Кимбаб", price: 5000 },
-    { id: 2, name: "Бургер", price: 8000 },
-    { id: 3, name: "Бууз", price: 6000 },
-    { id: 4, name: "Салад", price: 7000 },
-    { id: 5, name: "Кола 0.5л", price: 2000 },
-    { id: 6, name: "Хар цай", price: 1500 },
-    { id: 7, name: "Кофе", price: 3000 },
-    { id: 8, name: "Жүүс 0.33л", price: 2500 },
-  ]);
-})
+app.get("/health", async (req, res) => {
+  const r = await pool.query("select now() as now");
+  res.json({ ok: true, db_time: r.rows[0].now });
+});
 
+app.get("/api/from-places", async (req, res) => {
+  const r = await pool.query(
+    `SELECT id, kind, name, detail
+     FROM places
+     WHERE is_active=true AND kind IN ('store','restaurant','other')
+     ORDER BY name`
+  );
+  res.json(r.rows);
+});
+
+app.get("/api/to-places", async (req, res) => {
+  const r = await pool.query(
+    `SELECT id, name
+     FROM places
+     WHERE is_active=true AND kind='campus'
+     ORDER BY name`
+  );
+  res.json(r.rows);
+});
+
+app.get("/api/menus/:placeId", async (req, res) => {
+  const { placeId } = req.params;
+  const r = await pool.query(
+    `SELECT m.menu_json
+     FROM menus m
+     WHERE m.place_id=$1`,
+    [placeId]
+  );
+  res.json(r.rows[0] ?? { menu_json: [] });
+});
+
+// app.get('/api/orders', (req, res) => {
+//   res.json([
+//     { thumb: 'assets/img/box.svg', 
+//       title: 'GL burger - 7-р байр 207', 
+//       meta: '11/21/25 • 14:00', 
+//       price: '10,000₮', 
+//       sub: [
+//       { name: "Бууз", price: "5000₮" },
+//       { name: "Сүү", price: "2000₮" },] },
+//       { thumb: 'assets/img/document.svg', 
+//       title: 'GL burger - 7-р байр 207', 
+//       meta: '11/21/25 • 14:00', 
+//       price: '10,000₮', 
+//       sub: [
+//       { name: "Бууз", price: "5000₮" },
+//       { name: "Сүү", price: "2000₮" },] },
+//       { thumb: 'assets/img/tor.svg', 
+//       title: 'GL burger - 7-р байр 207', 
+//       meta: '11/21/25 • 14:00', 
+//       price: '10,000₮', 
+//       sub: [
+//       { name: "Бууз", price: "5000₮" },
+//       { name: "Сүү", price: "2000₮" },] },
+//       { thumb: 'assets/img/tor.svg', 
+//       title: 'GL burger - 7-р байр 207', 
+//       meta: '11/21/25 • 14:00', 
+//       price: '10,000₮', 
+//       sub: [
+//       { name: "Бууз", price: "5000₮" },
+//       { name: "Сүү", price: "2000₮" },] },
+//   ]);
+// })
+
+// app.get('/api/products', (req, res) => {
+//   res.json([
+//     { id: 1, name: "Кимбаб", price: 5000 },
+//     { id: 2, name: "Бургер", price: 8000 },
+//     { id: 3, name: "Бууз", price: 6000 },
+//     { id: 4, name: "Салад", price: 7000 },
+//     { id: 5, name: "Кола 0.5л", price: 2000 },
+//     { id: 6, name: "Хар цай", price: 1500 },
+//     { id: 7, name: "Кофе", price: 3000 },
+//     { id: 8, name: "Жүүс 0.33л", price: 2500 },
+//   ]);
+// })
+
+
+app.post("/api/orders", async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { customerId, fromPlaceId, toPlaceId, scheduledAt, items = [], deliveryFee = 0, note } = req.body;
+
+    const subtotal = items.reduce((s, it) => s + (it.unitPrice * it.qty), 0);
+    const total = subtotal + deliveryFee;
+
+    await client.query("BEGIN");
+
+    const orderR = await client.query(
+      `INSERT INTO orders (customer_id, from_place_id, to_place_id, scheduled_at, subtotal_amount, delivery_fee, total_amount, note)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+       RETURNING id`,
+      [customerId, fromPlaceId, toPlaceId, scheduledAt ?? null, subtotal, deliveryFee, total, note ?? null]
+    );
+
+    const orderId = orderR.rows[0].id;
+
+    for (const it of items) {
+      await client.query(
+        `INSERT INTO order_items (order_id, menu_item_key, name, unit_price, qty, item_snapshot_json)
+         VALUES ($1,$2,$3,$4,$5,$6)`,
+        [orderId, it.menuItemKey ?? null, it.name, it.unitPrice, it.qty, it.options ?? {}]
+      );
+    }
+
+    await client.query(
+      `INSERT INTO order_status_history (order_id, status, note)
+       VALUES ($1,'created','Order created')`,
+      [orderId]
+    );
+
+    await client.query("COMMIT");
+    res.status(201).json({ orderId, subtotal, deliveryFee, total });
+  } catch (e) {
+    await client.query("ROLLBACK");
+    res.status(500).json({ error: e.message });
+  } finally {
+    client.release();
+  }
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
