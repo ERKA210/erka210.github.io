@@ -26,7 +26,7 @@ orders-page {
   }
 
   .orders {
-    flex: 0.8;
+    flex: 0.5;
     background: var(--color-bg);
     border-radius: var(--radius-lg);
     box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
@@ -132,9 +132,8 @@ orders-page {
     background: var(--color-bg);
     border-radius: var(--radius-lg);
     box-shadow: 0 5px 10px 15px rgba(0, 0, 0, 0.08);
-    ;
-    ;
     padding: 30px;
+    width: 24rem;
   }
 
   .details h2 {
