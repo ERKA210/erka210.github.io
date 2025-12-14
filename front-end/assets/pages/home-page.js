@@ -2,8 +2,16 @@ class HomePage extends HTMLElement {
   connectedCallback() {
     this.pendingOrder = null;
     this.pendingOffer = null;
+
     this.render();
     this.setupConfirmModal();
+    loadPlaces();
+
+    // "Захиалах" товч дээр дархад order бэлдээд confirm modal гаргана
+    const orderBtn = this.querySelector(".order-btn");
+    if (orderBtn) {
+      orderBtn.addEventListener("click", () => this.prepareOrder());
+    }
   }
 
   render() {
@@ -75,9 +83,10 @@ class HomePage extends HTMLElement {
         }
         #confirm-modal .detail-row strong {
           display: inline-block;
-          min-width: 4.5rem;
+          min-width: 4.7rem;
         }
       </style>
+
       <section class="filter-section">
         <div class="middle-row">
           <div class="ctrl">
@@ -131,32 +140,35 @@ class HomePage extends HTMLElement {
     `;
   }
 
-  formatDate(d) {
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    const hh = String(d.getHours()).padStart(2, '0');
-    const mi = String(d.getMinutes()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd} • ${hh}:${mi}`;
+  formatPrice(n) {
+    return Number(n || 0).toLocaleString("mn-MN") + "₮";
   }
 
-  formatPrice(n) {
-    return Number(n || 0).toLocaleString('mn-MN') + '₮';
+  getScheduledAtISO() {
+
+    const picker = this.querySelector("date-time-picker");
+    const v = picker?.value;
+    if (v) {
+      const d = new Date(v);
+      if (!isNaN(d.getTime())) return d.toISOString();
+    }
+    return new Date().toISOString();
   }
 
   setupConfirmModal() {
-    this.confirmModal = this.querySelector('#confirm-modal');
-    this.confirmTextEl = this.querySelector('#confirm-text');
-    this.cancelBtn = this.querySelector('#cancel-order');
-    this.confirmBtn = this.querySelector('#confirm-order');
+    this.confirmModal = this.querySelector("#confirm-modal");
+    this.confirmTextEl = this.querySelector("#confirm-text");
+    this.cancelBtn = this.querySelector("#cancel-order");
+    this.confirmBtn = this.querySelector("#confirm-order");
+
     if (this.cancelBtn) {
-      this.cancelBtn.addEventListener('click', () => this.hideConfirmModal());
+      this.cancelBtn.addEventListener("click", () => this.hideConfirmModal());
     }
     if (this.confirmBtn) {
-      this.confirmBtn.addEventListener('click', () => this.confirmOrder());
+      this.confirmBtn.addEventListener("click", () => this.confirmOrder());
     }
     if (this.confirmModal) {
-      this.confirmModal.addEventListener('click', (e) => {
+      this.confirmModal.addEventListener("click", (e) => {
         if (e.target === this.confirmModal) this.hideConfirmModal();
       });
     }
@@ -164,70 +176,257 @@ class HomePage extends HTMLElement {
 
   showConfirmModal(order, summary) {
     if (!this.confirmModal || !this.confirmTextEl) return;
+
     const items = summary.items?.length
-      ? summary.items.map((i) => `• ${i.name} — ${i.qty} ширхэг`).join('<br>')
-      : 'Бараа сонгогдоогүй';
+      ? summary.items.map((i) => `• ${i.name} — ${i.qty} ширхэг`).join("<br>")
+      : "Бараа сонгогдоогүй";
+
+    const d = new Date(order.createdAt);
+
     this.confirmTextEl.innerHTML = `
       <div class="detail-row">
         <strong>Хаанаас:</strong> ${order.from}<br>
+        <strong>Байршил:</strong> ${order.fromDetail || "-"}<br>
         <strong>Хаашаа:</strong> ${order.to}<br>
-        <strong>Өдөр:</strong> ${order.createdAt.split('T')[0]}<br>
-        <strong>Цаг:</strong> ${new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        <strong>Өдөр:</strong> ${order.createdAt.split("T")[0]}<br>
+        <strong>Цаг:</strong> ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
       </div>
       <div class="detail-row">
         <strong>Таны хоол:</strong><br>
         ${items}
       </div>
       <div class="detail-row" style="text-align:center;">
-        <strong>Нийт үнэ:</strong> ${summary.total ? this.formatPrice(summary.total) : '0₮'}
+        <strong>Нийт үнэ:</strong> ${summary.total ? this.formatPrice(summary.total) : "0₮"}
       </div>
     `;
-    this.confirmModal.classList.remove('hidden');
-    this.confirmModal.classList.add('show');
+
+    this.confirmModal.classList.remove("hidden");
+    this.confirmModal.classList.add("show");
   }
 
   hideConfirmModal() {
     if (!this.confirmModal) return;
-    this.confirmModal.classList.remove('show');
+    this.confirmModal.classList.remove("show");
     this.pendingOrder = null;
     this.pendingOffer = null;
   }
 
-  confirmOrder() {
+  // "Захиалах" дархад pendingOrder/pendingOffer бэлдэнэ
+  prepareOrder() {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Эхлээд нэвтэрч орно уу!");
+      location.hash = "#login";
+      return;
+    }
+
+    const fromSel = this.querySelector("#fromPlace");
+    const toSel = this.querySelector("#toPlace");
+    const whatSel = this.querySelector("#what");
+
+    if (!fromSel?.value) {
+      alert("Хаанаасаа сонгоно уу");
+      return;
+    }
+    if (!toSel?.value) {
+      alert("Хаашаагаа сонгоно уу");
+      return;
+    }
+
+    const itemOpt = whatSel?.selectedOptions?.[0];
+    if (!itemOpt || !itemOpt.value) {
+      alert("Юуг (хоол/бараа) сонгоно уу");
+      return;
+    }
+
+    // "CU - 8-р байр 209" -> ["CU", "8-р байр 209"]
+    const fromOptionText = fromSel.selectedOptions[0].textContent || "";
+    const parts = fromOptionText.split(" - ");
+    const fromName = parts[0] || fromOptionText;
+    const fromDetail = parts[1] || "";
+
+    const scheduledAt = this.getScheduledAtISO();
+
+    const item = {
+      id: itemOpt.value,
+      name: (itemOpt.textContent || "").split(" — ")[0],
+      price: Number(itemOpt.dataset.price || 0),
+      qty: 1,
+    };
+
+    this.pendingOrder = {
+      fromId: fromSel.value,
+      toId: toSel.value,
+      from: fromName,
+      fromDetail,
+      to: toSel.selectedOptions[0].textContent,
+      createdAt: scheduledAt,
+    };
+
+    this.pendingOffer = {
+      items: [item],
+      total: item.price,
+    };
+
+    this.showConfirmModal(this.pendingOrder, this.pendingOffer);
+  }
+
+  async confirmOrder() {
     if (!this.pendingOrder || !this.pendingOffer) {
       this.hideConfirmModal();
       return;
     }
-    localStorage.setItem('activeOrder', JSON.stringify(this.pendingOrder));
-    localStorage.setItem('orderStep', '0');
 
-    const existingOffers = JSON.parse(localStorage.getItem('offers') || '[]');
-    existingOffers.unshift(this.pendingOffer);
-    localStorage.setItem('offers', JSON.stringify(existingOffers));
-
-    const offersEl = this.querySelector('#offers');
-    if (offersEl && 'items' in offersEl) {
-      offersEl.items = existingOffers;
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Эхлээд нэвтэрч орно уу!");
+      location.hash = "#login";
+      return;
     }
 
-    this.hideConfirmModal();
-    location.hash = '#delivery';
+    const payload = {
+      customerId: userId,
+      fromPlaceId: this.pendingOrder.fromId,
+      toPlaceId: this.pendingOrder.toId,
+      scheduledAt: this.pendingOrder.createdAt,
+      deliveryFee: 500,
+      items: this.pendingOffer.items.map((i) => ({
+        menuItemKey: i.id,
+        name: i.name,
+        unitPrice: i.price,
+        qty: i.qty,
+        options: {},
+      })),
+      note: this.pendingOrder.fromDetail ? `Pickup: ${this.pendingOrder.fromDetail}` : null,
+    };
+
+    try {
+      const resp = await fetch(`${API}/api/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok) {
+        alert(data?.error || "Захиалга үүсгэхэд алдаа гарлаа");
+        return;
+      }
+
+      // offers-list руу UI дээр харагдуулах (одоо байгаа логикийг хадгаллаа)
+      localStorage.setItem("activeOrder", JSON.stringify(this.pendingOrder));
+      localStorage.setItem("orderStep", "0");
+
+      const existingOffers = JSON.parse(localStorage.getItem("offers") || "[]");
+      existingOffers.unshift({
+        ...this.pendingOffer,
+        orderId: data.orderId,
+        meta: this.pendingOrder.createdAt,
+        from: this.pendingOrder.from,
+        fromDetail: this.pendingOrder.fromDetail,
+        to: this.pendingOrder.to,
+      });
+      localStorage.setItem("offers", JSON.stringify(existingOffers));
+
+      const offersEl = this.querySelector("#offers");
+      if (offersEl && "items" in offersEl) {
+        offersEl.items = existingOffers;
+      }
+
+      this.hideConfirmModal();
+      location.hash = "#delivery";
+    } catch (e) {
+      alert("Сервертэй холбогдож чадсангүй");
+    }
   }
 }
 
-const API = "http://localhost:3001";
+const API = "http://localhost:3000";
 
+// Places-ийг DB-с дүүргэнэ
 async function loadPlaces() {
-  const from = await fetch(`${API}/api/from-places`).then(r=>r.json());
-  const to = await fetch(`${API}/api/to-places`).then(r=>r.json());
+  const from = await fetch(`${API}/api/from-places`).then((r) => r.json());
+  const to = await fetch(`${API}/api/to-places`).then((r) => r.json());
 
   const fromSel = document.querySelector("#fromPlace");
   const toSel = document.querySelector("#toPlace");
 
-  fromSel.innerHTML = from.map(p => `<option value="${p.id}">${p.name}${p.detail ? " - "+p.detail : ""}</option>`).join("");
-  toSel.innerHTML = to.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
+  fromSel.innerHTML = `<option value="" disabled selected hidden>Хаанаас</option>`;
+  toSel.innerHTML = `<option value="" disabled selected hidden>Хаашаа</option>`;
+
+  fromSel.innerHTML += from
+    .map(
+      (p) =>
+        `<option value="${p.id}">${p.name}${p.detail ? " - " + p.detail : ""}</option>`
+    )
+    .join("");
+
+  toSel.innerHTML += to
+    .map((p) => `<option value="${p.id}">${p.name}</option>`)
+    .join("");
 }
 
 loadPlaces();
 
-customElements.define('home-page', HomePage);
+// From сонгогдоход menus (JSONB) ачаална
+document.addEventListener("change", async (e) => {
+  if (e.target.id !== "fromPlace") return;
+
+  const placeId = e.target.value;
+
+  const res = await fetch(`${API}/api/menus/${placeId}`).then((r) => r.json());
+
+  const whatSel = document.querySelector("#what");
+  if (!whatSel) return;
+
+  const items = Array.isArray(res.menu_json) ? res.menu_json : [];
+
+  const foods = items.filter((i) => i.category === "food");
+  const drinks = items.filter((i) => i.category === "drink");
+
+  whatSel.innerHTML = `<option value="" disabled selected hidden>Юуг</option>`;
+
+  if (foods.length) {
+    const og = document.createElement("optgroup");
+    og.label = "🥘 Идэх юм";
+    foods.forEach((item) => {
+      const opt = document.createElement("option");
+      opt.value = item.id;
+      opt.dataset.price = item.price;
+      opt.textContent = `${item.name} — ${item.price}₮`;
+      og.appendChild(opt);
+    });
+    whatSel.appendChild(og);
+  }
+
+  if (drinks.length) {
+    const og = document.createElement("optgroup");
+    og.label = "🥤 Уух юм";
+    drinks.forEach((item) => {
+      const opt = document.createElement("option");
+      opt.value = item.id;
+      opt.dataset.price = item.price;
+      opt.textContent = `${item.name} — ${item.price}₮`;
+      og.appendChild(opt);
+    });
+    whatSel.appendChild(og);
+  }
+
+  // category байхгүй хуучин меню байвал "Бусад" гэж гаргая (optional)
+  const others = items.filter((i) => !i.category);
+  if (others.length) {
+    const og = document.createElement("optgroup");
+    og.label = "📦 Бусад";
+    others.forEach((item) => {
+      const opt = document.createElement("option");
+      opt.value = item.id;
+      opt.dataset.price = item.price;
+      opt.textContent = `${item.name} — ${item.price}₮`;
+      og.appendChild(opt);
+    });
+    whatSel.appendChild(og);
+  }
+});
+
+customElements.define("home-page", HomePage);

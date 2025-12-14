@@ -6,6 +6,8 @@ const { Pool } = pkg;
 const app = express()
 const port = 3000
 
+app.use(cors());
+app.use(express.json());
 app.use(express.static('front-end'));
 
 app.get('/', (req, res) => {
@@ -27,7 +29,7 @@ app.get("/health", async (req, res) => {
 
 app.get("/api/from-places", async (req, res) => {
   const r = await pool.query(
-    `SELECT id, kind, name, detail
+    `SELECT id, kind, name
      FROM places
      WHERE is_active=true AND kind IN ('store','restaurant','other')
      ORDER BY name`
@@ -47,13 +49,37 @@ app.get("/api/to-places", async (req, res) => {
 
 app.get("/api/menus/:placeId", async (req, res) => {
   const { placeId } = req.params;
+
+  // UUID шалгах (placeId=1 гэх мэт бол шууд 400)
+  const isUuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(placeId);
+
+  if (!isUuid) {
+    return res.status(400).json({ error: "placeId must be UUID" });
+  }
+
   const r = await pool.query(
     `SELECT m.menu_json
      FROM menus m
-     WHERE m.place_id=$1`,
+     WHERE m.place_id = $1`,
     [placeId]
   );
+
   res.json(r.rows[0] ?? { menu_json: [] });
+});
+
+app.get("/api/courier/me", async (req, res) => {
+  const r = await pool.query(`
+    SELECT
+      u.id,
+      u.full_name AS name,
+      u.phone
+    FROM couriers c
+    JOIN users u ON u.id = c.user_id
+    WHERE c.is_active = true
+    LIMIT 1
+  `);
+  res.json(r.rows[0] ?? null);
 });
 
 // app.get('/api/orders', (req, res) => {
