@@ -12,7 +12,6 @@ import './assets/components/order-form.js';
 import './assets/components/num-router.js';
 import './assets/components/courier-card.js';
 import './assets/components/delivery-order-page.js';
-import './assets/components/rating.js';
 import './assets/components/order-progress.js';
 
 // Pages
