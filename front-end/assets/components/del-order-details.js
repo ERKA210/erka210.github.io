@@ -24,7 +24,7 @@ class DelOrderDetails extends HTMLElement {
       <div class="detail-header">
         <p><strong>${from}</strong> → <strong>${to}</strong></p>
         <p class="date">${dateText}</p>
-        <person-detail title="Захиалагчийн мэдээлэл" type="big"></person-detail>
+        <person-detail title="Захиалагчийн мэдээлэл" type="medium"></person-detail>
       </div>
     `;
   }

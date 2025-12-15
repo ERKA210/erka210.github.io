@@ -96,6 +96,7 @@ delivery-page {
     border-radius: var(--radius-lg);
     box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
     padding: 30px;
+    width: 100%;
   }
 
   .order-step {
@@ -255,6 +256,7 @@ delivery-page {
       border: 1px solid var(--color-accent);
       border-radius: var(--radius);
       padding: 15px;
+      display: flex;
 
 
       img {
