@@ -172,6 +172,58 @@ app.post("/api/orders", async (req, res) => {
   }
 });
 
+// Төлбөрийн төлөв солих
+app.post("/api/orders/:id/pay", async (req, res) => {
+  const { id } = req.params;
+  const { amount, method } = req.body;
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query(
+      `INSERT INTO payments (order_id, amount, method, status, paid_at)
+       VALUES ($1,$2,$3,'paid',now())`,
+      [id, amount, method]
+    );
+    await client.query(
+      `UPDATE orders SET status='delivered', total_amount=$1 WHERE id=$2`,
+      [amount, id]
+    );
+    await client.query(
+      `INSERT INTO order_status_history (order_id, status, note)
+       VALUES ($1,'delivered','Paid and delivered')`,
+      [id]
+    );
+    await client.query("COMMIT");
+    res.json({ ok: true });
+  } catch (e) {
+    await client.query("ROLLBACK");
+    res.status(500).json({ error: e.message });
+  } finally {
+    client.release();
+  }
+});
+
+// Үнэлгээ хадгалах
+app.post("/api/orders/:id/review", async (req, res) => {
+  const { id } = req.params;
+  const { customerId, courierId, rating, comment } = req.body;
+  try {
+    await pool.query(
+      `INSERT INTO reviews (order_id, customer_id, courier_id, rating, comment)
+       VALUES ($1,$2,$3,$4,$5)
+       ON CONFLICT (order_id) DO UPDATE
+         SET rating = EXCLUDED.rating,
+             comment = EXCLUDED.comment,
+             courier_id = EXCLUDED.courier_id`,
+      [id, customerId, courierId ?? null, rating, comment ?? null]
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })

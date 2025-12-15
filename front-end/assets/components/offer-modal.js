@@ -216,7 +216,7 @@ class OfferModal extends HTMLElement {
 
   show(data) {
     if (!this.modal) return;
-    this.thumbEl.src = data.thumb || '';
+    this.thumbEl.src = data.thumb || 'assets/img/box.svg';
     this.thumbEl.alt = data.title || 'offer thumbnail';
     this.titleEl.textContent = data.title || 'Санал';
     this.metaEl.textContent = data.meta || '';

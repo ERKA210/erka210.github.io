@@ -1,40 +1,21 @@
+const API = "http://localhost:3000";
+
 class OrdersPage extends HTMLElement {
   connectedCallback() {
     this.render();
-    this.applyActiveOrder();
+    this.loadOrders();
+    this.bindModal();
+    this.bindProgress();
   }
 
   render() {
     this.innerHTML = `
-    
   <link rel="stylesheet" href="assets/css/order.css">
       <main class="container">
         <section class="orders">
           <h2>Миний захиалга</h2>
-          <div class="order-list">
-            <div class="order-card">
-              <div class="order-info">
-                <h3 class="order-title">GL Burger - 7-р байр 207</h3>
-                <h4>2025.10.08 • 09:36</h4>
-                <p style=margin-top: 2rem>Бургер: 7,000₮</p>
-                <p>Кимбаб: 5,500₮</p>
-                <p>Кола: 2,500₮</p>
-                <p class="order-total">Дүн: 15,000₮</p>
-              </div>
-              <img src="assets/img/tor.svg" alt="hemjee">
-            </div>
-
-            <article>
-              <p style="font-weight: bold; font-size: 1.5rem;">Хүргэгчийн мэдээлэл</p>
-              <div class="delivery">
-                <img src="assets/img/profile.jpg" alt="Хүргэгчийн зураг">
-                <div class="delivery-info">
-                  <h3>Нэр: Чигцалмаа</h3>
-                  <p>Утас: 99001234</p>
-                  <p>ID: 23B1NUM0245</p>
-                </div>
-              </div>
-            </article>
+          <div class="order-list" id="orderList">
+            <p class="muted">Захиалга ачааллаж байна...</p>
           </div>
         </section>
 
@@ -69,53 +50,134 @@ class OrdersPage extends HTMLElement {
             </div>
           </div>
 
-<button id="openModal">Бараа хүлээж авсан</button>
+          <button id="openModal">Бараа хүлээж авсан</button>
 
-<div id="ratingModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-
-    <h3>Сэтгэгдэл үлдээнэ үү...</h3>
-
-    <rating-stars max="5" color="orange" size="28px"></rating-stars>
-
-    <input type="text" id="comment" placeholder="Сэтгэгдэл үлдээнэ үү...">
-
-    <button class="submit" id="sendBtn">Илгээх</button>
-  </div>
-</div>
+          <div id="ratingModal" class="modal">
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <h3>Сэтгэгдэл үлдээнэ үү...</h3>
+              <rating-stars max="5" color="orange" size="28px"></rating-stars>
+              <input type="text" id="comment" placeholder="Сэтгэгдэл үлдээнэ үү...">
+              <button class="submit" id="sendBtn">Илгээх</button>
+            </div>
+          </div>
 
         </section>
       </main>
     `;
-const modal = document.getElementById("ratingModal");
-const openBtn = document.getElementById("openModal");
-const closeBtn = document.querySelector(".close");
+  }
 
-openBtn.onclick = () => modal.style.display = "block";
-closeBtn.onclick = () => modal.style.display = "none";
+  async loadOrders() {
+    const listEl = this.querySelector("#orderList");
+    if (!listEl) return;
 
-window.onclick = (e) => {
-  if (e.target === modal) modal.style.display = "none";
-};
+    const userId = localStorage.getItem("userId");
+    const qs = userId ? `?customerId=${encodeURIComponent(userId)}` : "";
 
-document.getElementById("sendBtn").onclick = () => {
-  const rating = document.querySelector("rating-stars").getAttribute("value");
-  const comment = document.getElementById("comment").value;
+    try {
+      const res = await fetch(`${API}/api/orders${qs}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Алдаа");
 
-  console.log("Rating:", rating);
-  console.log("Comment:", comment);
+      const filtered = this.filterExpired(data);
+      const list = filtered.length ? filtered : (data.length ? data : this.readLocalOffers());
+      this.renderOrders(list);
+    } catch (e) {
+      const fallback = this.readLocalOffers();
+      if (fallback.length) {
+        this.renderOrders(fallback);
+      } else {
+        listEl.innerHTML = `<p class="muted">Захиалга уншихад алдаа: ${e.message}</p>`;
+      }
+    }
+  }
 
-  modal.style.display = "none";
-};
+  renderOrders(orders) {
+    const listEl = this.querySelector("#orderList");
+    if (!listEl) return;
 
-    const ratingEl = this.querySelector('rating-stars');
-    if (ratingEl) {
-      ratingEl.addEventListener('rate', e => {
-        console.log('Үнэлгээ:', e.detail);
-      });
+    if (!orders.length) {
+      listEl.innerHTML = `<p class="muted">Захиалга алга.</p>`;
+      return;
     }
 
+    listEl.innerHTML = orders
+      .map((o) => {
+        const ts = this.getOrderTimestamp(o) || Date.now();
+        const dt = new Date(ts);
+        const meta = `${dt.toLocaleDateString()} • ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+        const itemsTxt = (o.items || [])
+          .map((it) => `${it.name} ×${it.qty}`)
+          .join(" · ");
+        return `
+          <div class="order-card">
+            <div class="order-info">
+              <h3 class="order-title">${o.from_name || ""} - ${o.to_name || ""}</h3>
+              <h4>${meta}</h4>
+              <p>${itemsTxt || "Бараа байхгүй"}</p>
+              <p class="order-total">Дүн: ${this.formatPrice(o.total_amount || 0)}</p>
+            </div>
+            <img src="assets/img/tor.svg" alt="hemjee">
+          </div>
+        `;
+      })
+      .join("");
+
+    // Эхний захиалгын статусыг алхамд тусгана
+    this.setProgressFromStatus(orders[0]?.status);
+  }
+
+  // LocalStorage дээрх offers-ээс fallback үүсгэх
+  readLocalOffers() {
+    try {
+      const raw = localStorage.getItem("offers");
+      const offers = raw ? JSON.parse(raw) : [];
+      return offers.map((o, idx) => {
+        const titleParts = (o.title || "").split(" - ");
+        return {
+          id: o.orderId || `local-${idx}`,
+          from_name: o.from || titleParts[0] || "",
+          to_name: o.to || titleParts[1] || "",
+          total_amount: o.total || this.parsePrice(o.price),
+          created_at: o.meta || new Date().toISOString(),
+          items: (o.sub || []).map((s) => {
+            if (typeof s === "string") return { name: s, qty: 1 };
+            return { name: s.name || "", qty: 1 };
+          }),
+        };
+      });
+    } catch {
+      return [];
+    }
+  }
+
+  parsePrice(v) {
+    return parseInt(String(v || "").replace(/[^\d]/g, ""), 10) || 0;
+  }
+
+  formatPrice(v) {
+    return Number(v || 0).toLocaleString("mn-MN") + "₮";
+  }
+
+  mapStatusToStep(status) {
+    switch ((status || "").toLowerCase()) {
+      case "on_the_way":
+      case "on-the-way":
+        return 1;
+      case "delivered":
+        return 2;
+      default:
+        return 0;
+    }
+  }
+
+  setProgressFromStatus(status) {
+    const stepIndex = this.mapStatusToStep(status);
+    localStorage.setItem("orderStep", String(stepIndex));
+    this.bindProgress();
+  }
+
+  bindProgress() {
     const stepIndex = parseInt(localStorage.getItem('orderStep')) || 0;
     const steps = this.querySelectorAll('.step');
     steps.forEach((step, idx) => {
@@ -125,22 +187,76 @@ document.getElementById("sendBtn").onclick = () => {
     });
   }
 
-  applyActiveOrder() {
-    const raw = localStorage.getItem('activeOrder');
-    if (!raw) return;
+  // Одоогоос 24 цагийн өмнөх захиалгыг нуух (фоллбэк: бүгдийг үзүүлнэ)
+  filterExpired(orders) {
+    const now = Date.now();
+    const cutoff = now - 24 * 60 * 60 * 1000;
+    return orders.filter((o) => {
+      const ts = this.getOrderTimestamp(o);
+      if (ts === null) return false;
+      return ts >= cutoff;
+    });
+  }
 
-    try {
-      const order = JSON.parse(raw);
-      const titleEl = this.querySelector('.order-title');
-      if (titleEl && order.from && order.to) {
-        titleEl.textContent = `${order.from} - ${order.to}`;
-      }
-      const totalEl = this.querySelector('.order-total');
-      if (totalEl && order.item) {
-        totalEl.textContent = `Зүйл: ${order.item}`;
-      }
-    } catch (e) {
-      console.error('activeOrder parse error', e);
+  getOrderTimestamp(o) {
+    const raw =
+      o.scheduled_at ||
+      o.scheduledAt ||
+      o.created_at ||
+      o.createdAt ||
+      o.meta ||
+      null;
+    const t = this.parseDate(raw);
+    return t;
+  }
+
+  parseDate(val) {
+    if (!val) return null;
+    const parsed = Date.parse(val);
+    if (!Number.isNaN(parsed)) return parsed;
+
+    const m = String(val).match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4}).*?(\d{1,2}:\d{2}\s*[AP]M)/i);
+    if (m) {
+      const [_, mm, dd, yyRaw, time] = m;
+      const yy = yyRaw.length === 2 ? `20${yyRaw}` : yyRaw;
+      const d = new Date(`${yy}-${mm}-${dd} ${time}`);
+      if (!Number.isNaN(d.getTime())) return d.getTime();
+    }
+
+    return null;
+  }
+
+  bindModal() {
+    const modal = this.querySelector("#ratingModal");
+    const openBtn = this.querySelector("#openModal");
+    const closeBtn = this.querySelector(".close");
+    const sendBtn = this.querySelector("#sendBtn");
+    const ratingEl = this.querySelector("rating-stars");
+
+    if (openBtn && modal) {
+      openBtn.onclick = () => modal.style.display = "block";
+    }
+    if (closeBtn && modal) {
+      closeBtn.onclick = () => modal.style.display = "none";
+    }
+    window.onclick = (e) => {
+      if (e.target === modal) modal.style.display = "none";
+    };
+
+    if (sendBtn && modal) {
+      sendBtn.onclick = () => {
+        const rating = ratingEl?.getAttribute("value");
+        const comment = this.querySelector("#comment")?.value || "";
+        console.log("Rating:", rating);
+        console.log("Comment:", comment);
+        modal.style.display = "none";
+      };
+    }
+
+    if (ratingEl) {
+      ratingEl.addEventListener('rate', e => {
+        console.log('Үнэлгээ:', e.detail);
+      });
     }
   }
 }

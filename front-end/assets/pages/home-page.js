@@ -144,15 +144,31 @@ class HomePage extends HTMLElement {
     return Number(n || 0).toLocaleString("mn-MN") + "₮";
   }
 
-  getScheduledAtISO() {
+  formatMeta(ts) {
+    const d = new Date(ts);
+    if (isNaN(d.getTime())) return "";
+    const date = d.toLocaleDateString("en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      year: "2-digit",
+    });
+    const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return `${date} • ${time}`;
+  }
 
+  getScheduledAtISO() {
     const picker = this.querySelector("date-time-picker");
-    const v = picker?.value;
-    if (v) {
-      const d = new Date(v);
-      if (!isNaN(d.getTime())) return d.toISOString();
+    const dateVal = picker?.shadowRoot?.querySelector(".date")?.value;
+    const timeVal = picker?.shadowRoot?.querySelector(".time")?.value;
+
+    if (dateVal && timeVal) {
+      const iso = new Date(`${dateVal}T${timeVal}:00`);
+      if (!isNaN(iso.getTime())) return iso.toISOString();
     }
-    return new Date().toISOString();
+
+    // fallback: одоогийн цаг
+    const now = new Date();
+    return now.toISOString();
   }
 
   setupConfirmModal() {
@@ -186,7 +202,6 @@ class HomePage extends HTMLElement {
     this.confirmTextEl.innerHTML = `
       <div class="detail-row">
         <strong>Хаанаас:</strong> ${order.from}<br>
-        <strong>Байршил:</strong> ${order.fromDetail || "-"}<br>
         <strong>Хаашаа:</strong> ${order.to}<br>
         <strong>Өдөр:</strong> ${order.createdAt.split("T")[0]}<br>
         <strong>Цаг:</strong> ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -213,13 +228,6 @@ class HomePage extends HTMLElement {
 
   // "Захиалах" дархад pendingOrder/pendingOffer бэлдэнэ
   prepareOrder() {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      alert("Эхлээд нэвтэрч орно уу!");
-      location.hash = "#login";
-      return;
-    }
-
     const fromSel = this.querySelector("#fromPlace");
     const toSel = this.querySelector("#toPlace");
     const whatSel = this.querySelector("#what");
@@ -233,10 +241,15 @@ class HomePage extends HTMLElement {
       return;
     }
 
+    const cartEl = this.querySelector("sh-cart");
+    const cartSummary = cartEl?.getSummary() || { totalQty: 0, items: [], total: 0, deliveryFee: 0 };
+
     const itemOpt = whatSel?.selectedOptions?.[0];
-    if (!itemOpt || !itemOpt.value) {
-      alert("Юуг (хоол/бараа) сонгоно уу");
-      return;
+    if (cartSummary.totalQty === 0) {
+      if (!itemOpt || !itemOpt.value) {
+        alert("Юуг (хоол/бараа) сонгоно уу");
+        return;
+      }
     }
 
     // "CU - 8-р байр 209" -> ["CU", "8-р байр 209"]
@@ -247,12 +260,20 @@ class HomePage extends HTMLElement {
 
     const scheduledAt = this.getScheduledAtISO();
 
-    const item = {
-      id: itemOpt.value,
-      name: (itemOpt.textContent || "").split(" — ")[0],
-      price: Number(itemOpt.dataset.price || 0),
-      qty: 1,
-    };
+    const items =
+      cartSummary.totalQty > 0
+        ? cartSummary.items.map((it) => ({
+            id: it.key || it.name,
+            name: it.name,
+            price: it.unitPrice,
+            qty: it.qty,
+          }))
+        : [{
+            id: itemOpt.value,
+            name: (itemOpt.textContent || "").split(" — ")[0],
+            price: Number(itemOpt.dataset.price || 0),
+            qty: 1,
+          }];
 
     this.pendingOrder = {
       fromId: fromSel.value,
@@ -264,8 +285,10 @@ class HomePage extends HTMLElement {
     };
 
     this.pendingOffer = {
-      items: [item],
-      total: item.price,
+      items,
+      total: cartSummary.totalQty > 0 ? cartSummary.total : items.reduce((s, it) => s + (it.price * it.qty), 0),
+      deliveryFee: cartSummary.totalQty > 0 ? cartSummary.deliveryFee : 500,
+      thumb: cartSummary.deliveryIcon || "assets/img/box.svg"
     };
 
     this.showConfirmModal(this.pendingOrder, this.pendingOffer);
@@ -278,18 +301,23 @@ class HomePage extends HTMLElement {
     }
 
     const userId = localStorage.getItem("userId");
-    if (!userId) {
-      alert("Эхлээд нэвтэрч орно уу!");
-      location.hash = "#login";
+
+    if (!this.pendingOrder.fromId || !this.pendingOrder.toId) {
+      alert("Хаанаас/Хаашаа сонгоно уу");
+      return;
+    }
+
+    if (!Array.isArray(this.pendingOffer.items) || this.pendingOffer.items.length === 0) {
+      alert("Сагс хоосон байна");
       return;
     }
 
     const payload = {
-      customerId: userId,
+      customerId: userId || null,
       fromPlaceId: this.pendingOrder.fromId,
       toPlaceId: this.pendingOrder.toId,
       scheduledAt: this.pendingOrder.createdAt,
-      deliveryFee: 500,
+      deliveryFee: this.pendingOffer.deliveryFee ?? 500,
       items: this.pendingOffer.items.map((i) => ({
         menuItemKey: i.id,
         name: i.name,
@@ -322,10 +350,17 @@ class HomePage extends HTMLElement {
       existingOffers.unshift({
         ...this.pendingOffer,
         orderId: data.orderId,
-        meta: this.pendingOrder.createdAt,
+        meta: this.formatMeta(this.pendingOrder.createdAt),
         from: this.pendingOrder.from,
         fromDetail: this.pendingOrder.fromDetail,
         to: this.pendingOrder.to,
+        title: `${this.pendingOrder.from} - ${this.pendingOrder.to}`,
+        price: this.formatPrice((data?.total ?? this.pendingOffer.total) || 0),
+        thumb: this.pendingOffer.thumb || "assets/img/box.svg",
+        sub: this.pendingOffer.items.map((it) => ({
+          name: `${it.name} x${it.qty}`,
+          price: this.formatPrice(it.price * it.qty)
+        }))
       });
       localStorage.setItem("offers", JSON.stringify(existingOffers));
 
@@ -335,7 +370,14 @@ class HomePage extends HTMLElement {
       }
 
       this.hideConfirmModal();
-      location.hash = "#delivery";
+
+      // Offer list рүү тайван гүйлгэж очуулах
+      const offersSection = document.querySelector("#offers");
+      if (offersSection && offersSection.scrollIntoView) {
+        setTimeout(() => {
+          offersSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150); // бага зэрэг хүлээлттэй
+      }
     } catch (e) {
       alert("Сервертэй холбогдож чадсангүй");
     }
@@ -394,6 +436,7 @@ document.addEventListener("change", async (e) => {
       const opt = document.createElement("option");
       opt.value = item.id;
       opt.dataset.price = item.price;
+      opt.dataset.name = item.name;
       opt.textContent = `${item.name} — ${item.price}₮`;
       og.appendChild(opt);
     });
@@ -407,6 +450,7 @@ document.addEventListener("change", async (e) => {
       const opt = document.createElement("option");
       opt.value = item.id;
       opt.dataset.price = item.price;
+      opt.dataset.name = item.name;
       opt.textContent = `${item.name} — ${item.price}₮`;
       og.appendChild(opt);
     });
@@ -422,6 +466,7 @@ document.addEventListener("change", async (e) => {
       const opt = document.createElement("option");
       opt.value = item.id;
       opt.dataset.price = item.price;
+      opt.dataset.name = item.name;
       opt.textContent = `${item.name} — ${item.price}₮`;
       og.appendChild(opt);
     });

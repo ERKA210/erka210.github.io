@@ -48,7 +48,11 @@ class OffersList extends HTMLElement {
     row.innerHTML = '';
     let content = '';
     list.forEach(item => {
-      content += `<offer-card thumb="${item.thumb}" title="${item.title}" meta="${item.meta}" sub='${JSON.stringify(item.sub)}' price="${item.price}" ></offer-card>`;
+      const thumb = item.thumb || 'assets/img/box.svg';
+      const title = item.title || '';
+      const meta = item.meta || '';
+      const price = item.price || '';
+      content += `<offer-card thumb="${thumb}" title="${title}" meta="${meta}" sub='${JSON.stringify(item.sub || [])}' price="${price}" ></offer-card>`;
     });
     row.innerHTML = content;
   }
