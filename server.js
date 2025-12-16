@@ -10,6 +10,26 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('front-end'));
 
+const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+async function ensureCustomerUser(client, { id, name, phone }) {
+  if (!id || !uuidRe.test(String(id))) {
+    throw new Error("customerId must be UUID");
+  }
+
+  const fullName = (name || "Зочин хэрэглэгч").trim() || "Зочин хэрэглэгч";
+  const phoneSafe = (phone || "00000000").trim() || "00000000";
+
+  await client.query(
+    `INSERT INTO users (id, full_name, phone, role)
+     VALUES ($1,$2,$3,'customer')
+     ON CONFLICT (id) DO UPDATE
+       SET full_name = EXCLUDED.full_name,
+           phone = CASE WHEN EXCLUDED.phone <> '' THEN EXCLUDED.phone ELSE users.phone END` ,
+    [id, fullName, phoneSafe]
+  );
+}
+
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
@@ -135,7 +155,13 @@ app.get("/api/courier/me", async (req, res) => {
 app.post("/api/orders", async (req, res) => {
   const client = await pool.connect();
   try {
-    const { customerId, fromPlaceId, toPlaceId, scheduledAt, items = [], deliveryFee = 0, note } = req.body;
+    const { customerId, fromPlaceId, toPlaceId, scheduledAt, items = [], deliveryFee = 0, note, customerName, customerPhone } = req.body;
+
+    await ensureCustomerUser(client, {
+      id: customerId,
+      name: customerName || "Зочин хэрэглэгч",
+      phone: customerPhone || "00000000",
+    });
 
     const subtotal = items.reduce((s, it) => s + (it.unitPrice * it.qty), 0);
     const total = subtotal + deliveryFee;

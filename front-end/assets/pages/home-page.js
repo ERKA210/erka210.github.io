@@ -260,7 +260,7 @@ class HomePage extends HTMLElement {
         ? cartSummary.items.map((it) => ({
             id: it.key || it.name,
             name: it.name,
-            price: it.unitPrice,
+            price: Number(it.unitPrice ?? it.price ?? 0),
             qty: it.qty,
           }))
         : [{
@@ -323,19 +323,29 @@ class HomePage extends HTMLElement {
       return;
     }
 
+    const safeItems = this.pendingOffer.items
+      .map((i) => {
+        const unitPrice = Number(i.price);
+        const qty = Number(i.qty);
+        return {
+          menuItemKey: i.id,
+          name: i.name,
+          unitPrice: Number.isFinite(unitPrice) ? unitPrice : 0,
+          qty: Number.isFinite(qty) && qty > 0 ? qty : 1,
+          options: {},
+        };
+      })
+      .filter((i) => i.qty > 0);
+
     const payload = {
       customerId: userId || null,
       fromPlaceId: this.pendingOrder.fromId,
       toPlaceId: this.pendingOrder.toId,
       scheduledAt: this.pendingOrder.createdAt,
-      deliveryFee: this.pendingOffer.deliveryFee ?? 500,
-      items: this.pendingOffer.items.map((i) => ({
-        menuItemKey: i.id,
-        name: i.name,
-        unitPrice: i.price,
-        qty: i.qty,
-        options: {},
-      })),
+      deliveryFee: Number.isFinite(this.pendingOffer.deliveryFee) ? this.pendingOffer.deliveryFee : 0,
+      items: safeItems,
+      customerName: localStorage.getItem("userName") || "Зочин хэрэглэгч",
+      customerPhone: localStorage.getItem("userPhone") || "00000000",
       note: this.pendingOrder.fromDetail ? `Pickup: ${this.pendingOrder.fromDetail}` : null,
     };
 

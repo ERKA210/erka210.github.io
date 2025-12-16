@@ -155,7 +155,8 @@ class ShCart extends HTMLElement {
             totalQty += qty;
 
             const name = box.querySelector("b")?.textContent?.trim() || "";
-            items.push({ name, qty, price: base * qty });
+            // Keep unit price to avoid NaN when sending to API
+            items.push({ name, qty, price: base, unitPrice: base });
         });
 
         let deliveryFee = 0;
