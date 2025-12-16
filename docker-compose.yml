@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: numd_admin
+      POSTGRES_PASSWORD: qwer1234
+      POSTGRES_DB: numdelivery
+    ports:
+      - "55432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  app:
+    image: node:20-alpine
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: numd_admin
+      PGPASSWORD: qwer1234
+      PGDATABASE: numdelivery
+    depends_on:
+      - db
+    command: sh -c "npm install && npm run dev"
+
+volumes:
+  db-data:

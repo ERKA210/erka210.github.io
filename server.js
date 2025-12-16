@@ -15,11 +15,11 @@ app.get('/', (req, res) => {
 })
 
 const pool = new Pool({
-  host: "127.0.0.1",
-  port: 55432,
-  user: "numd_admin",
-  password: "qwer1234",
-  database: "numdelivery",
+  host: process.env.PGHOST ?? "127.0.0.1",
+  port: Number(process.env.PGPORT ?? 55432),
+  user: process.env.PGUSER ?? "numd_admin",
+  password: process.env.PGPASSWORD ?? "qwer1234",
+  database: process.env.PGDATABASE ?? "numdelivery",
 });
 
 app.get("/health", async (req, res) => {
@@ -225,4 +225,3 @@ app.post("/api/orders/:id/review", async (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
-
