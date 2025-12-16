@@ -5,6 +5,21 @@ class DeliveryPage extends HTMLElement {
   connectedCallback() {
     this.render();
     this.applyActiveOrder();
+    this.handleRouteChange = this.handleRouteChange.bind(this);
+    this.applyActiveOrderBound = this.applyActiveOrder.bind(this);
+    window.addEventListener('hashchange', this.handleRouteChange);
+    window.addEventListener('order-updated', this.applyActiveOrderBound);
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener('hashchange', this.handleRouteChange);
+    window.removeEventListener('order-updated', this.applyActiveOrderBound);
+  }
+
+  handleRouteChange() {
+    if (location.hash === '#delivery') {
+      this.applyActiveOrder();
+    }
   }
 
   render() {

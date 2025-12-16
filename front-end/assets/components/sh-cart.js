@@ -75,13 +75,7 @@ class ShCart extends HTMLElement {
                     if (!opt) return;
 
                     const name = (opt.dataset.name || opt.textContent || "").split(" — ")[0].trim();
-
                     const price = Number(opt.dataset.price || 0);
-
-                    const itemId = opt.value;
-
-                    this.addItemToCart(name, price); 
-                    e.target.selectedIndex = 0;
                 const img = e.target.selectedOptions && e.target.selectedOptions[0].dataset.img ? e.target.selectedOptions[0].dataset.img : '';
                 this.addItemToCart(name, price, img);
                 e.target.selectedIndex = 0;
@@ -196,7 +190,8 @@ class ShCart extends HTMLElement {
             itemsTotal,
             deliveryFee,
             total: totalWithDelivery,
-            totalQty
+            totalQty,
+            deliveryIcon: iconSrc
         };
     }
 

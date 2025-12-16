@@ -652,7 +652,10 @@ home-page {
     }
 
     .filter-section {
-      margin: 2rem;
+      margin-top: 4.5rem;
+      margin-left: .75rem;
+      margin-right: .75rem;
+      margin-bottom: .75rem;
       background: var(--color-bg);
       border: 0.0625rem solid var(--color-border);
       border-radius: var(--radius-lg);
@@ -1082,15 +1085,6 @@ home-page {
     }
 
     @media (max-width: 54rem) {
-      main {
-        padding-top: 4.75rem;
-      }
-
-      .filter-section {
-        margin: 1rem;
-        padding: 1rem 1.25rem;
-        gap: .75rem;
-      }
 
       .middle-row {
         gap: .6rem;
@@ -1112,16 +1106,6 @@ home-page {
     }
 
     @media (max-width: 54rem) {
-      main {
-        padding-top: 4.25rem;
-        padding-bottom: 4rem;
-      }
-
-      .filter-section {
-        margin: .75rem;
-        padding: .875rem 1rem;
-        gap: .75rem;
-      }
 
       .top-row {
         justify-content: flex-end;

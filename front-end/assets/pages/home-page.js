@@ -6,6 +6,7 @@ class HomePage extends HTMLElement {
     this.render();
     this.setupConfirmModal();
     loadPlaces();
+    this.hydrateCustomerFromDb();
 
     const orderBtn = this.querySelector(".order-btn");
     if (orderBtn) {
@@ -137,6 +138,33 @@ class HomePage extends HTMLElement {
         </div>
       </div>
     `;
+  }
+
+  async hydrateCustomerFromDb() {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
+    try {
+      await this.syncCustomerInfo(userId);
+    } catch (e) {
+      // ignore network errors, fallback to localStorage data
+    }
+  }
+
+  async syncCustomerInfo(userId) {
+    if (!userId) return;
+    const res = await fetch(`${API}/api/customers/${userId}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data) {
+      if (data.name) localStorage.setItem("userName", data.name);
+      if (data.phone) localStorage.setItem("userPhone", data.phone);
+      localStorage.setItem("userId", data.id);
+      if (data.student_id) {
+        localStorage.setItem("userDisplayId", data.student_id);
+      }
+      window.dispatchEvent(new Event("user-updated"));
+    }
   }
 
   formatPrice(n) {
@@ -296,16 +324,11 @@ class HomePage extends HTMLElement {
     }
 
     const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    let userId = localStorage.getItem("userId");
+    const userId = localStorage.getItem("userId");
+    const registered = localStorage.getItem("userRegistered") === "1";
 
-    if (!uuidRe.test(userId || "")) {
-      const newId = (crypto.randomUUID && crypto.randomUUID()) || `00000000-0000-4000-8000-${Date.now().toString().padStart(12, "0").slice(-12)}`;
-      localStorage.setItem("userId", newId);
-      userId = newId;
-    }
-
-    if (!userId) {
-      // Нэвтрээгүй хэрэглэгчийг login хуудас руу чиглүүлнэ
+    if (!registered || !uuidRe.test(userId || "")) {
+      // бүртгэлгүй бол login руу шиднэ
       localStorage.setItem("pendingOrderDraft", JSON.stringify(this.pendingOrder));
       localStorage.setItem("pendingOfferDraft", JSON.stringify(this.pendingOffer));
       this.hideConfirmModal();
@@ -344,8 +367,9 @@ class HomePage extends HTMLElement {
       scheduledAt: this.pendingOrder.createdAt,
       deliveryFee: Number.isFinite(this.pendingOffer.deliveryFee) ? this.pendingOffer.deliveryFee : 0,
       items: safeItems,
-      customerName: localStorage.getItem("userName") || "Зочин хэрэглэгч",
+      customerName: `${localStorage.getItem("userLastName") || ""} ${localStorage.getItem("userName") || "Зочин хэрэглэгч"}`.trim(),
       customerPhone: localStorage.getItem("userPhone") || "00000000",
+      customerStudentId: localStorage.getItem("userDisplayId") || "",
       note: this.pendingOrder.fromDetail ? `Pickup: ${this.pendingOrder.fromDetail}` : null,
     };
 
@@ -363,8 +387,14 @@ class HomePage extends HTMLElement {
         return;
       }
 
+      if (data?.customerId) {
+        localStorage.setItem("userId", data.customerId);
+        this.syncCustomerInfo(data.customerId);
+      }
+
       localStorage.setItem("activeOrder", JSON.stringify(this.pendingOrder));
       localStorage.setItem("orderStep", "0");
+      window.dispatchEvent(new Event("order-updated"));
 
       const existingOffers = JSON.parse(localStorage.getItem("offers") || "[]");
       existingOffers.unshift({

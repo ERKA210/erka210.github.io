@@ -9,6 +9,37 @@ class OrdersPage extends HTMLElement {
     this.bindClicks();
   }
 
+  renderCourier(courier) {
+    const box = this.querySelector("#courierBox");
+    if (!box) return;
+    if (!courier) {
+      box.setEmpty?.();
+      return;
+    }
+    box.setData?.(courier);
+  }
+
+  async loadCourierForOrder(order) {
+    // Одоогоор backend order-д courier_id ирдэггүй тул идэвхтэй courier-г авч үзнэ
+    let courier = null;
+    const cached = localStorage.getItem("activeCourier");
+    if (cached) {
+      try { courier = JSON.parse(cached); } catch { courier = null; }
+    }
+    if (!courier) {
+      try {
+        const res = await fetch(`${API}/api/courier/me`);
+        if (res.ok) {
+          courier = await res.json();
+          localStorage.setItem("activeCourier", JSON.stringify(courier));
+        }
+      } catch {
+        courier = null;
+      }
+    }
+    this.renderCourier(courier);
+  }
+
   render() {
     this.innerHTML = `
   <link rel="stylesheet" href="assets/css/order.css">
@@ -22,6 +53,7 @@ class OrdersPage extends HTMLElement {
 
         <section class="details">
           <h2>Захиалгын явц</h2>
+          <couriers-card id="courierBox"></couriers-card>
           <div class="order-progress">
             <div class="step" data-step="0">
               <div class="step-indicator">
@@ -138,6 +170,7 @@ class OrdersPage extends HTMLElement {
     const order = JSON.parse(decodeURIComponent(raw));
 
     this.setProgressFromStatus(order.status);
+    this.loadCourierForOrder(order);
 
   });
 }

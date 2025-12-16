@@ -12,22 +12,43 @@ app.use(express.static('front-end'));
 
 const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-async function ensureCustomerUser(client, { id, name, phone }) {
+async function ensureCustomerUser(client, { id, name, phone, studentId }) {
   if (!id || !uuidRe.test(String(id))) {
     throw new Error("customerId must be UUID");
   }
 
   const fullName = (name || "Зочин хэрэглэгч").trim() || "Зочин хэрэглэгч";
   const phoneSafe = (phone || "00000000").trim() || "00000000";
+  const studentSafe = (studentId || "").trim();
+
+  // If энэ утасны дугаар аль хэдийн бүртгэлтэй бол тухайн хэрэглэгчийн ID-г ашиглана
+  const existing = await client.query(
+    `SELECT id FROM users WHERE phone = $1 AND role = 'customer' LIMIT 1`,
+    [phoneSafe]
+  );
+  if (existing.rows.length) {
+    const existingId = existing.rows[0].id;
+    await client.query(
+      `UPDATE users
+         SET full_name = $2,
+             student_id = CASE WHEN $3 <> '' THEN $3 ELSE student_id END
+       WHERE id = $1`,
+      [existingId, fullName, studentSafe]
+    );
+    return existingId;
+  }
 
   await client.query(
-    `INSERT INTO users (id, full_name, phone, role)
-     VALUES ($1,$2,$3,'customer')
+    `INSERT INTO users (id, full_name, phone, student_id, role)
+     VALUES ($1,$2,$3,$4,'customer')
      ON CONFLICT (id) DO UPDATE
        SET full_name = EXCLUDED.full_name,
-           phone = CASE WHEN EXCLUDED.phone <> '' THEN EXCLUDED.phone ELSE users.phone END` ,
-    [id, fullName, phoneSafe]
+           phone = CASE WHEN EXCLUDED.phone <> '' THEN EXCLUDED.phone ELSE users.phone END,
+           student_id = CASE WHEN EXCLUDED.student_id <> '' THEN EXCLUDED.student_id ELSE users.student_id END`,
+    [id, fullName, phoneSafe, studentSafe]
   );
+
+  return id;
 }
 
 app.get('/', (req, res) => {
@@ -86,6 +107,25 @@ app.get("/api/menus/:placeId", async (req, res) => {
   );
 
   res.json(r.rows[0] ?? { menu_json: [] });
+});
+
+app.get("/api/customers/:id", async (req, res) => {
+  const { id } = req.params;
+  if (!uuidRe.test(id || "")) {
+    return res.status(400).json({ error: "customerId must be UUID" });
+  }
+
+  try {
+    const r = await pool.query(
+      `SELECT id, full_name AS name, phone, student_id
+       FROM users
+       WHERE id = $1 AND role = 'customer'`,
+      [id]
+    );
+    res.json(r.rows[0] || null);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.get("/api/courier/me", async (req, res) => {
@@ -155,12 +195,13 @@ app.get("/api/courier/me", async (req, res) => {
 app.post("/api/orders", async (req, res) => {
   const client = await pool.connect();
   try {
-    const { customerId, fromPlaceId, toPlaceId, scheduledAt, items = [], deliveryFee = 0, note, customerName, customerPhone } = req.body;
+    const { customerId, fromPlaceId, toPlaceId, scheduledAt, items = [], deliveryFee = 0, note, customerName, customerPhone, customerStudentId } = req.body;
 
-    await ensureCustomerUser(client, {
+    const resolvedCustomerId = await ensureCustomerUser(client, {
       id: customerId,
       name: customerName || "Зочин хэрэглэгч",
       phone: customerPhone || "00000000",
+      studentId: customerStudentId || "",
     });
 
     const subtotal = items.reduce((s, it) => s + (it.unitPrice * it.qty), 0);
@@ -172,7 +213,7 @@ app.post("/api/orders", async (req, res) => {
       `INSERT INTO orders (customer_id, from_place_id, to_place_id, scheduled_at, subtotal_amount, delivery_fee, total_amount, note)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
        RETURNING id`,
-      [customerId, fromPlaceId, toPlaceId, scheduledAt ?? null, subtotal, deliveryFee, total, note ?? null]
+      [resolvedCustomerId, fromPlaceId, toPlaceId, scheduledAt ?? null, subtotal, deliveryFee, total, note ?? null]
     );
 
     const orderId = orderR.rows[0].id;
@@ -192,7 +233,7 @@ app.post("/api/orders", async (req, res) => {
     );
 
     await client.query("COMMIT");
-    res.status(201).json({ orderId, subtotal, deliveryFee, total });
+    res.status(201).json({ orderId, subtotal, deliveryFee, total, customerId: resolvedCustomerId });
   } catch (e) {
     await client.query("ROLLBACK");
     res.status(500).json({ error: e.message });

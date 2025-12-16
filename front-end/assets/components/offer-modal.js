@@ -129,6 +129,35 @@ class OfferModal extends HTMLElement {
           font-weight: 800;
         }
 
+        .courier {
+          border: 1px solid #eef0f6;
+          border-radius: 12px;
+          padding: 0.75rem 0.85rem;
+          background: #f8f9fc;
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: 0.7rem;
+          align-items: center;
+        }
+        .courier img {
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          object-fit: cover;
+          background: #fff;
+          border: 1px solid #e5e7eb;
+        }
+        .courier h4 {
+          margin: 0;
+          font-size: 1rem;
+          color: var(--text);
+        }
+        .courier p {
+          margin: 0.1rem 0 0;
+          color: var(--muted);
+          font-size: 0.9rem;
+        }
+
         .actions {
           display: flex;
           justify-content: flex-end;
@@ -183,6 +212,15 @@ class OfferModal extends HTMLElement {
             <span class="pill" id="price">0₮</span>
           </div>
 
+          <div class="courier" id="courier">
+            <img src="assets/img/profile.jpg" alt="courier">
+            <div>
+              <h4 id="courier-name">Хүргэгч</h4>
+              <p id="courier-phone"></p>
+              <p id="courier-id"></p>
+            </div>
+          </div>
+
           <div class="actions">
             <button class="delete" type="button">Устгах</button>
             <button class="confirm" type="button">Хүргэх</button>
@@ -200,6 +238,10 @@ class OfferModal extends HTMLElement {
     this.thumbEl = this.shadowRoot.getElementById('thumb');
     this.subEl = this.shadowRoot.getElementById('sub');
     this.priceEl = this.shadowRoot.getElementById('price');
+    this.courierWrap = this.shadowRoot.getElementById('courier');
+    this.courierNameEl = this.shadowRoot.getElementById('courier-name');
+    this.courierPhoneEl = this.shadowRoot.getElementById('courier-phone');
+    this.courierIdEl = this.shadowRoot.getElementById('courier-id');
     this.closeBtn = this.shadowRoot.querySelector('.close-btn');
     this.deleteBtn = this.shadowRoot.querySelector('.delete');
     this.confirmBtn = this.shadowRoot.querySelector('.confirm');
@@ -228,6 +270,8 @@ class OfferModal extends HTMLElement {
       return `<li><span>${name}</span><span class="price">${price}</span></li>`;
     }).join('') || '<li><span>Бараа алга</span><span class="price">-</span></li>';
     this.priceEl.textContent = data.price ? String(data.price) : '0₮';
+
+    this.populateCourier(data);
     this.modal.classList.add('open');
   }
 
@@ -277,7 +321,38 @@ class OfferModal extends HTMLElement {
     }
 
     this.close();
+    window.dispatchEvent(new Event('order-updated'));
     location.hash = '#delivery';
+  }
+
+  async populateCourier(data) {
+    if (!this.courierWrap) return;
+    const localCourier = localStorage.getItem('activeCourier');
+    let courier = null;
+    if (localCourier) {
+      try { courier = JSON.parse(localCourier); } catch (e) { courier = null; }
+    }
+
+    if (!courier) {
+      try {
+        const res = await fetch('/api/courier/me');
+        if (res.ok) {
+          courier = await res.json();
+          localStorage.setItem('activeCourier', JSON.stringify(courier));
+        }
+      } catch (e) {
+        courier = null;
+      }
+    }
+
+    if (courier) {
+      this.courierWrap.style.display = 'grid';
+      this.courierNameEl.textContent = courier.name || 'Хүргэгч';
+      this.courierPhoneEl.textContent = courier.phone ? `Утас: ${courier.phone}` : '';
+      this.courierIdEl.textContent = courier.student_id ? `ID: ${courier.student_id}` : '';
+    } else {
+      this.courierWrap.style.display = 'none';
+    }
   }
 }
 
