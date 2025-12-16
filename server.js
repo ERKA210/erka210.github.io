@@ -69,18 +69,20 @@ app.get("/api/menus/:placeId", async (req, res) => {
 });
 
 app.get("/api/courier/me", async (req, res) => {
-  const r = await pool.query(`
-    SELECT
-      u.id,
-      u.full_name AS name,
-      u.phone,
-      u.student_id
-    FROM couriers c
-    JOIN users u ON u.id = c.user_id
-    WHERE c.is_active = true
-    LIMIT 1
-  `);
-  res.json(r.rows[0] ?? null);
+  try {
+    const r = await pool.query(`
+      SELECT u.id, u.full_name AS name, u.phone, u.student_id
+      FROM couriers c
+      JOIN users u ON u.id = c.user_id
+      WHERE c.is_active = true
+      ORDER BY c.created_at ASC
+      LIMIT 1
+    `);
+
+    res.json(r.rows[0] || null);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // app.get('/api/orders', (req, res) => {
@@ -131,84 +133,12 @@ app.get("/api/courier/me", async (req, res) => {
 
 
 app.post("/api/orders", async (req, res) => {
-  const { customerId, fromPlaceId, toPlaceId, scheduledAt, items = [], deliveryFee = 0, note } = req.body;
-
-  const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  const safeFromPlaceId = uuidRe.test(fromPlaceId) ? fromPlaceId : null;
-  const safeToPlaceId = uuidRe.test(toPlaceId) ? toPlaceId : null;
-
-  if (!safeFromPlaceId || !safeToPlaceId) {
-    return res.status(400).json({ error: "fromPlaceId/toPlaceId must be UUID" });
-  }
-
-  const safeItems = Array.isArray(items) ? items : [];
-  const normalizedItems = safeItems
-    .map((it) => {
-      const qty = Number.isFinite(Number(it.qty)) ? Number(it.qty) : 0;
-      const unitPrice = Number.isFinite(Number(it.unitPrice)) ? Number(it.unitPrice) : 0;
-      return {
-        menuItemKey: it.menuItemKey ?? null,
-        name: it.name || "Тодорхойгүй бараа",
-        unitPrice,
-        qty,
-        options: it.options ?? {},
-      };
-    })
-    .filter((it) => it.qty > 0);
-
-  const subtotal = normalizedItems.reduce((s, it) => s + (it.unitPrice * it.qty), 0);
-  const total = subtotal + Number(deliveryFee || 0);
-
-  let client;
+  const client = await pool.connect();
   try {
-    client = await pool.connect();
-  } catch (e) {
-    // fallback when DB холбогдохгүй үед ч UI явуулах
-    console.warn("DB connect failed, returning mock order:", e.message);
-    return res.status(201).json({
-      orderId: `local-${Date.now()}`,
-      subtotal,
-      deliveryFee,
-      total,
-      offline: true
-    });
-  }
+    const { customerId, fromPlaceId, toPlaceId, scheduledAt, items = [], deliveryFee = 0, note } = req.body;
 
-  try {
-    // resolve customer by UUID -> else student_id/phone -> else env default -> else first user
-    let resolvedCustomerId = null;
-    if (uuidRe.test(customerId)) {
-      const customerRes = await client.query(`SELECT id FROM users WHERE id = $1`, [customerId]);
-      if (customerRes.rowCount > 0) {
-        resolvedCustomerId = customerRes.rows[0].id;
-      }
-    }
-
-    if (!resolvedCustomerId && customerId) {
-      const lookupRes = await client.query(
-        `SELECT id FROM users WHERE student_id = $1 OR phone = $1 LIMIT 1`,
-        [customerId]
-      );
-      if (lookupRes.rowCount > 0) {
-        resolvedCustomerId = lookupRes.rows[0].id;
-      }
-    }
-
-    if (!resolvedCustomerId) {
-      const defaultUuid = process.env.DEFAULT_CUSTOMER_UUID || process.env.DEFAULT_CUSTOMER_ID || null;
-      if (defaultUuid && uuidRe.test(defaultUuid)) {
-        const defRes = await client.query(`SELECT id FROM users WHERE id = $1`, [defaultUuid]);
-        if (defRes.rowCount > 0) resolvedCustomerId = defRes.rows[0].id;
-      }
-    }
-
-    if (!resolvedCustomerId) {
-      const fallbackRes = await client.query(`SELECT id FROM users ORDER BY created_at DESC NULLS LAST LIMIT 1`);
-      if (fallbackRes.rowCount === 0) {
-        return res.status(400).json({ error: "No valid customer found" });
-      }
-      resolvedCustomerId = fallbackRes.rows[0].id;
-    }
+    const subtotal = items.reduce((s, it) => s + (it.unitPrice * it.qty), 0);
+    const total = subtotal + deliveryFee;
 
     await client.query("BEGIN");
 
@@ -216,12 +146,12 @@ app.post("/api/orders", async (req, res) => {
       `INSERT INTO orders (customer_id, from_place_id, to_place_id, scheduled_at, subtotal_amount, delivery_fee, total_amount, note)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
        RETURNING id`,
-      [resolvedCustomerId, safeFromPlaceId, safeToPlaceId, scheduledAt ?? null, subtotal, deliveryFee, total, note ?? null]
+      [customerId, fromPlaceId, toPlaceId, scheduledAt ?? null, subtotal, deliveryFee, total, note ?? null]
     );
 
     const orderId = orderR.rows[0].id;
 
-    for (const it of normalizedItems) {
+    for (const it of items) {
       await client.query(
         `INSERT INTO order_items (order_id, menu_item_key, name, unit_price, qty, item_snapshot_json)
          VALUES ($1,$2,$3,$4,$5,$6)`,
@@ -238,9 +168,7 @@ app.post("/api/orders", async (req, res) => {
     await client.query("COMMIT");
     res.status(201).json({ orderId, subtotal, deliveryFee, total });
   } catch (e) {
-    try {
-      await client.query("ROLLBACK");
-    } catch {}
+    await client.query("ROLLBACK");
     res.status(500).json({ error: e.message });
   } finally {
     client.release();

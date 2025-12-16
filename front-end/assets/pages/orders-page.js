@@ -7,14 +7,6 @@ class OrdersPage extends HTMLElement {
     this.bindModal();
     this.bindProgress();
     this.bindClicks();
-    this.renderCourierPanel();
-
-    this.onHashChange = () => {
-      if ((location.hash || "#").replace("#", "") === "orders") {
-        this.renderCourierPanel();
-      }
-    };
-    window.addEventListener("hashchange", this.onHashChange);
   }
 
   render() {
@@ -70,11 +62,6 @@ class OrdersPage extends HTMLElement {
               <button class="submit" id="sendBtn">Илгээх</button>
             </div>
           </div>
-
-          <section class="courier-panel" id="courierPanel" hidden>
-            <h3>Хүргэгчийн мэдээлэл</h3>
-            <div class="courier-box" id="courierBox"></div>
-          </section>
 
         </section>
       </main>
@@ -137,7 +124,6 @@ class OrdersPage extends HTMLElement {
   `;
 }).join("");
 
-    // Эхний захиалгын статусыг алхамд тусгана
     this.setProgressFromStatus(orders[0]?.status);
   }
 
@@ -151,15 +137,11 @@ class OrdersPage extends HTMLElement {
 
     const order = JSON.parse(decodeURIComponent(raw));
 
-    // progress update
     this.setProgressFromStatus(order.status);
 
-    // энд хүсвэл баруун талын хэсэгт нэмэлт detail гаргаж болно
-    // жишээ: console.log(order)
   });
 }
 
-  // LocalStorage дээрх offers-ээс fallback үүсгэх
   readLocalOffers() {
     try {
       const raw = localStorage.getItem("offers");
@@ -191,46 +173,6 @@ class OrdersPage extends HTMLElement {
     return Number(v || 0).toLocaleString("mn-MN") + "₮";
   }
 
-  getActiveCourier() {
-    try {
-      const raw = localStorage.getItem("activeCourier");
-      if (!raw) return null;
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
-  }
-
-  renderCourierPanel() {
-    const panel = this.querySelector("#courierPanel");
-    const box = this.querySelector("#courierBox");
-    if (!panel || !box) return;
-
-    const courier = this.getActiveCourier();
-    if (!courier) {
-      panel.hidden = true;
-      return;
-    }
-
-    const avatar = courier.avatar || "assets/img/profile.jpg";
-    const name = courier.name || "Мэдээлэл алга";
-    const phone = courier.phone ? `Утас: ${courier.phone}` : "";
-    const code = courier.student_id || courier.id || "";
-    const idTxt = code ? `ID: ${code}` : "";
-
-    box.innerHTML = `
-      <div class="delivery" style="display:flex;gap:12px;align-items:center;padding:12px;border:1px solid #e5e7eb;border-radius:12px;">
-        <img src="${avatar}" alt="courier" style="width:56px;height:56px;border-radius:14px;object-fit:cover;">
-        <div class="delivery-info">
-          <div style="font-weight:700;color:#111827;">${name}</div>
-          <div style="color:#374151;">${phone}</div>
-          <div style="color:#6b7280;">${idTxt}</div>
-        </div>
-      </div>
-    `;
-    panel.hidden = false;
-  }
-
   mapStatusToStep(status) {
     switch ((status || "").toLowerCase()) {
       case "on_the_way":
@@ -259,13 +201,6 @@ class OrdersPage extends HTMLElement {
     });
   }
 
-  disconnectedCallback() {
-    if (this.onHashChange) {
-      window.removeEventListener("hashchange", this.onHashChange);
-    }
-  }
-
-  // Одоогоос 24 цагийн өмнөх захиалгыг нуух (фоллбэк: бүгдийг үзүүлнэ)
   filterExpired(orders) {
     const now = Date.now();
     const cutoff = now - 24 * 60 * 60 * 1000;
