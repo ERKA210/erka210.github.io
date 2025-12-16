@@ -6,6 +6,15 @@ class OrdersPage extends HTMLElement {
     this.loadOrders();
     this.bindModal();
     this.bindProgress();
+    this.bindClicks();
+    this.renderCourierPanel();
+
+    this.onHashChange = () => {
+      if ((location.hash || "#").replace("#", "") === "orders") {
+        this.renderCourierPanel();
+      }
+    };
+    window.addEventListener("hashchange", this.onHashChange);
   }
 
   render() {
@@ -62,6 +71,11 @@ class OrdersPage extends HTMLElement {
             </div>
           </div>
 
+          <section class="courier-panel" id="courierPanel" hidden>
+            <h3>Хүргэгчийн мэдээлэл</h3>
+            <div class="courier-box" id="courierBox"></div>
+          </section>
+
         </section>
       </main>
     `;
@@ -76,6 +90,7 @@ class OrdersPage extends HTMLElement {
 
     try {
       const res = await fetch(`${API}/api/orders${qs}`);
+      
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Алдаа");
 
@@ -92,6 +107,8 @@ class OrdersPage extends HTMLElement {
     }
   }
 
+  
+
   renderOrders(orders) {
     const listEl = this.querySelector("#orderList");
     if (!listEl) return;
@@ -101,31 +118,46 @@ class OrdersPage extends HTMLElement {
       return;
     }
 
-    listEl.innerHTML = orders
-      .map((o) => {
-        const ts = this.getOrderTimestamp(o) || Date.now();
-        const dt = new Date(ts);
-        const meta = `${dt.toLocaleDateString()} • ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
-        const itemsTxt = (o.items || [])
-          .map((it) => `${it.name} ×${it.qty}`)
-          .join(" · ");
-        return `
-          <div class="order-card">
-            <div class="order-info">
-              <h3 class="order-title">${o.from_name || ""} - ${o.to_name || ""}</h3>
-              <h4>${meta}</h4>
-              <p>${itemsTxt || "Бараа байхгүй"}</p>
-              <p class="order-total">Дүн: ${this.formatPrice(o.total_amount || 0)}</p>
-            </div>
-            <img src="assets/img/tor.svg" alt="hemjee">
-          </div>
-        `;
-      })
-      .join("");
+   listEl.innerHTML = orders.map((o) => {
+  const ts = this.getOrderTimestamp(o) || Date.now();
+  const dt = new Date(ts);
+  const meta = `${dt.toLocaleDateString()} • ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  const itemsTxt = (o.items || []).map(it => `${it.name} ×${it.qty}`).join(" · ");
+
+  return `
+    <div class="order-card" data-order='${encodeURIComponent(JSON.stringify(o))}'>
+      <div class="order-info">
+        <h3 class="order-title">${o.from_name || ""} - ${o.to_name || ""}</h3>
+        <h4>${meta}</h4>
+        <p>${itemsTxt || "Бараа байхгүй"}</p>
+        <p class="order-total">Дүн: ${this.formatPrice(o.total_amount || 0)}</p>
+      </div>
+      <img src="assets/img/tor.svg" alt="hemjee">
+    </div>
+  `;
+}).join("");
 
     // Эхний захиалгын статусыг алхамд тусгана
     this.setProgressFromStatus(orders[0]?.status);
   }
+
+  bindClicks() {
+  this.addEventListener("click", (e) => {
+    const card = e.target.closest(".order-card");
+    if (!card) return;
+
+    const raw = card.getAttribute("data-order");
+    if (!raw) return;
+
+    const order = JSON.parse(decodeURIComponent(raw));
+
+    // progress update
+    this.setProgressFromStatus(order.status);
+
+    // энд хүсвэл баруун талын хэсэгт нэмэлт detail гаргаж болно
+    // жишээ: console.log(order)
+  });
+}
 
   // LocalStorage дээрх offers-ээс fallback үүсгэх
   readLocalOffers() {
@@ -159,6 +191,46 @@ class OrdersPage extends HTMLElement {
     return Number(v || 0).toLocaleString("mn-MN") + "₮";
   }
 
+  getActiveCourier() {
+    try {
+      const raw = localStorage.getItem("activeCourier");
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
+  renderCourierPanel() {
+    const panel = this.querySelector("#courierPanel");
+    const box = this.querySelector("#courierBox");
+    if (!panel || !box) return;
+
+    const courier = this.getActiveCourier();
+    if (!courier) {
+      panel.hidden = true;
+      return;
+    }
+
+    const avatar = courier.avatar || "assets/img/profile.jpg";
+    const name = courier.name || "Мэдээлэл алга";
+    const phone = courier.phone ? `Утас: ${courier.phone}` : "";
+    const code = courier.student_id || courier.id || "";
+    const idTxt = code ? `ID: ${code}` : "";
+
+    box.innerHTML = `
+      <div class="delivery" style="display:flex;gap:12px;align-items:center;padding:12px;border:1px solid #e5e7eb;border-radius:12px;">
+        <img src="${avatar}" alt="courier" style="width:56px;height:56px;border-radius:14px;object-fit:cover;">
+        <div class="delivery-info">
+          <div style="font-weight:700;color:#111827;">${name}</div>
+          <div style="color:#374151;">${phone}</div>
+          <div style="color:#6b7280;">${idTxt}</div>
+        </div>
+      </div>
+    `;
+    panel.hidden = false;
+  }
+
   mapStatusToStep(status) {
     switch ((status || "").toLowerCase()) {
       case "on_the_way":
@@ -185,6 +257,12 @@ class OrdersPage extends HTMLElement {
       if (idx < stepIndex) step.classList.add('completed');
       else if (idx === stepIndex) step.classList.add('active');
     });
+  }
+
+  disconnectedCallback() {
+    if (this.onHashChange) {
+      window.removeEventListener("hashchange", this.onHashChange);
+    }
   }
 
   // Одоогоос 24 цагийн өмнөх захиалгыг нуух (фоллбэк: бүгдийг үзүүлнэ)

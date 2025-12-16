@@ -211,11 +211,12 @@ class OfferModal extends HTMLElement {
       if (e.target === this.modal) this.close();
     });
     this.deleteBtn.addEventListener('click', () => this.close());
-    this.confirmBtn.addEventListener('click', () => this.close());
+    this.confirmBtn.addEventListener('click', () => this.handleConfirm());
   }
 
   show(data) {
     if (!this.modal) return;
+    this.currentData = data;
     this.thumbEl.src = data.thumb || 'assets/img/box.svg';
     this.thumbEl.alt = data.title || 'offer thumbnail';
     this.titleEl.textContent = data.title || 'Санал';
@@ -232,6 +233,51 @@ class OfferModal extends HTMLElement {
 
   close() {
     if (this.modal) this.modal.classList.remove('open');
+  }
+
+  parseMetaToISO(meta) {
+    if (!meta) return null;
+    const sanitized = meta.replace('•', '');
+    const parsed = Date.parse(sanitized);
+    if (!Number.isNaN(parsed)) return new Date(parsed).toISOString();
+    return null;
+  }
+
+  buildActiveOrder(data) {
+    const [fromRaw = '', toRaw = ''] = (data.title || '').split('-').map((s) => s.trim());
+    const firstItem = Array.isArray(data.sub) && data.sub.length ? data.sub[0] : null;
+    return {
+      from: fromRaw,
+      to: toRaw,
+      item: firstItem?.name || '',
+      items: Array.isArray(data.sub) ? data.sub : [],
+      total: data.price || '',
+      createdAt: this.parseMetaToISO(data.meta) || new Date().toISOString(),
+    };
+  }
+
+  async handleConfirm() {
+    if (!this.currentData) {
+      this.close();
+      return;
+    }
+
+    const activeOrder = this.buildActiveOrder(this.currentData);
+    localStorage.setItem('activeOrder', JSON.stringify(activeOrder));
+    localStorage.setItem('orderStep', '0');
+
+    try {
+      const res = await fetch('/api/courier/me');
+      if (res.ok) {
+        const courier = await res.json();
+        localStorage.setItem('activeCourier', JSON.stringify(courier));
+      }
+    } catch (e) {
+      console.warn('courier fetch failed', e);
+    }
+
+    this.close();
+    location.hash = '#delivery';
   }
 }
 

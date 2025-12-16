@@ -1,9 +1,20 @@
+const API = "http://localhost:3000";
+
 class Couriers extends HTMLElement {
   connectedCallback() {
     this.render();
+
+    fetch(`${API}/api/courier/me`)
+      .then(r => r.json())
+      .then(courier => {
+        if (!courier) return;
+        this.setData(courier); 
+      })
+      .catch(() => {});
   }
 
-  setData({ name, phone, id }) {
+  setData({ name, phone, id, student_id }) {
+    const code = student_id || id || "";
     this.innerHTML = `
       <article>
         <p style="font-weight:bold;font-size:1.5rem;">Хүргэгчийн мэдээлэл</p>
@@ -12,7 +23,7 @@ class Couriers extends HTMLElement {
           <div class="delivery-info">
             <h3>Нэр: ${name}</h3>
             <p>Утас: ${phone}</p>
-            <p>ID: ${id}</p>
+            <p>ID: ${code}</p>
           </div>
         </div>
       </article>
@@ -24,12 +35,4 @@ class Couriers extends HTMLElement {
   }
 }
 
-fetch(`${API}/api/courier/me`)
-  .then(r => r.json())
-  .then(courier => {
-    if (!courier) return;
-    const courierCard = document.querySelector("couriers-card");
-    courierCard?.setData(courier);
-  });
-  
 customElements.define("couriers-card", Couriers);

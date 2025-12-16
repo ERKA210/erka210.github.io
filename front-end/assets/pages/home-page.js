@@ -7,7 +7,6 @@ class HomePage extends HTMLElement {
     this.setupConfirmModal();
     loadPlaces();
 
-    // "Захиалах" товч дээр дархад order бэлдээд confirm modal гаргана
     const orderBtn = this.querySelector(".order-btn");
     if (orderBtn) {
       orderBtn.addEventListener("click", () => this.prepareOrder());
@@ -166,7 +165,6 @@ class HomePage extends HTMLElement {
       if (!isNaN(iso.getTime())) return iso.toISOString();
     }
 
-    // fallback: одоогийн цаг
     const now = new Date();
     return now.toISOString();
   }
@@ -226,7 +224,6 @@ class HomePage extends HTMLElement {
     this.pendingOffer = null;
   }
 
-  // "Захиалах" дархад pendingOrder/pendingOffer бэлдэнэ
   prepareOrder() {
     const fromSel = this.querySelector("#fromPlace");
     const toSel = this.querySelector("#toPlace");
@@ -251,8 +248,6 @@ class HomePage extends HTMLElement {
         return;
       }
     }
-
-    // "CU - 8-р байр 209" -> ["CU", "8-р байр 209"]
     const fromOptionText = fromSel.selectedOptions[0].textContent || "";
     const parts = fromOptionText.split(" - ");
     const fromName = parts[0] || fromOptionText;
@@ -300,7 +295,23 @@ class HomePage extends HTMLElement {
       return;
     }
 
-    const userId = localStorage.getItem("userId");
+    const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    let userId = localStorage.getItem("userId");
+
+    if (!uuidRe.test(userId || "")) {
+      const newId = (crypto.randomUUID && crypto.randomUUID()) || `00000000-0000-4000-8000-${Date.now().toString().padStart(12, "0").slice(-12)}`;
+      localStorage.setItem("userId", newId);
+      userId = newId;
+    }
+
+    if (!userId) {
+      // Нэвтрээгүй хэрэглэгчийг login хуудас руу чиглүүлнэ
+      localStorage.setItem("pendingOrderDraft", JSON.stringify(this.pendingOrder));
+      localStorage.setItem("pendingOfferDraft", JSON.stringify(this.pendingOffer));
+      this.hideConfirmModal();
+      location.hash = "#login";
+      return;
+    }
 
     if (!this.pendingOrder.fromId || !this.pendingOrder.toId) {
       alert("Хаанаас/Хаашаа сонгоно уу");
@@ -342,7 +353,6 @@ class HomePage extends HTMLElement {
         return;
       }
 
-      // offers-list руу UI дээр харагдуулах (одоо байгаа логикийг хадгаллаа)
       localStorage.setItem("activeOrder", JSON.stringify(this.pendingOrder));
       localStorage.setItem("orderStep", "0");
 
@@ -371,12 +381,11 @@ class HomePage extends HTMLElement {
 
       this.hideConfirmModal();
 
-      // Offer list рүү тайван гүйлгэж очуулах
       const offersSection = document.querySelector("#offers");
       if (offersSection && offersSection.scrollIntoView) {
         setTimeout(() => {
           offersSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 150); // бага зэрэг хүлээлттэй
+        }, 150); 
       }
     } catch (e) {
       alert("Сервертэй холбогдож чадсангүй");
@@ -386,7 +395,6 @@ class HomePage extends HTMLElement {
 
 const API = "http://localhost:3000";
 
-// Places-ийг DB-с дүүргэнэ
 async function loadPlaces() {
   const from = await fetch(`${API}/api/from-places`).then((r) => r.json());
   const to = await fetch(`${API}/api/to-places`).then((r) => r.json());
@@ -411,7 +419,6 @@ async function loadPlaces() {
 
 loadPlaces();
 
-// From сонгогдоход menus (JSONB) ачаална
 document.addEventListener("change", async (e) => {
   if (e.target.id !== "fromPlace") return;
 
@@ -457,7 +464,6 @@ document.addEventListener("change", async (e) => {
     whatSel.appendChild(og);
   }
 
-  // category байхгүй хуучин меню байвал "Бусад" гэж гаргая (optional)
   const others = items.filter((i) => !i.category);
   if (others.length) {
     const og = document.createElement("optgroup");
