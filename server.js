@@ -172,7 +172,6 @@ app.post("/api/orders", async (req, res) => {
   }
 });
 
-// Төлбөрийн төлөв солих
 app.post("/api/orders/:id/pay", async (req, res) => {
   const { id } = req.params;
   const { amount, method } = req.body;
@@ -203,7 +202,6 @@ app.post("/api/orders/:id/pay", async (req, res) => {
   }
 });
 
-// Үнэлгээ хадгалах
 app.post("/api/orders/:id/review", async (req, res) => {
   const { id } = req.params;
   const { customerId, courierId, rating, comment } = req.body;
