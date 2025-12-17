@@ -13,10 +13,10 @@
   "license": "ISC",
   "author": "",
   "type": "module",
-  "main": "index.js",
+  "main": "back-end/server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js"
+    "dev": "nodemon back-end/server.js",
+    "start": "node back-end/server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
