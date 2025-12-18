@@ -9,9 +9,10 @@ services:
       POSTGRES_PASSWORD: qwer1234
       POSTGRES_DB: numdelivery
     ports:
-      - "55432:5432"
+      - "55433:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
 
   app:
     image: node:20-alpine
