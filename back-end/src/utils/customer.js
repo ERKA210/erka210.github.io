@@ -9,7 +9,6 @@ export async function ensureCustomerUser(client, { id, name, phone, studentId })
   const phoneSafe = (phone || "00000000").trim() || "00000000";
   const studentSafe = (studentId || "").trim();
 
-  // Reuse existing customer by phone when possible to keep accounts consistent.
   const existing = await client.query(
     `SELECT id FROM users WHERE phone = $1 AND role = 'customer' LIMIT 1`,
     [phoneSafe]
