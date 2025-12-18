@@ -20,7 +20,6 @@ class OrdersPage extends HTMLElement {
   }
 
   async loadCourierForOrder(order) {
-    // Одоогоор backend order-д courier_id ирдэггүй тул идэвхтэй courier-г авч үзнэ
     let courier = null;
     const cached = localStorage.getItem("activeCourier");
     if (cached) {

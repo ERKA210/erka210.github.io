@@ -147,7 +147,7 @@ class HomePage extends HTMLElement {
     try {
       await this.syncCustomerInfo(userId);
     } catch (e) {
-      // ignore network errors, fallback to localStorage data
+      console.error("kkkkkk:", e);
     }
   }
 
@@ -328,7 +328,6 @@ class HomePage extends HTMLElement {
     const registered = localStorage.getItem("userRegistered") === "1";
 
     if (!registered || !uuidRe.test(userId || "")) {
-      // бүртгэлгүй бол login руу шиднэ
       localStorage.setItem("pendingOrderDraft", JSON.stringify(this.pendingOrder));
       localStorage.setItem("pendingOfferDraft", JSON.stringify(this.pendingOffer));
       this.hideConfirmModal();
@@ -478,7 +477,7 @@ document.addEventListener("change", async (e) => {
 
   if (foods.length) {
     const og = document.createElement("optgroup");
-    og.label = "🥘 Идэх юм";
+    og.label = "Идэх юм";
     foods.forEach((item) => {
       const opt = document.createElement("option");
       opt.value = item.id;
@@ -492,7 +491,7 @@ document.addEventListener("change", async (e) => {
 
   if (drinks.length) {
     const og = document.createElement("optgroup");
-    og.label = "🥤 Уух юм";
+    og.label = "Уух юм";
     drinks.forEach((item) => {
       const opt = document.createElement("option");
       opt.value = item.id;
@@ -507,7 +506,7 @@ document.addEventListener("change", async (e) => {
   const others = items.filter((i) => !i.category);
   if (others.length) {
     const og = document.createElement("optgroup");
-    og.label = "📦 Бусад";
+    og.label = "Бусад";
     others.forEach((item) => {
       const opt = document.createElement("option");
       opt.value = item.id;
