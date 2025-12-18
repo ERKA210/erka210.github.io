@@ -31,6 +31,9 @@ orders-page {
     border-radius: var(--radius-lg);
     box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
     padding: 25px 30px;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    height: 30rem;
   }
 
   .orders h2 {
