@@ -41,7 +41,7 @@ class Couriers extends HTMLElement {
   }
 
   setData({ name, phone, id, student_id }) {
-    const code = student_id || id || "";
+    const code = id || "";
     this.innerHTML = `
       <article class="courier-card">
         <p class="title">Хүргэгчийн мэдээлэл</p>
