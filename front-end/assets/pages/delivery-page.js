@@ -30,6 +30,15 @@ class DeliveryPage extends HTMLElement {
           <d-orders data-active="true"
                     header="GL Burger - 7-р байр 207"
                     detail="3 ширхэг • 10,000₮"></d-orders>
+          <d-orders data-active="true"
+                    header="GL Burger - 7-р байр 207"
+                    detail="3 ширхэг • 10,000₮"></d-orders>
+          <d-orders data-active="true"
+                    header="GL Burger - 7-р байр 207"
+                    detail="3 ширхэг • 10,000₮"></d-orders>
+          <d-orders data-active="true"
+                    header="GL Burger - 7-р байр 207"
+                    detail="3 ширхэг • 10,000₮"></d-orders>
         </section>
 
         <section class="details">

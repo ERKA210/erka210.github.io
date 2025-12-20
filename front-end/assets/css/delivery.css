@@ -326,7 +326,8 @@ delivery-page {
       gap: 1.2rem;
       width: 100%;
       padding: 0 1rem;
-      margin: 0;
+      margin-top: 7ch;
+      padding-bottom: 0ch;
     }
 
     .details {
@@ -430,6 +431,10 @@ delivery-page {
 
     .order-progress {
       align-items: center;
+    }
+
+    .header-actions  {
+      display: none;
     }
   }
 }
