@@ -48,11 +48,15 @@ class OrdersPage extends HTMLElement {
           <div class="order-list" id="orderList">
             <p class="muted">Захиалга ачааллаж байна...</p>
           </div>
+          <div class="delivery-info">
+            <h2>Хүргэгчийн мэдээлэл</h2>
+            <couriers-card id="courierBox"></couriers-card>
+          </div>
         </section>
 
         <section class="details">
           <h2>Захиалгын явц</h2>
-          <couriers-card id="courierBox"></couriers-card>
+
           <div class="order-progress">
             <div class="step" data-step="0">
               <div class="step-indicator">

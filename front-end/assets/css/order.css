@@ -31,8 +31,6 @@ orders-page {
     border-radius: var(--radius-lg);
     box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
     padding: 25px 30px;
-    overflow-y: scroll;
-    scrollbar-width: none;
     height: 30rem;
   }
 
@@ -44,6 +42,16 @@ orders-page {
   .order-list {
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    height: 20rem;
+  }
+  .delivery-info{
+    margin-top: 5rem;
+
+    border-radius: var(--radius);
+    width: 30rem;
+    height: 10rem;
   }
 
   .order-list button {
@@ -207,6 +215,19 @@ orders-page {
   .next-btn:hover {
     background: #a70b29;
   }
+
+  .order-side {
+  flex: 0.5;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+couriers-card,
+order-progress {
+  width: 100%;
+}
+
 
   .order-info img {
     display: flex;

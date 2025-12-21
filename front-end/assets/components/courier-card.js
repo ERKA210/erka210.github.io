@@ -27,7 +27,6 @@ class Couriers extends HTMLElement {
   render() {
     this.innerHTML = `
       <article class="courier-card">
-        <p class="title">Хүргэгчийн мэдээлэл</p>
         <div class="delivery loading">
           <div class="avatar skeleton"></div>
           <div class="delivery-info">
@@ -44,7 +43,6 @@ class Couriers extends HTMLElement {
     const code = id || "";
     this.innerHTML = `
       <article class="courier-card">
-        <p class="title">Хүргэгчийн мэдээлэл</p>
         <div class="delivery">
           <div class="avatar">
             <img src="assets/img/profile.jpg" alt="Хүргэгчийн зураг">
@@ -62,7 +60,6 @@ class Couriers extends HTMLElement {
   setEmpty() {
     this.innerHTML = `
       <article class="courier-card">
-        <p class="title">Хүргэгчийн мэдээлэл</p>
         <p class="muted">Хүргэгчийн мэдээлэл олдсонгүй.</p>
       </article>
     `;
