@@ -50,7 +50,7 @@ class OrdersPage extends HTMLElement {
           </div>
           <div class="delivery-info">
             <h2>Хүргэгчийн мэдээлэл</h2>
-            <couriers-card id="courierBox"></couriers-card>
+            <del-order-details id="courierBox"></del-order-details>
           </div>
         </section>
 

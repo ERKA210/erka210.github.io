@@ -13,6 +13,8 @@ import './assets/components/num-router.js';
 import './assets/components/courier-card.js';
 import './assets/components/delivery-order-page.js';
 import './assets/components/order-progress.js';
+import './assets/components/person-detail.js';
+import './assets/components/order-courier.js';
 
 // Pages
 import './assets/pages/home-page.js';
