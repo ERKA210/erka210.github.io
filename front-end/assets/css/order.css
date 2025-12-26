@@ -48,7 +48,6 @@ orders-page {
   }
   .delivery-info{
     margin-top: 5rem;
-
     border-radius: var(--radius);
     width: 30rem;
     height: 10rem;
