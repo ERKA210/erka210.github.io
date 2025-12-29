@@ -283,6 +283,7 @@ class LoginPage extends HTMLElement {
           const res = await fetch(`${API}/api/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({
               name: fullName,
               phone,
@@ -298,9 +299,6 @@ class LoginPage extends HTMLElement {
           }
 
           const data = await res.json();
-          if (data?.token) {
-            localStorage.setItem("auth_token", data.token);
-          }
           window.dispatchEvent(new Event("user-updated"));
 
           const hasDraft = localStorage.getItem("pendingOrderDraft");

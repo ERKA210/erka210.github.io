@@ -186,7 +186,9 @@ class HomePage extends HTMLElement {
   async fetchCurrentUser() {
     if (this.currentUser) return this.currentUser;
     try {
-      const res = await fetch("/api/auth/me");
+      const res = await fetch("/api/auth/me", {
+        credentials: "include", 
+      });
       if (!res.ok) return null;
       const data = await res.json();
       this.currentUser = data?.user || null;
@@ -325,17 +327,17 @@ class HomePage extends HTMLElement {
     const items =
       cartSummary.totalQty > 0
         ? cartSummary.items.map((it) => ({
-            id: it.key || it.name,
-            name: it.name,
-            price: Number(it.unitPrice ?? it.price ?? 0),
-            qty: it.qty,
-          }))
+          id: it.key || it.name,
+          name: it.name,
+          price: Number(it.unitPrice ?? it.price ?? 0),
+          qty: it.qty,
+        }))
         : [{
-            id: itemOpt.value,
-            name: (itemOpt.textContent || "").split(" — ")[0],
-            price: Number(itemOpt.dataset.price || 0),
-            qty: 1,
-          }];
+          id: itemOpt.value,
+          name: (itemOpt.textContent || "").split(" — ")[0],
+          price: Number(itemOpt.dataset.price || 0),
+          qty: 1,
+        }];
 
     this.pendingOrder = {
       fromId: fromSel.value,
@@ -412,6 +414,7 @@ class HomePage extends HTMLElement {
       const resp = await fetch(`${API}/api/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
@@ -438,6 +441,7 @@ class HomePage extends HTMLElement {
         await fetch("/api/active-order", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({ order: activeOrder }),
         });
       } catch (e) {
@@ -474,7 +478,7 @@ class HomePage extends HTMLElement {
       if (offersSection && offersSection.scrollIntoView) {
         setTimeout(() => {
           offersSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 150); 
+        }, 150);
       }
     } catch (e) {
       alert("Сервертэй холбогдож чадсангүй");

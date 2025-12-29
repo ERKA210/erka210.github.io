@@ -377,7 +377,10 @@ class OfferModal extends HTMLElement {
     this.removeOfferFromList(this.currentData);
 
     try {
-      const res = await fetch(`${this.API}/api/courier/me`);
+      const res = await fetch(`${this.API}/api/courier/me`, {
+        credentials: "include",
+      });
+
       if (res.ok) {
         const courier = await res.json();
       }
