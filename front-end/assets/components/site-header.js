@@ -25,10 +25,13 @@ class SiteHeader extends HTMLElement {
 
     document.removeEventListener("click", this.handleDocClick);
 
+    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const logoSrc = prefersDark ? "assets/img/logo_dark.png" : "assets/img/logo.svg";
+
     this.innerHTML = `
       <header class="site-top">
         <div class="brand">
-          <img src="assets/img/logo.svg" alt="Logo" class="brand-logo" />
+          <img src="${logoSrc}" alt="Logo" class="brand-logo" />
         </div>
 
         <nav class="top-menu">
@@ -85,6 +88,22 @@ class SiteHeader extends HTMLElement {
       loginBtn.addEventListener("click", () => {
         location.hash = "#login";
       });
+    }
+
+    if (window.matchMedia) {
+      const media = window.matchMedia("(prefers-color-scheme: dark)");
+      const logo = this.querySelector(".brand-logo");
+      if (logo) {
+        const updateLogo = (event) => {
+          logo.src = event.matches ? "assets/img/logo_dark.png" : "assets/img/logo.svg";
+        };
+        updateLogo(media);
+        if (media.addEventListener) {
+          media.addEventListener("change", updateLogo);
+        } else {
+          media.addListener(updateLogo);
+        }
+      }
     }
 
     const avatarBtn = this.querySelector(".avatar-btn");

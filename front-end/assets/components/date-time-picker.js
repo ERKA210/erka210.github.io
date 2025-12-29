@@ -42,7 +42,7 @@ class DateTimePicker extends HTMLElement {
           border: 0.0625rem solid var(--color-border);
           border-radius: var(--radius);
           transition: all 0.25s ease;
-          background: #fff;
+          background: var(--color-bg);
           flex: 1 1 0;
           min-width: 0;
           font-family: var(--font-family);
@@ -56,6 +56,7 @@ class DateTimePicker extends HTMLElement {
           font-size: var(--font-size-base, 0.875rem);
           font-family: var(--font-family);
           cursor: pointer;
+          color: var(--color-text);
         }
 
         .wrapper:has(input:focus) {
@@ -66,10 +67,19 @@ class DateTimePicker extends HTMLElement {
         input[type="date"],
         input[type="time"] {
           accent-color: var(--color-accent, #d00);
+          background-color: transparent;
         }
 
         input::-webkit-calendar-picker-indicator {
           cursor: pointer;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          input[type="date"],
+          input[type="time"] {
+            color-scheme: dark;
+            background-color: var(--color-bg);
+          }
         }
 
         @media (max-width: 54rem) {

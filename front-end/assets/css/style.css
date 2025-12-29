@@ -19,6 +19,88 @@
   --border-show: none
   --top-h: 4rem;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --color-bg: #0b0f14;
+    --color-bg-light: #111827;
+    --color-border: #243040;
+    --color-text: #e5e7eb;
+    --color-muted: #9aa4b2;
+    --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.5);
+    --shadow-card: 0 10px 24px rgba(0, 0, 0, 0.45);
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  input[type="date"],
+  input[type="time"],
+  select {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    color-scheme: dark;
+  }
+
+  .site-top,
+  .top-menu {
+    background: var(--color-bg);
+    border-color: var(--color-border);
+  }
+
+  .brand-logo {
+    content: url("assets/img/logo_dark.png");
+  }
+
+  .top-menu a {
+    color: var(--color-muted);
+  }
+
+  .top-menu a.is-active {
+    color: var(--color-accent);
+  }
+
+  .top-menu a.is-active::before {
+    background: var(--color-bg);
+  }
+
+  .header-actions .avatar-dropdown {
+    background: var(--color-bg);
+    border-color: var(--color-border);
+  }
+
+  .header-actions .avatar-action {
+    color: var(--color-text);
+  }
+
+  .header-actions .avatar-action:hover {
+    background: #1f2937;
+  }
+
+  .header-actions .logout-btn,
+  .header-actions .avatar-btn {
+    background: var(--color-bg);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  .top-menu a.is-active::before {
+    box-shadow: none;
+  }
+
+  .header-actions .logout-btn:hover {
+    background: #1f2937;
+  }
+}
+
+@media (prefers-color-scheme: dark) and (max-width: 54rem) {
+  .top-menu a.is-active::before {
+    background: #0b0f14 !important;
+  }
+}
 * {
   box-sizing: border-box;
   font-family: var(--font-family);
@@ -296,5 +378,17 @@ num-router > [data-route].is-leaving {
   }
   .header-actions .logout-btn {
     display: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .header-actions .logout-btn {
+    background: #0b0f14;
+    color: var(--color-text);
+    border-color: var(--color-border);
+  }
+
+  .header-actions .logout-btn:hover {
+    background: #1f2937;
   }
 }

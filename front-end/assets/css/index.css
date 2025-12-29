@@ -50,7 +50,7 @@ home-page {
     min-width: 10rem;
     border: 0.0625rem solid var(--color-border);
     border-radius: var(--radius);
-    background: #fff;
+    background: var(--color-bg);
     flex: 1 1 10rem;
   }
 
@@ -120,12 +120,28 @@ home-page {
     color: var(--color-muted);
   }
 
+@media (prefers-color-scheme: dark) {
+  .middle-row img[src*="arrow.svg"] {
+    filter: brightness(0) invert(1);
+  }
+
+  .middle-row .ctrl img,
+  .bottom-row .ctrl img {
+    filter: brightness(0) invert(1);
+  }
+
+  img[src*="map_pin.svg"],
+  img[src*="fork.svg"] {
+    filter: brightness(0) invert(1);
+  }
+}
+
   .btn {
     height: 2.75rem;
     padding: 0 1.2rem;
     border-radius: var(--radius);
     border: 0.0625rem solid var(--color-border);
-    background: #fff;
+    background: var(--color-bg);
     font-weight: var(--font-weight-bold);
     cursor: pointer;
     transition: var(--transition);
@@ -209,7 +225,7 @@ home-page {
     padding: 0.65rem;
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
-    background: #fff;
+    background: var(--color-bg-light);
   }
 
   .delivery-cart__thumb img {
@@ -242,7 +258,7 @@ home-page {
 
   .delivery-cart__remove {
     border: 1px solid var(--color-border);
-    background: #fff;
+    background: var(--color-bg);
     color: var(--color-text);
     width: 1.6rem;
     height: 1.6rem;
@@ -305,7 +321,7 @@ home-page {
   .offer-card {
     flex: 0 0 calc((100% - 2rem) / 4);
     scroll-snap-align: start;
-    background: #fff;
+    background: var(--color-bg-light);
     border: 0.0625rem solid var(--color-border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-light);
@@ -418,7 +434,7 @@ home-page {
   .offer-card {
     position: relative;
     z-index: 2;
-    background: #fff;
+    background: var(--color-bg-light);
     border-radius: 1rem;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     padding: 1rem;
@@ -431,9 +447,9 @@ home-page {
   .cart {
     width: 100%;
     margin: 2rem auto;
-    border: 0.06rem solid #000;
+    border: 0.06rem solid var(--color-border);
     border-radius: 0.8rem;
-    background: #fff;
+    background: var(--color-bg);
     padding: 1.5rem 2rem 2rem;
     font-family: "Inter", sans-serif;
     position: relative;
@@ -456,12 +472,12 @@ home-page {
   }
 
   .cart-content>div:first-child::-webkit-scrollbar-thumb {
-    background: #ccc;
+    background: var(--color-border);
     border-radius: 1rem;
   }
 
   .cart-content>div:first-child::-webkit-scrollbar-thumb:hover {
-    background: #999;
+    background: var(--color-muted);
   }
 
   .delivery-box,
@@ -503,7 +519,7 @@ home-page {
   }
 
   .cart-content {
-    border: 0.06rem solid #ddd;
+    border: 0.06rem solid var(--color-border);
     border-radius: 0.6rem;
     padding: 1rem;
     display: grid;
@@ -515,10 +531,10 @@ home-page {
   }
 
   .item-box {
-    border: 0.06rem solid #e2e2e2;
+    border: 0.06rem solid var(--color-border);
     border-radius: 0.8rem;
     padding: 1rem 1.2rem;
-    background: #fff;
+    background: var(--color-bg-light);
     display: grid;
     grid-template-columns: 1fr auto auto;
     align-items: center;
@@ -753,7 +769,7 @@ home-page {
   .modal-content {
     width: 90%;
     max-width: 360px;
-    background: #fff;
+    background: var(--color-bg);
     padding: 20px;
     border-radius: 14px;
     text-align: center;
@@ -839,7 +855,7 @@ home-page {
       min-width: 10rem;
       border: 0.0625rem solid var(--color-border);
       border-radius: var(--radius);
-      background: #fff;
+      background: var(--color-bg);
       flex: 1 1 10rem;
     }
 
@@ -914,7 +930,7 @@ home-page {
       padding: 0 1.2rem;
       border-radius: var(--radius);
       border: 0.0625rem solid var(--color-border);
-      background: #fff;
+      background: var(--color-bg);
       font-weight: var(--font-weight-bold);
       cursor: pointer;
       transition: var(--transition);
@@ -962,7 +978,7 @@ home-page {
     .offer-card {
       flex: 0 0 calc((100% - 2rem) / 4);
       scroll-snap-align: start;
-      background: #fff;
+      background: var(--color-bg-light);
       border: 0.0625rem solid var(--color-border);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-light);
@@ -1064,7 +1080,7 @@ home-page {
     .offer-card {
       position: relative;
       z-index: 2;
-      background: #fff;
+      background: var(--color-bg-light);
       border-radius: 1rem;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       padding: 1rem;
@@ -1077,9 +1093,9 @@ home-page {
     .cart {
       width: 100%;
       margin: 2rem auto;
-      border: 0.06rem solid #000;
+      border: 0.06rem solid var(--color-border);
       border-radius: 0.8rem;
-      background: #fff;
+      background: var(--color-bg);
       padding: 1.5rem 2rem 2rem;
       font-family: "Inter", sans-serif;
       position: relative;
@@ -1097,12 +1113,12 @@ home-page {
     }
 
     .cart-content>div:first-child::-webkit-scrollbar-thumb {
-      background: #ccc;
+      background: var(--color-border);
       border-radius: 1rem;
     }
 
     .cart-content>div:first-child::-webkit-scrollbar-thumb:hover {
-      background: #999;
+      background: var(--color-muted);
     }
 
     .delivery-box,
@@ -1144,7 +1160,7 @@ home-page {
     }
 
     .cart-content {
-      border: 0.06rem solid #ddd;
+      border: 0.06rem solid var(--color-border);
       border-radius: 0.6rem;
       padding: 1rem;
       display: grid;
@@ -1156,10 +1172,10 @@ home-page {
     }
 
     .item-box {
-      border: 0.06rem solid #e2e2e2;
+      border: 0.06rem solid var(--color-border);
       border-radius: 0.8rem;
       padding: 1rem 1.2rem;
-      background: #fff;
+      background: var(--color-bg-light);
       display: grid;
       grid-template-columns: 1fr auto auto;
       align-items: center;
@@ -1375,7 +1391,7 @@ home-page {
     .modal-content {
       width: 90%;
       max-width: 360px;
-      background: #fff;
+      background: var(--color-bg);
       padding: 20px;
       border-radius: 14px;
       text-align: center;

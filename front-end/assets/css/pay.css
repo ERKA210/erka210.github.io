@@ -8,7 +8,7 @@ pay-page {
         align-items: center;
         justify-content: center;
         padding: 32px;
-        color: #111827;
+        color: var(--color-text);
     }
 
     .pay {

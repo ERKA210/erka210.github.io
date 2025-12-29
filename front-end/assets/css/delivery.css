@@ -127,7 +127,7 @@ delivery-page {
     top: 0;
     bottom: 0;
     width: 2px;
-    background: #f1f1f1;
+    background: var(--color-border);
   }
 
   .detail-header {
@@ -163,7 +163,7 @@ delivery-page {
     height: 18px;
     border-radius: 50%;
     background: var(--color-bg-light);
-    border: 2px solid #e0e0e0;
+    border: 2px solid var(--color-border);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -208,6 +208,12 @@ delivery-page {
 
   .step.active .step-indicator svg path {
     fill: var(--color-bg);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .step.active .step-indicator svg path {
+      fill: #fff;
+    }
   }
 
   .step.completed {

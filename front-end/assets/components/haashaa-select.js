@@ -58,6 +58,11 @@ class ToSelect extends HTMLElement {
                 accent-color: var(--color-accent);
                 
               }
+        @media (prefers-color-scheme: dark) {
+          img {
+            filter: brightness(0) invert(1);
+          }
+        }
       </style>
       <div class="ctrl">    
       <span>
