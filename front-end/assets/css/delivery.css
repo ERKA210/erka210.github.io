@@ -136,6 +136,10 @@ delivery-page {
     border-radius: var(--radius);
     margin-bottom: 25px;
     border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 6ch;
+    align-items: center;
   }
 
   .date {
@@ -437,10 +441,16 @@ delivery-page {
 
     .order-progress {
       align-items: center;
+      display: flex;
+      flex-direction: column;
+      gap: 6ch
     }
 
     .header-actions  {
       display: none;
+    }
+    .detail-header {
+      gap:0px;
     }
   }
 }
