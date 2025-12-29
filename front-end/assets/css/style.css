@@ -94,6 +94,78 @@ num-router > [data-route].is-leaving {
   align-items: center;
 }
 
+.header-actions .avatar-menu {
+  position: relative;
+}
+
+.header-actions .avatar-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 10rem;
+  background: #fff;
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-card);
+  padding: 0.5rem;
+  opacity: 0;
+  transform: translateY(-0.4rem);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+}
+
+.header-actions .avatar-action {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  color: var(--color-text, #333);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.header-actions .avatar-action:hover {
+  background: #f5f5f5;
+}
+
+.header-actions .avatar-logout {
+  color: var(--color-accent, #c90d30);
+}
+
+.header-actions .avatar-logout:hover {
+  background: #b0112f;
+}
+
+.header-actions .logout-btn {
+  padding: 0.625rem 1.25rem;
+  background: #fff;
+  color: var(--color-text, #333);
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.header-actions .logout-btn:hover {
+  background: #f5f5f5;
+}
+
+@media (min-width: 54.01rem) {
+  .header-actions .avatar-menu:hover .avatar-dropdown,
+  .header-actions .avatar-menu:focus-within .avatar-dropdown {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
 .header-actions .login-btn {
   padding: 0.625rem 1.25rem;
   background: var(--color-accent);
@@ -135,22 +207,6 @@ num-router > [data-route].is-leaving {
   display: block;
 }
 
-.header-actions .logout-btn {
-  padding: 0.625rem 1.25rem;
-  background: #fff;
-  color: var(--color-text, #333);
-  border: 1px solid var(--color-border, #e0e0e0);
-  border-radius: var(--radius);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.header-actions .logout-btn:hover {
-  background: #f5f5f5;
-}
 
 @media (max-width: 54rem){
   .site-top .brand-logo{

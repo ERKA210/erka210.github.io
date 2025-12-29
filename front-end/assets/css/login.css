@@ -14,7 +14,7 @@ login-page {
     }
 
     .card {
-        width: 60ch;
+        width: min(70rem, 90vw);
         border: 1px solid gray;
         background: var(--color-bg);
         border-radius: 18px;
@@ -41,6 +41,7 @@ login-page {
         margin-bottom: 18px
     }
 
+    .auth-tabs,
     .login-tabs {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -73,6 +74,29 @@ login-page {
         margin-bottom: 14px;
         display: flex;
         flex-direction: column;
+    }
+
+    .auth-layout {
+        display: grid;
+        grid-template-columns: 1fr 0fr;
+        gap: 18px;
+        align-items: start;
+        transition: grid-template-columns 0.3s ease;
+    }
+
+    login-page.show-payment .auth-layout {
+        grid-template-columns: 1fr 0.9fr;
+    }
+
+    login-page.show-payment form {
+        transform: translateX(-6px);
+        transition: transform 0.3s ease;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
     }
 
     label {
@@ -130,6 +154,128 @@ login-page {
         font-weight: 600;
         cursor: pointer;
         box-shadow: var(--shadow-card);
+    }
+
+    .payment-section {
+        margin-top: 18px;
+        padding: 16px;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        background: #fff7f7;
+        min-width: 18rem;
+    }
+
+    .section-title {
+        margin: 0 0 6px 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .section-note {
+        margin: 0 0 12px 0;
+        font-size: 12px;
+        color: var(--color-muted);
+    }
+
+    .plan-grid,
+    .method-grid {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .plan-card,
+    .method-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .plan-card input,
+    .method-card input {
+        margin: 0;
+    }
+
+    .payment-details {
+        margin-top: 6px;
+    }
+
+    .qpay-box {
+        display: grid;
+        grid-template-columns: 60px 1fr;
+        gap: 10px;
+        align-items: center;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px dashed #e5e7eb;
+        background: #fff;
+        font-size: 12px;
+        color: var(--color-text);
+    }
+
+    .qpay-qr {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: #f3f4f6;
+        color: #6b7280;
+        font-weight: 700;
+    }
+
+    .payment-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .pay-btn {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: none;
+        background: var(--color-accent);
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: var(--shadow-light);
+    }
+
+    .pay-btn:disabled {
+        background: #cbd5e1;
+        cursor: not-allowed;
+    }
+
+    .pay-status {
+        margin: 0;
+        font-size: 12px;
+        color: #16a34a;
+        font-weight: 600;
+    }
+
+    @media (max-width: 720px) {
+        .auth-layout {
+            grid-template-columns: 1fr;
+        }
+        login-page.show-payment .auth-layout {
+            grid-template-columns: 1fr;
+        }
+        login-page.show-payment form {
+            transform: none;
+        }
+        .payment-section {
+            min-width: 0;
+        }
     }
 
     .or {

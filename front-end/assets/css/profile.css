@@ -10,7 +10,7 @@
 
   width: 100%;
   margin: 0;
-  padding: 1rem 2rem 0.75rem;
+  padding: 5rem 2rem 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -25,9 +25,9 @@
     align-items: start;
     width: 100%;
     margin: 0;
-    padding: 1rem 2rem 0.75rem;
     column-gap: 2rem;
     row-gap: 1.5rem;
+    padding: 5rem 2rem 2rem;
   }
 
   .profile-hero {

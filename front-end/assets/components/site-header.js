@@ -66,8 +66,13 @@ class SiteHeader extends HTMLElement {
           ${
             isAuthed
               ? `
-                <button class="avatar-btn" type="button" aria-label="Профайл руу орох"></button>
-                <button class="logout-btn" type="button" hidden>Гарах</button>
+                <div class="avatar-menu">
+                  <button class="avatar-btn" type="button" aria-label="Профайл цэс нээх"></button>
+                  <div class="avatar-dropdown" role="menu" aria-label="Профайл цэс">
+                    <button class="avatar-action avatar-logout" type="button">Гарах</button>
+                  </div>
+                </div>
+                <button class="logout-btn" type="button">Гарах</button>
               `
               : `<button class="login-btn" type="button">Хүргэгч болох</button>`
           }
@@ -90,8 +95,15 @@ class SiteHeader extends HTMLElement {
       });
     }
 
-    const logoutBtn = this.querySelector(".logout-btn");
-    if (logoutBtn) {
+    const profileAction = this.querySelector(".avatar-action");
+    if (profileAction) {
+      profileAction.addEventListener("click", () => {
+        location.hash = "#profile";
+      });
+    }
+
+    const logoutHandlers = this.querySelectorAll(".avatar-logout, .logout-btn");
+    logoutHandlers.forEach((logoutBtn) => {
       logoutBtn.addEventListener("click", async () => {
         try {
           await fetch("/api/auth/logout", { method: "POST" });
@@ -103,7 +115,7 @@ class SiteHeader extends HTMLElement {
         window.dispatchEvent(new Event("user-updated"));
         location.hash = "#home";
       });
-    }
+    });
   }
 
   handleDocClick(e) {
@@ -145,10 +157,6 @@ class SiteHeader extends HTMLElement {
       a.classList.toggle('is-active', href === current);
     });
 
-    const logoutBtn = this.querySelector(".logout-btn");
-    if (logoutBtn) {
-      logoutBtn.hidden = current !== "#profile";
-    }
   }
 }
 
