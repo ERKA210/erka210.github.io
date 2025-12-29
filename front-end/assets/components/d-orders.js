@@ -5,23 +5,6 @@ class DOrders extends HTMLElement {
     let header = this.getAttribute('header') || '';
     let detail = this.getAttribute('detail') || '';
 
-    if (isActive) {
-      const raw = localStorage.getItem('activeOrder');
-      if (raw) {
-        try {
-          const order = JSON.parse(raw);
-          if (order.from && order.to) {
-            header = `${order.from} → ${order.to}`;
-          }
-          if (order.item) {
-            detail = `${order.item}`;
-          }
-        } catch (e) {
-          console.error('activeOrder parse алдаа', e);
-        }
-      }
-    }
-
     this.innerHTML = `
       <article class="order-card">
         <div class="order-info">
@@ -43,6 +26,28 @@ class DOrders extends HTMLElement {
 </svg></button>
       </article>
     `;
+
+    if (isActive) {
+      this.loadActiveOrder();
+    }
+  }
+
+  async loadActiveOrder() {
+    try {
+      const res = await fetch("/api/active-order");
+      if (!res.ok) return;
+      const data = await res.json();
+      const order = data?.order;
+      if (!order) return;
+      const header = order.from && order.to ? `${order.from} → ${order.to}` : "";
+      const detail = order.item || "";
+      const titleEl = this.querySelector(".order-info h3");
+      const detailEl = this.querySelector(".order-info p");
+      if (titleEl) titleEl.textContent = header;
+      if (detailEl) detailEl.textContent = detail;
+    } catch (e) {
+      // ignore
+    }
   }
 }
 

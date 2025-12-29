@@ -11,6 +11,7 @@ class OfferModal extends HTMLElement {
   }
 
   render() {
+    this.API = "http://localhost:3000";
     this.shadowRoot.innerHTML = `
       <style>
         :host {
@@ -290,6 +291,10 @@ class OfferModal extends HTMLElement {
   buildActiveOrder(data) {
     const [fromRaw = '', toRaw = ''] = (data.title || '').split('-').map((s) => s.trim());
     const firstItem = Array.isArray(data.sub) && data.sub.length ? data.sub[0] : null;
+    const customerName = this.currentUser?.name || "Чигцалмаа";
+    const customerPhone = this.currentUser?.phone || "99001234";
+    const customerId = this.currentUser?.student_id || "23b1num0245";
+    const customerAvatar = this.currentUser?.avatar || "assets/img/profile.jpg";
     return {
       from: fromRaw,
       to: toRaw,
@@ -297,7 +302,20 @@ class OfferModal extends HTMLElement {
       items: Array.isArray(data.sub) ? data.sub : [],
       total: data.price || '',
       createdAt: this.parseMetaToISO(data.meta) || new Date().toISOString(),
+      customer: {
+        name: this.normalizeName(customerName),
+        phone: customerPhone,
+        studentId: customerId,
+        avatar: customerAvatar,
+      },
     };
+  }
+
+  normalizeName(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "Чигцалмаа";
+    const tokens = raw.split(/\s+/).filter((t) => t && t.length > 1);
+    return tokens.length ? tokens.join(" ") : raw;
   }
 
   async handleConfirm() {
@@ -306,15 +324,19 @@ class OfferModal extends HTMLElement {
       return;
     }
 
+    await this.fetchCurrentUser();
     const activeOrder = this.buildActiveOrder(this.currentData);
-    localStorage.setItem('activeOrder', JSON.stringify(activeOrder));
-    localStorage.setItem('orderStep', '0');
+    const added = await this.addToDeliveryCart(this.currentData);
+    if (!added) {
+      return;
+    }
+    await this.saveActiveOrder(activeOrder);
+    this.removeOfferFromList(this.currentData);
 
     try {
-      const res = await fetch('/api/courier/me');
+      const res = await fetch(`${this.API}/api/courier/me`);
       if (res.ok) {
         const courier = await res.json();
-        localStorage.setItem('activeCourier', JSON.stringify(courier));
       }
     } catch (e) {
       console.warn('courier fetch failed', e);
@@ -322,27 +344,107 @@ class OfferModal extends HTMLElement {
 
     this.close();
     window.dispatchEvent(new Event('order-updated'));
-    location.hash = '#delivery';
+    window.dispatchEvent(new Event('delivery-cart-updated'));
+    const cartEl = document.querySelector('delivery-cart');
+    if (cartEl && typeof cartEl.load === 'function') {
+      cartEl.load();
+    }
+    if (!document.querySelector('delivery-cart')) {
+      location.hash = '#delivery';
+    }
+  }
+
+  async addToDeliveryCart(data) {
+    const title = data.title || '';
+    const meta = data.meta || '';
+    const price = data.price || '';
+    try {
+      const res = await fetch("/api/delivery-cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          meta,
+          price,
+          thumb: data.thumb || "assets/img/box.svg",
+          sub: Array.isArray(data.sub) ? data.sub : [],
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        if (String(err.error || "").toLowerCase().includes("unauthorized")) {
+          location.hash = "#login";
+          return false;
+        }
+        alert(err.error || "Хүргэлт нэмэхэд алдаа гарлаа");
+        return false;
+      }
+      return true;
+    } catch (e) {
+      alert("Хүргэлт нэмэхэд алдаа гарлаа");
+      return false;
+    }
+  }
+
+  async saveActiveOrder(order) {
+    try {
+      await fetch("/api/active-order", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order }),
+      });
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  async fetchCurrentUser() {
+    if (this.currentUser) return this.currentUser;
+    try {
+      const res = await fetch("/api/auth/me");
+      if (!res.ok) {
+        this.currentUser = null;
+      } else {
+        const data = await res.json();
+        this.currentUser = data?.user || null;
+      }
+    } catch (e) {
+      this.currentUser = null;
+    }
+    return this.currentUser;
+  }
+
+  removeOfferFromList(data) {
+    const raw = localStorage.getItem('offers');
+    if (!raw) return;
+    let offers = [];
+    try {
+      offers = JSON.parse(raw) || [];
+    } catch (e) {
+      return;
+    }
+    const key = `${data.title || ''}|${data.meta || ''}|${data.price || ''}`;
+    const next = offers.filter((item) => {
+      const itemKey = `${item.title || ''}|${item.meta || ''}|${item.price || ''}`;
+      return itemKey !== key;
+    });
+    localStorage.setItem('offers', JSON.stringify(next));
+    const offerList = document.querySelector('#offers');
+    if (offerList && 'items' in offerList) {
+      offerList.items = next;
+    }
   }
 
   async populateCourier(data) {
     if (!this.courierWrap) return;
-    const localCourier = localStorage.getItem('activeCourier');
     let courier = null;
-    if (localCourier) {
-      try { courier = JSON.parse(localCourier); } catch (e) { courier = null; }
-    }
-
-    if (!courier) {
-      try {
-        const res = await fetch('/api/courier/me');
-        if (res.ok) {
-          courier = await res.json();
-          localStorage.setItem('activeCourier', JSON.stringify(courier));
-        }
-      } catch (e) {
-        courier = null;
+    try {
+      const res = await fetch(`${this.API}/api/courier/me`);
+      if (res.ok) {
+        courier = await res.json();
       }
+    } catch (e) {
+      courier = null;
     }
 
     if (courier) {

@@ -2,6 +2,7 @@ class HomePage extends HTMLElement {
   connectedCallback() {
     this.pendingOrder = null;
     this.pendingOffer = null;
+    this.currentUser = null;
 
     this.render();
     this.setupConfirmModal();
@@ -124,7 +125,14 @@ class HomePage extends HTMLElement {
         </div>
       </section>
 
-      <offers-list id="offers"></offers-list>
+      <div class="offers-layout">
+        <div class="offers-panel">
+          <offers-list id="offers"></offers-list>
+        </div>
+        <aside class="delivery-cart-panel">
+          <delivery-cart></delivery-cart>
+        </aside>
+      </div>
       <offer-modal></offer-modal>
 
       <div id="confirm-modal" class="modal hidden">
@@ -141,13 +149,26 @@ class HomePage extends HTMLElement {
   }
 
   async hydrateCustomerFromDb() {
-    const userId = localStorage.getItem("userId");
-    if (!userId) return;
+    const user = await this.fetchCurrentUser();
+    if (!user?.id) return;
 
     try {
-      await this.syncCustomerInfo(userId);
+      await this.syncCustomerInfo(user.id);
     } catch (e) {
       console.error("kkkkkk:", e);
+    }
+  }
+
+  async fetchCurrentUser() {
+    if (this.currentUser) return this.currentUser;
+    try {
+      const res = await fetch("/api/auth/me");
+      if (!res.ok) return null;
+      const data = await res.json();
+      this.currentUser = data?.user || null;
+      return this.currentUser;
+    } catch (e) {
+      return null;
     }
   }
 
@@ -157,12 +178,6 @@ class HomePage extends HTMLElement {
     if (!res.ok) return;
     const data = await res.json();
     if (data) {
-      if (data.name) localStorage.setItem("userName", data.name);
-      if (data.phone) localStorage.setItem("userPhone", data.phone);
-      localStorage.setItem("userId", data.id);
-      if (data.student_id) {
-        localStorage.setItem("userDisplayId", data.student_id);
-      }
       window.dispatchEvent(new Event("user-updated"));
     }
   }
@@ -323,11 +338,8 @@ class HomePage extends HTMLElement {
       return;
     }
 
-    const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    const userId = localStorage.getItem("userId");
-    const registered = localStorage.getItem("userRegistered") === "1";
-
-    if (!registered || !uuidRe.test(userId || "")) {
+    const user = await this.fetchCurrentUser();
+    if (!user?.id) {
       localStorage.setItem("pendingOrderDraft", JSON.stringify(this.pendingOrder));
       localStorage.setItem("pendingOfferDraft", JSON.stringify(this.pendingOffer));
       this.hideConfirmModal();
@@ -360,15 +372,15 @@ class HomePage extends HTMLElement {
       .filter((i) => i.qty > 0);
 
     const payload = {
-      customerId: userId || null,
+      customerId: user.id,
       fromPlaceId: this.pendingOrder.fromId,
       toPlaceId: this.pendingOrder.toId,
       scheduledAt: this.pendingOrder.createdAt,
       deliveryFee: Number.isFinite(this.pendingOffer.deliveryFee) ? this.pendingOffer.deliveryFee : 0,
       items: safeItems,
-      customerName: `${localStorage.getItem("userLastName") || ""} ${localStorage.getItem("userName") || "Зочин хэрэглэгч"}`.trim(),
-      customerPhone: localStorage.getItem("userPhone") || "00000000",
-      customerStudentId: localStorage.getItem("userDisplayId") || "",
+      customerName: user.name || "Зочин хэрэглэгч",
+      customerPhone: user.phone || "00000000",
+      customerStudentId: user.student_id || "",
       note: this.pendingOrder.fromDetail ? `Pickup: ${this.pendingOrder.fromDetail}` : null,
     };
 
@@ -387,12 +399,26 @@ class HomePage extends HTMLElement {
       }
 
       if (data?.customerId) {
-        localStorage.setItem("userId", data.customerId);
         this.syncCustomerInfo(data.customerId);
       }
 
-      localStorage.setItem("activeOrder", JSON.stringify(this.pendingOrder));
-      localStorage.setItem("orderStep", "0");
+      const activeOrder = {
+        ...this.pendingOrder,
+        customer: {
+          name: user.name || "Зочин хэрэглэгч",
+          phone: user.phone || "00000000",
+          studentId: user.student_id || "",
+        },
+      };
+      try {
+        await fetch("/api/active-order", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order: activeOrder }),
+        });
+      } catch (e) {
+        // ignore
+      }
       window.dispatchEvent(new Event("order-updated"));
 
       const existingOffers = JSON.parse(localStorage.getItem("offers") || "[]");

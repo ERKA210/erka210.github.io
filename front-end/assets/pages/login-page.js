@@ -1,5 +1,7 @@
 class LoginPage extends HTMLElement {
   connectedCallback() {
+    const API = "http://localhost:3000";
+    this.currentRole = "customer";
     this.innerHTML = `
       <link rel="stylesheet" href="assets/css/login.css">
       <div class="card" role="dialog" aria-labelledby="login-title">
@@ -9,16 +11,21 @@ class LoginPage extends HTMLElement {
           <div class="close">✕</div>
         </div>
 
+        <div class="login-tabs" role="tablist" aria-label="Бүртгэлийн төрөл">
+          <button class="tab-btn is-active" type="button" data-role="customer" role="tab" aria-selected="true">
+            Хэрэглэгчээр
+          </button>
+          <button class="tab-btn" type="button" data-role="courier" role="tab" aria-selected="false">
+            Хүргэгчээр
+          </button>
+        </div>
+
         <div class="subtitle">
           Бид таны дугаарыг баталгаажуулахын тулд утсаар залгах эсвэл мессеж илгээх болно.
         </div>
 
         <form onsubmit="event.preventDefault(); alert('Continue clicked')">
-          <div class="form-group">
-            <label for="lastname">Овог</label>
-            <input id="lastname" name="lastname" type="text" placeholder="Овог" required>
-          </div>
-
+          <input type="hidden" name="role" value="customer">
           <div class="form-group">
             <label for="name">Нэр</label>
             <input id="name" name="name" type="text" placeholder="Нэр" required>
@@ -59,6 +66,10 @@ class LoginPage extends HTMLElement {
 
     const form = this.querySelector("form");
     const closeBtn = this.querySelector(".close");
+    const roleInput = this.querySelector("input[name='role']");
+    const tabs = this.querySelectorAll(".tab-btn");
+    const titleEl = this.querySelector("#login-title");
+    const submitBtn = this.querySelector(".continue-btn");
 
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
@@ -66,36 +77,70 @@ class LoginPage extends HTMLElement {
       });
     }
 
+    tabs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const role = btn.getAttribute("data-role") || "customer";
+        this.currentRole = role;
+        tabs.forEach((b) => {
+          const isActive = b === btn;
+          b.classList.toggle("is-active", isActive);
+          b.setAttribute("aria-selected", isActive ? "true" : "false");
+        });
+        if (roleInput) roleInput.value = role;
+        if (titleEl) titleEl.textContent = "Бүртгүүлэх";
+        if (submitBtn) {
+          submitBtn.textContent = role === "courier" ? "Хүргэгчээр бүртгүүлэх" : "Хэрэглэгчээр бүртгүүлэх";
+        }
+      });
+    });
+
     if (form) {
-      form.addEventListener("submit", (e) => {
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const name = this.querySelector("#name")?.value?.trim() || "Нэргүй";
-        const lastName = this.querySelector("#lastname")?.value?.trim() || "";
         const phone = this.querySelector("#phone")?.value?.trim() || "";
         const idVal = this.querySelector("#studentId")?.value?.trim() || "";
+        const role = roleInput?.value || "customer";
 
-        const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        const generatedUuid =
-          (crypto.randomUUID && crypto.randomUUID()) ||
-          `00000000-0000-4000-8000-${Date.now().toString().padStart(12, "0").slice(-12)}`;
+        const fullName = name.trim() || "Зочин хэрэглэгч";
 
-        // Use provided ID only if it matches UUID, otherwise keep it for display and use generated UUID for backend
-        const userId = uuidRe.test(idVal) ? idVal : generatedUuid;
-        localStorage.setItem("userId", userId);
-        if (idVal) {
-          localStorage.setItem("userDisplayId", idVal);
+        try {
+          const res = await fetch(`${API}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: fullName,
+              phone,
+              studentId: idVal,
+              role,
+            }),
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || "Нэвтрэх үед алдаа гарлаа");
+          }
+
+          const data = await res.json();
+          if (data?.token) {
+            localStorage.setItem("auth_token", data.token);
+          }
+          window.dispatchEvent(new Event("user-updated"));
+
+          const hasDraft = localStorage.getItem("pendingOrderDraft");
+          location.hash = hasDraft ? "#home" : "#profile";
+        } catch (err) {
+          alert(err.message || "Нэвтрэх үед алдаа гарлаа");
         }
-        localStorage.setItem("userName", name);
-        localStorage.setItem("userLastName", lastName);
-        localStorage.setItem("userPhone", phone);
-        localStorage.setItem("userRegistered", "1");
-
-        window.dispatchEvent(new Event("user-updated"));
-
-        const hasDraft = localStorage.getItem("pendingOrderDraft");
-        location.hash = hasDraft ? "#home" : "#profile";
       });
     }
+  }
+
+  normalizeName(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "Зочин хэрэглэгч";
+    const tokens = raw.split(/\s+/).filter((t) => t && t.length > 1);
+    return tokens.length ? tokens.join(" ") : raw;
   }
 }
 

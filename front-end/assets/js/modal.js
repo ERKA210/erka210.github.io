@@ -1,14 +1,27 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const picker = document.querySelector("date-time-picker");
+  if (!picker) {
+    return;
+  }
 
-  const fromSel   = document.querySelector("#from");
-  const toSel     = document.querySelector("#to");
-  const dateSel = document.querySelector("date-time-picker").shadowRoot.querySelector("input[type='date']");
-  const timeSel = document.querySelector("date-time-picker").shadowRoot.querySelector("input[type='time']");
-  const orderBtn  = document.querySelector(".order-btn");
-  const modal     = document.querySelector("#confirm-modal");
-  const confirmText = document.querySelector("#confirm-text");
-  const cancelBtn = document.querySelector("#cancel-order");
-  const confirmBtn = document.querySelector("#confirm-order");
+  customElements.whenDefined("date-time-picker").then(() => {
+    const fromSel = document.querySelector("#from");
+    const toSel = document.querySelector("#to");
+    const shadow = picker.shadowRoot;
+    if (!fromSel || !toSel || !shadow) {
+      return;
+    }
+
+    const dateSel = shadow.querySelector("input[type='date']");
+    const timeSel = shadow.querySelector("input[type='time']");
+    const orderBtn = document.querySelector(".order-btn");
+    const modal = document.querySelector("#confirm-modal");
+    const confirmText = document.querySelector("#confirm-text");
+    const cancelBtn = document.querySelector("#cancel-order");
+    const confirmBtn = document.querySelector("#confirm-order");
+    if (!dateSel || !timeSel || !orderBtn || !modal || !confirmText || !cancelBtn || !confirmBtn) {
+      return;
+    }
 
 
   function getCartItems() {
@@ -30,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return parseInt(totalText.replace(/[^\d]/g, ""));
   }
 
-  orderBtn.addEventListener("click", () => {
+    orderBtn.addEventListener("click", () => {
 
     const fromSelected = fromSel.selectedIndex > 0;
     const toSelected   = toSel.selectedIndex > 0;
@@ -72,12 +85,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 
-  cancelBtn.addEventListener("click", () => {
-    modal.classList.add("hidden");
-  });
+    cancelBtn.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
 
 
-  confirmBtn.addEventListener("click", () => {
+    confirmBtn.addEventListener("click", () => {
 
     const items = getCartItems();
     const itemsText = items.map(i => `${i.name} (${i.qty}ш)`).join(", ");
@@ -99,6 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     modal.classList.add("hidden");
     alert("Захиалга амжилттай нэмэгдлээ!");
+    });
   });
-
 });

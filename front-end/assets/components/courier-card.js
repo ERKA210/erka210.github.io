@@ -8,15 +8,9 @@ class Couriers extends HTMLElement {
 
   async loadCourier() {
     try {
-      const cached = localStorage.getItem("activeCourier");
-      let courier = cached ? JSON.parse(cached) : null;
-
-      if (!courier) {
-        const r = await fetch(`${API}/api/courier/me`);
-        if (!r.ok) throw new Error("courier not found");
-        courier = await r.json();
-        localStorage.setItem("activeCourier", JSON.stringify(courier));
-      }
+      const r = await fetch(`${API}/api/courier/me`);
+      if (!r.ok) throw new Error("courier not found");
+      const courier = await r.json();
 
       if (courier) this.setData(courier);
     } catch {

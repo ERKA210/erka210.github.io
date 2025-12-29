@@ -7,6 +7,7 @@ class OrdersPage extends HTMLElement {
     this.bindModal();
     this.bindProgress();
     this.bindClicks();
+    this.selectedOrder = null;
   }
 
   renderCourier(courier) {
@@ -21,20 +22,13 @@ class OrdersPage extends HTMLElement {
 
   async loadCourierForOrder(order) {
     let courier = null;
-    const cached = localStorage.getItem("activeCourier");
-    if (cached) {
-      try { courier = JSON.parse(cached); } catch { courier = null; }
-    }
-    if (!courier) {
-      try {
-        const res = await fetch(`${API}/api/courier/me`);
-        if (res.ok) {
-          courier = await res.json();
-          localStorage.setItem("activeCourier", JSON.stringify(courier));
-        }
-      } catch {
-        courier = null;
+    try {
+      const res = await fetch(`${API}/api/courier/me`);
+      if (res.ok) {
+        courier = await res.json();
       }
+    } catch {
+      courier = null;
     }
     this.renderCourier(courier);
   }
@@ -107,7 +101,16 @@ class OrdersPage extends HTMLElement {
     const listEl = this.querySelector("#orderList");
     if (!listEl) return;
 
-    const userId = localStorage.getItem("userId");
+    let userId = "";
+    try {
+      const resUser = await fetch("/api/auth/me");
+      if (resUser.ok) {
+        const data = await resUser.json();
+        userId = data?.user?.id || "";
+      }
+    } catch (e) {
+      userId = "";
+    }
     const qs = userId ? `?customerId=${encodeURIComponent(userId)}` : "";
 
     try {
@@ -159,6 +162,7 @@ class OrdersPage extends HTMLElement {
   `;
 }).join("");
 
+    this.selectedOrder = orders[0] || null;
     this.setProgressFromStatus(orders[0]?.status);
   }
 
@@ -171,6 +175,7 @@ class OrdersPage extends HTMLElement {
     if (!raw) return;
 
     const order = JSON.parse(decodeURIComponent(raw));
+    this.selectedOrder = order;
 
     this.setProgressFromStatus(order.status);
     this.loadCourierForOrder(order);
@@ -283,7 +288,13 @@ class OrdersPage extends HTMLElement {
     const ratingEl = this.querySelector("rating-stars");
 
     if (openBtn && modal) {
-      openBtn.onclick = () => modal.style.display = "block";
+      openBtn.onclick = () => {
+        if (!this.selectedOrder?.id) {
+          alert("Захиалга сонгоно уу.");
+          return;
+        }
+        modal.style.display = "block";
+      };
     }
     if (closeBtn && modal) {
       closeBtn.onclick = () => modal.style.display = "none";
@@ -293,12 +304,39 @@ class OrdersPage extends HTMLElement {
     };
 
     if (sendBtn && modal) {
-      sendBtn.onclick = () => {
-        const rating = ratingEl?.getAttribute("value");
+      sendBtn.onclick = async () => {
+        const rating = Number(ratingEl?.getAttribute("value") || 0);
         const comment = this.querySelector("#comment")?.value || "";
-        console.log("Rating:", rating);
-        console.log("Comment:", comment);
-        modal.style.display = "none";
+        const orderId = this.selectedOrder?.id;
+        if (!orderId) {
+          alert("Захиалга сонгоно уу.");
+          return;
+        }
+        const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (!uuidRe.test(orderId)) {
+          alert("Энэ захиалгад сэтгэгдэл үлдээх боломжгүй.");
+          return;
+        }
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+          alert("Үнэлгээ сонгоно уу.");
+          return;
+        }
+        try {
+          const res = await fetch("/api/ratings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId, stars: rating, comment }),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            alert(err.error || "Сэтгэгдэл хадгалахад алдаа гарлаа");
+            return;
+          }
+          modal.style.display = "none";
+          window.dispatchEvent(new Event("reviews-updated"));
+        } catch (e) {
+          alert("Сэтгэгдэл хадгалахад алдаа гарлаа");
+        }
       };
     }
 

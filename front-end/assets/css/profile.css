@@ -8,14 +8,39 @@
   --muted: #5b6570; 
   --shadow: 0 12px 45px rgba(17, 24, 39, 0.08);
 
-  width: min(1200px, 100%);
-  margin: 0 auto;
-  padding: 1.25rem 1.25rem 2rem;
+  width: 100%;
+  margin: 0;
+  padding: 1rem 2rem 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   color: var(--text);
   background: var(--surface);
+}
+
+@media (min-width: 64rem) {
+  .profile-page {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1.2fr);
+    align-items: start;
+    width: 100%;
+    margin: 0;
+    padding: 1rem 2rem 0.75rem;
+    column-gap: 2rem;
+    row-gap: 1.5rem;
+  }
+
+  .profile-hero {
+    grid-column: 1;
+    margin-top: 0;
+  }
+
+  .profile-grid {
+    grid-column: 2;
+    margin-top: 0;
+    width: 100%;
+    align-self: start;
+  }
 }
 
 .profile-hero {
@@ -25,7 +50,7 @@
   background: radial-gradient(circle at 20% 20%, #ff7a9c, #c90d30);
   color: #fff;
   box-shadow: var(--shadow);
-  margin-top: 3rem;
+  margin-top: 0;
 }
 
 .profile-hero::before,

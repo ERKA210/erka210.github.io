@@ -1,19 +1,30 @@
 class SiteHeader extends HTMLElement {
   connectedCallback() {
+    this.render = this.render.bind(this);
+    this.updateActive = this.updateActive.bind(this);
+    this.handleDocClick = this.handleDocClick.bind(this);
+    this.handleUserUpdated = this.handleUserUpdated.bind(this);
+    this.loadUser = this.loadUser.bind(this);
+
     this.render();
 
-    // hash-д таарахаар bind хийх
-    this.updateActive = this.updateActive.bind(this);
-
     window.addEventListener('hashchange', this.updateActive);
-    this.updateActive(); // эхний ачаалалт дээр
+    window.addEventListener('user-updated', this.handleUserUpdated);
+    this.loadUser();
+    this.updateActive(); 
   }
 
   disconnectedCallback() {
     window.removeEventListener('hashchange', this.updateActive);
+    window.removeEventListener('user-updated', this.handleUserUpdated);
+    document.removeEventListener('click', this.handleDocClick);
   }
 
   render() {
+    const isAuthed = Boolean(this.currentUser);
+
+    document.removeEventListener("click", this.handleDocClick);
+
     this.innerHTML = `
       <header class="site-top">
         <div class="brand">
@@ -52,10 +63,73 @@ class SiteHeader extends HTMLElement {
         </nav>
 
         <div class="header-actions">
-          <button onclick="location.hash='#login'">Хүргэгч болох</button>
+          ${
+            isAuthed
+              ? `
+                <button class="avatar-btn" type="button" aria-label="Профайл руу орох"></button>
+                <button class="logout-btn" type="button" hidden>Гарах</button>
+              `
+              : `<button class="login-btn" type="button">Хүргэгч болох</button>`
+          }
         </div>
       </header>
     `;
+
+    const loginBtn = this.querySelector(".login-btn");
+    if (loginBtn) {
+      loginBtn.addEventListener("click", () => {
+        location.hash = "#login";
+      });
+    }
+
+    const avatarBtn = this.querySelector(".avatar-btn");
+    if (avatarBtn) {
+      avatarBtn.innerHTML = `<img src="assets/img/profile.jpg" alt="Профайл">`;
+      avatarBtn.addEventListener("click", () => {
+        location.hash = "#profile";
+      });
+    }
+
+    const logoutBtn = this.querySelector(".logout-btn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        try {
+          await fetch("/api/auth/logout", { method: "POST" });
+        } catch (e) {
+          // ignore
+        }
+        localStorage.removeItem("auth_token");
+        this.currentUser = null;
+        window.dispatchEvent(new Event("user-updated"));
+        location.hash = "#home";
+      });
+    }
+  }
+
+  handleDocClick(e) {
+    if (!this.contains(e.target)) {
+      this.classList.remove("profile-open");
+    }
+  }
+
+  handleUserUpdated() {
+    this.loadUser();
+  }
+
+  async loadUser() {
+    try {
+      const res = await fetch("/api/auth/me");
+      if (!res.ok) {
+        this.currentUser = null;
+      } else {
+        const data = await res.json();
+        this.currentUser = data?.user || null;
+      }
+    } catch (e) {
+      this.currentUser = null;
+    }
+    this.render();
+    this.updateActive();
   }
 
   updateActive() {
@@ -70,6 +144,11 @@ class SiteHeader extends HTMLElement {
       const href = a.getAttribute('href');
       a.classList.toggle('is-active', href === current);
     });
+
+    const logoutBtn = this.querySelector(".logout-btn");
+    if (logoutBtn) {
+      logoutBtn.hidden = current !== "#profile";
+    }
   }
 }
 

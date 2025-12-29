@@ -1,24 +1,13 @@
-class DelOrderDetails extends HTMLElement {
+class OrderCourier extends HTMLElement {
   connectedCallback() {
-    const raw = localStorage.getItem('activeOrder');
-    let from = 'GS25';
-    let to = 'МУИС 7-р байр';
-    let dateText = '2025.10.08 • 09:36';
+    this.render();
+    this.loadOrder();
+  }
 
-    if (raw) {
-      try {
-        const order = JSON.parse(raw);
-        if (order.from) from = order.from;
-        if (order.to) to = order.to;
-        if (order.createdAt) {
-          const dt = new Date(order.createdAt);
-          const pad = (n) => n.toString().padStart(2, '0');
-          dateText = `${dt.getFullYear()}.${pad(dt.getMonth()+1)}.${pad(dt.getDate())} • ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
-        }
-      } catch (e) {
-        console.error('DelOrderDetails parse error', e);
-      }
-    }
+  render(data = {}) {
+    const from = data.from || 'GS25';
+    const to = data.to || 'МУИС 7-р байр';
+    const dateText = data.createdAt || '2025.10.08 • 09:36';
 
     this.innerHTML = `
       <div class="detail-header">
@@ -28,6 +17,29 @@ class DelOrderDetails extends HTMLElement {
       </div>
     `;
   }
+
+  async loadOrder() {
+    try {
+      const res = await fetch("/api/active-order");
+      if (!res.ok) return;
+      const data = await res.json();
+      const order = data?.order;
+      if (!order) return;
+      let dateText = order.createdAt || '';
+      if (order.createdAt) {
+        const dt = new Date(order.createdAt);
+        const pad = (n) => n.toString().padStart(2, '0');
+        dateText = `${dt.getFullYear()}.${pad(dt.getMonth()+1)}.${pad(dt.getDate())} • ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+      }
+      this.render({
+        from: order.from,
+        to: order.to,
+        createdAt: dateText,
+      });
+    } catch (e) {
+      // ignore
+    }
+  }
 }
 
-customElements.define('del-order-details', DelOrderDetails);
+customElements.define('order-courier', OrderCourier);

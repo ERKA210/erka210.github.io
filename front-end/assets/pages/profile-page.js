@@ -1,10 +1,68 @@
 class ProfilePage extends HTMLElement {
   connectedCallback() {
+    this.renderAccessGate();
+    this.ensureAuthenticated();
+  }
+
+  renderAccessGate() {
+    this.innerHTML = `
+      <section class="profile-page">
+        <div class="profile-hero">
+          <div class="profile-hero__content">
+            <div class="profile-meta">
+              <div class="hero-info hero-info--stack">
+                <strong>Профайл ачаалж байна...</strong>
+                <span class="muted">Нэвтрэлт шалгаж байна</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  async ensureAuthenticated() {
+    try {
+      const res = await fetch("/api/auth/me");
+      if (!res.ok) {
+        this.redirectToLogin();
+        return;
+      }
+      const data = await res.json();
+      if (!data?.user?.id) {
+        this.redirectToLogin();
+        return;
+      }
+      this.currentUser = data.user;
+      this.renderProfile();
+    } catch (e) {
+      this.redirectToLogin();
+    }
+  }
+
+  redirectToLogin() {
+    this.innerHTML = `
+      <section class="profile-page">
+        <div class="profile-hero">
+          <div class="profile-hero__content">
+            <div class="profile-meta">
+              <div class="hero-info hero-info--stack">
+                <strong>Профайл харахын тулд нэвтэрнэ үү.</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    `;
+    location.hash = "#login";
+  }
+
+  renderProfile() {
     this.profileData = this.loadProfileData();
     const activeOrders = this.getActiveOrders();
     const activeOrdersMarkup = this.buildActiveOrdersMarkup(activeOrders);
     const reviews = this.getReviews();
-    const reviewsMarkup = this.buildReviewsMarkup(reviews.slice(0, 3));
+    const reviewsMarkup = this.buildReviewsMarkup(reviews);
     const reviewsModalMarkup = this.buildReviewsMarkup(reviews);
     const orderHistory = this.getOrderHistory();
     const deliveryHistory = this.getDeliveryHistory();
@@ -39,10 +97,10 @@ class ProfilePage extends HTMLElement {
               </div>
               <div class="stat-card">
                 <p>Дундаж үнэлгээ</p>
-                <div class="stars" aria-label="4.8 од">
-                  <span>★</span><span>★</span><span>★</span><span>★</span><span class="dim">★</span>
+                <div class="stars avg-stars" aria-label="0 од">
+                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
                 </div>
-                <small>4.8 / 5</small>
+                <small class="avg-rating-text">0 / 5</small>
               </div>
             </div>
           </div>
@@ -146,17 +204,20 @@ class ProfilePage extends HTMLElement {
     this.bindProfileData();
     this.attachNavigation();
     this.attachModalHandlers();
+    this.hydrateProfileFromApi();
+    this.loadActiveOrder();
+    this.handleReviewsUpdated = this.loadReviews.bind(this);
+    window.addEventListener("reviews-updated", this.handleReviewsUpdated);
+    this.loadReviews();
+  }
+
+  disconnectedCallback() {
+    if (this.handleReviewsUpdated) {
+      window.removeEventListener("reviews-updated", this.handleReviewsUpdated);
+    }
   }
 
   loadProfileData() {
-    try {
-      const raw = localStorage.getItem('profileData');
-      if (raw) {
-        return JSON.parse(raw);
-      }
-    } catch (err) {
-      console.error('profileData уншихад алдаа гарлаа', err);
-    }
     return {
       name: 'Чигцалмаа',
       phone: '99001234',
@@ -166,34 +227,31 @@ class ProfilePage extends HTMLElement {
     };
   }
 
-  saveProfileData(data) {
-    localStorage.setItem('profileData', JSON.stringify(data));
-  }
-
-  getActiveOrders() {
+  async hydrateProfileFromApi() {
     try {
-      const raw = localStorage.getItem('activeOrder');
-      if (!raw) return [];
-
-      const parsed = JSON.parse(raw);
-
-      if (Array.isArray(parsed)) return parsed;
-      if (parsed && typeof parsed === 'object') return [parsed];
-
-      return [];
-    } catch (err) {
-      console.error('activeOrder уншихад алдаа гарлаа', err);
-      return [];
+      const res = await fetch("/api/auth/me");
+      if (!res.ok) return;
+      const data = await res.json();
+      const user = data?.user;
+      if (!user) return;
+      this.profileData = {
+        ...this.profileData,
+        name: user.name || this.profileData.name,
+        phone: user.phone || this.profileData.phone,
+        id: user.student_id || this.profileData.id,
+      };
+      this.bindProfileData();
+    } catch (e) {
+      // ignore
     }
   }
 
+  getActiveOrders() {
+    return [];
+  }
+
   getReviews() {
-    return [
-      { name: 'Бат', text: 'Үнэхээр найдвартай хүргэгч байна.', stars: '★★★★☆' },
-      { name: 'Сувдаа', text: 'Хугацаандаа авчирсан, харилцаа эелдэг.', stars: '★★★★★' },
-      { name: 'Ганболд', text: 'Захиалгаа шалгахад ойлгомжтой байлаа.', stars: '★★★★☆' },
-      { name: 'Тэмүүжин', text: 'Замын мэдээлэл тодорхой, хурдтай.', stars: '★★★★☆' },
-    ];
+    return [];
   }
 
   getOrderHistory() {
@@ -234,11 +292,13 @@ class ProfilePage extends HTMLElement {
   }
 
   buildReviewsMarkup(list) {
+    if (!list.length) {
+      return `<p class="muted">Сэтгэгдэл байхгүй</p>`;
+    }
     return list.map((r) => `
       <div class="review">
         <div>
-          <h4>${r.name}</h4>
-          <p>${r.text}</p>
+          ${r.text ? `<p>${r.text}</p>` : ""}
         </div>
         <span class="stars">${r.stars}</span>
       </div>
@@ -360,12 +420,94 @@ class ProfilePage extends HTMLElement {
           phone: form.phone.value.trim(),
           email: form.email.value.trim(),
           id: form.id.value.trim(),
-          avatar: form.avatar.value.trim() || 'assets/img/profile.jpg',
+          avatar: this.profileData.avatar,
         };
-        this.saveProfileData(this.profileData);
+        this.saveProfileToApi();
         this.bindProfileData();
+        window.dispatchEvent(new Event('user-updated'));
         this.toggleModal('profileModal', false);
       });
+    }
+  }
+
+  async loadReviews() {
+    try {
+      const res = await fetch("/api/ratings/me");
+      if (!res.ok) return;
+      const data = await res.json();
+      const items = Array.isArray(data?.items) ? data.items : [];
+      const reviews = items.map((r) => ({
+        text: (r.comment || "").trim(),
+        stars: this.toStars(r.stars),
+      }));
+      const avg =
+        items.length > 0
+          ? items.reduce((sum, r) => sum + (Number(r.stars) || 0), 0) / items.length
+          : 0;
+      this.updateReviewsUI(reviews);
+      this.updateAverageRating(avg);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  updateReviewsUI(reviews) {
+    const content = this.buildReviewsMarkup(reviews);
+    const lists = this.querySelectorAll(".review-list");
+    if (lists[0]) lists[0].innerHTML = content;
+    if (lists[1]) lists[1].innerHTML = content;
+  }
+
+  toStars(value) {
+    const count = Math.max(0, Math.min(5, Number(value) || 0));
+    return "★★★★★".slice(0, count) + "☆☆☆☆☆".slice(0, 5 - count);
+  }
+
+  updateAverageRating(avg) {
+    const starsWrap = this.querySelector(".avg-stars");
+    const textEl = this.querySelector(".avg-rating-text");
+    if (!starsWrap || !textEl) return;
+
+    const safeAvg = Math.max(0, Math.min(5, Number(avg) || 0));
+    const filledCount = Math.round(safeAvg);
+    const stars = starsWrap.querySelectorAll("span");
+    stars.forEach((star, idx) => {
+      star.classList.toggle("dim", idx >= filledCount);
+    });
+    starsWrap.setAttribute("aria-label", `${safeAvg.toFixed(1)} од`);
+    textEl.textContent = `${safeAvg.toFixed(1)} / 5`;
+  }
+
+  async saveProfileToApi() {
+    try {
+      await fetch("/api/auth/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: this.profileData.name,
+          phone: this.profileData.phone,
+          studentId: this.profileData.id,
+        }),
+      });
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  async loadActiveOrder() {
+    try {
+      const res = await fetch("/api/active-order");
+      if (!res.ok) return;
+      const data = await res.json();
+      const order = data?.order;
+      if (!order) return;
+      const activeOrdersMarkup = this.buildActiveOrdersMarkup([order]);
+      const pillWrap = this.querySelector(".pill");
+      if (pillWrap) {
+        pillWrap.outerHTML = activeOrdersMarkup;
+      }
+    } catch (e) {
+      // ignore
     }
   }
 

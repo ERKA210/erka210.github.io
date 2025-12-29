@@ -67,12 +67,34 @@
 main {
   padding-top: calc(var(--top-h) + 0.75rem);
 }
+num-router {
+  display: block;
+}
+
+num-router > [data-route] {
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  opacity: 0;
+  transform: translateX(0.4rem);
+  pointer-events: none;
+}
+
+num-router > [data-route].is-active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+num-router > [data-route].is-leaving {
+  opacity: 0;
+  transform: translateX(-0.4rem);
+}
+
 .header-actions {
   display: flex;
   align-items: center;
 }
 
-.header-actions button {
+.header-actions .login-btn {
   padding: 0.625rem 1.25rem;
   background: var(--color-accent);
   color: #fff;
@@ -85,18 +107,57 @@ main {
   white-space: nowrap;
 }
 
-.header-actions button:hover {
+.header-actions .login-btn:hover {
   background: #b0112f;
   transform: translateY(-0.0625rem);
   box-shadow: 0 0.25rem 0.5rem rgba(201, 13, 48, 0.2);
 }
 
-.header-actions button:active {
+.header-actions .login-btn:active {
   transform: translateY(0);
 }
+
+.header-actions .avatar-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border, #e0e0e0);
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+  cursor: pointer;
+}
+
+.header-actions .avatar-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.header-actions .logout-btn {
+  padding: 0.625rem 1.25rem;
+  background: #fff;
+  color: var(--color-text, #333);
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.header-actions .logout-btn:hover {
+  background: #f5f5f5;
+}
+
 @media (max-width: 54rem){
   .site-top .brand-logo{
     height: 3rem;
+  }
+  .header-actions .avatar-btn {
+    display: none;
   }
   .top-menu{
     position: fixed;
@@ -171,4 +232,13 @@ main {
     justify-content: space-between;
   }
   main{ padding-bottom: 5.5rem; }
+}
+
+@media (min-width: 54.01rem) {
+  .top-menu a[href="#profile"] {
+    display: none;
+  }
+  .header-actions .logout-btn {
+    display: none;
+  }
 }

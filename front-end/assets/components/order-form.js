@@ -32,11 +32,13 @@ class OrderForm extends HTMLElement {
       createdAt: new Date().toISOString()
     };
 
-    localStorage.setItem('activeOrder', JSON.stringify(activeOrder));
-
-    localStorage.setItem('orderStep', '0'); 
-
-    window.location.href = 'delivery.html';
+    fetch("/api/active-order", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ order: activeOrder }),
+    }).finally(() => {
+      window.location.hash = "#delivery";
+    });
   }
 }
 

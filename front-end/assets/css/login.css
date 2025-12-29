@@ -41,6 +41,34 @@ login-page {
         margin-bottom: 18px
     }
 
+    .login-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        background: #f3f4f6;
+        border-radius: 12px;
+        padding: 6px;
+        margin-bottom: 14px;
+    }
+
+    .tab-btn {
+        border: 0;
+        background: transparent;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        color: #6b7280;
+        transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tab-btn.is-active {
+        background: #fff;
+        color: #111827;
+        box-shadow: 0 6px 14px rgba(17, 24, 39, 0.08);
+    }
+
     .form-group {
         margin-bottom: 14px;
         display: flex;
