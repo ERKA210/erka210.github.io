@@ -189,6 +189,49 @@ class OfferModal extends HTMLElement {
           transition: transform 0.15s ease;
         }
         .confirm:hover { transform: translateY(-1px); }
+
+        @media (prefers-color-scheme: dark) {
+          :host {
+            --text: #e5e7eb;
+            --muted: #9aa4b2;
+          }
+
+          .card {
+            background: #0f172a;
+            border-color: #243040;
+            box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+          }
+
+          .thumb {
+            background: #111827;
+            box-shadow: inset 0 0 0 1px #243040;
+          }
+
+          .close-btn:hover {
+            background: #1f2937;
+          }
+
+          .list li {
+            background: #111827;
+            border-color: #243040;
+          }
+
+          .courier {
+            background: #111827;
+            border-color: #243040;
+          }
+
+          .courier img {
+            background: #0b0f14;
+            border-color: #243040;
+          }
+
+          .delete {
+            background: #111827;
+            color: var(--muted);
+            border-color: #243040;
+          }
+        }
       </style>
       <div class="modal">
         <div class="card">

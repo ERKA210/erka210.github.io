@@ -32,6 +32,62 @@ class OrderConfirm extends HTMLElement {
           padding: 0.5rem 1rem;
           cursor: pointer;
         }
+        #confirm-text {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+        .card-block {
+          background: #f8f9fc;
+          border: 1px solid #e6eaf2;
+          border-radius: 10px;
+          padding: 0.75rem 0.85rem;
+          color: #1f2937;
+        }
+        .card-block strong {
+          color: #111827;
+        }
+        .item-list {
+          margin-top: 0.35rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          .modal-content {
+            background: #0f172a;
+            color: #e5e7eb;
+            border: 1px solid #243040;
+            box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+          }
+
+          #confirm-text {
+            color: #e5e7eb;
+          }
+
+          .card-block {
+            background: #111827;
+            border-color: #243040;
+            color: #e5e7eb;
+          }
+
+          .card-block strong {
+            color: #f9fafb;
+          }
+
+          button {
+            background: #111827;
+            color: #e5e7eb;
+            border: 1px solid #243040;
+          }
+
+          #confirm-order {
+            background: var(--color-accent, #c90d30);
+            color: #fff;
+            border: none;
+          }
+        }
       </style>
 
       <div class="modal hidden">
@@ -78,15 +134,19 @@ class OrderConfirm extends HTMLElement {
     let itemsHTML = items.map(i => `<div>• ${i.name} — ${i.qty} ширхэг</div>`).join("");
 
     this.confirmText.innerHTML = `
-      <div><b>Хаанаас:</b> ${from}</div>
-      <div><b>Хаашаа:</b> ${to}</div>
-      <div><b>Өдөр:</b> ${date}</div>
-      <div><b>Цаг:</b> ${time}</div>
+      <div class="card-block">
+        <div><b>Хаанаас:</b> ${from}</div>
+        <div><b>Хаашаа:</b> ${to}</div>
+        <div><b>Өдөр:</b> ${date}</div>
+        <div><b>Цаг:</b> ${time}</div>
+      </div>
 
-      <div style="margin-top: 10px;"><b>Таны хоол:</b></div>
-      <div class="item-list">${itemsHTML}</div>
+      <div class="card-block">
+        <div><b>Таны хоол:</b></div>
+        <div class="item-list">${itemsHTML}</div>
+      </div>
 
-      <div style="margin-top: 10px;">
+      <div class="card-block">
         <b>Нийт үнэ:</b> ${total.toLocaleString("mn-MN")}₮
       </div>
     `;

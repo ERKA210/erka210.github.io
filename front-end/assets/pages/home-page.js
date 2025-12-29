@@ -86,6 +86,30 @@ class HomePage extends HTMLElement {
           display: inline-block;
           min-width: 4.7rem;
         }
+        @media (prefers-color-scheme: dark) {
+          #confirm-modal .modal-content {
+            background: #0f172a;
+            color: #e5e7eb;
+            border: 1px solid #243040;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.45);
+          }
+          #confirm-modal h3 {
+            color: #f9fafb;
+          }
+          #confirm-modal p {
+            color: #9aa4b2;
+          }
+          #confirm-modal .btn--gray {
+            background: #111827;
+            color: #e5e7eb;
+            border-color: #243040;
+          }
+          #confirm-modal .detail-row {
+            background: #111827;
+            border-color: #243040;
+            color: #e5e7eb;
+          }
+        }
       </style>
 
       <section class="filter-section">
