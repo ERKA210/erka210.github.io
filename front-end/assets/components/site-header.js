@@ -145,7 +145,6 @@ class SiteHeader extends HTMLElement {
   }
 
   updateActive() {
-    // hash байхгүй бол default-оор #home болгочихъё
     if (!location.hash) {
       history.replaceState(null, '', '#home');
     }
