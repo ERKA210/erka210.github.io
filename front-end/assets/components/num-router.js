@@ -9,6 +9,15 @@ class NumRouter extends HTMLElement {
 
   applyRoute() {
     const hash = (location.hash || '#home').replace('#', '') || 'home';
+    const role = localStorage.getItem("authRole");
+    const paid = localStorage.getItem("courierPaid");
+    const loggedIn = localStorage.getItem("authLoggedIn");
+    if (hash === "delivery") {
+      if (loggedIn !== "1" || role !== "courier" || paid !== "1") {
+        location.hash = "#login";
+        return;
+      }
+    }
 
     const next = this._views.find((section) => section.dataset.route === hash);
     if (!next) {

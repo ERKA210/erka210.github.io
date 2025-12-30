@@ -6,6 +6,14 @@ class DeliveryPage extends HTMLElement {
     this.render();
     this.applyActiveOrder();
     this.renderDeliveryCart();
+    const loggedIn = localStorage.getItem("authLoggedIn");
+    const role = localStorage.getItem("authRole");
+    const paid = localStorage.getItem("courierPaid");
+
+    if (loggedIn !== "1" || role !== "courier" || paid !== "1") {
+      location.hash = "#login";
+      return;
+    }
     this.handleRouteChange = this.handleRouteChange.bind(this);
     this.applyActiveOrderBound = this.applyActiveOrder.bind(this);
     this.renderDeliveryCartBound = this.renderDeliveryCart.bind(this);
