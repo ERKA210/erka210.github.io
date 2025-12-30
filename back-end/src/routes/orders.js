@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { pool } from "../db.js";
 import { ensureCustomerUser } from "../utils/customer.js";
+import { sanitizeText } from "../utils/sanitize.js";
 
 const router = Router();
 
@@ -22,12 +23,17 @@ router.post("/orders", async (req, res) => {
 
     const resolvedCustomerId = await ensureCustomerUser(client, {
       id: customerId,
-      name: customerName || "Зочин хэрэглэгч",
+      name: sanitizeText(customerName || "Зочин хэрэглэгч", { maxLen: 80 }),
       phone: customerPhone || "00000000",
-      studentId: customerStudentId || "",
+      studentId: sanitizeText(customerStudentId || "", { maxLen: 32 }),
     });
 
-    const subtotal = items.reduce((s, it) => s + it.unitPrice * it.qty, 0);
+    const sanitizedItems = items.map((it) => ({
+      ...it,
+      name: sanitizeText(it?.name || "", { maxLen: 120 }),
+      menuItemKey: sanitizeText(it?.menuItemKey || "", { maxLen: 120 }),
+    }));
+    const subtotal = sanitizedItems.reduce((s, it) => s + it.unitPrice * it.qty, 0);
     const total = subtotal + deliveryFee;
 
     await client.query("BEGIN");
@@ -36,16 +42,32 @@ router.post("/orders", async (req, res) => {
       `INSERT INTO orders (customer_id, from_place_id, to_place_id, scheduled_at, subtotal_amount, delivery_fee, total_amount, note)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
        RETURNING id`,
-      [resolvedCustomerId, fromPlaceId, toPlaceId, scheduledAt ?? null, subtotal, deliveryFee, total, note ?? null]
+      [
+        resolvedCustomerId,
+        fromPlaceId,
+        toPlaceId,
+        scheduledAt ?? null,
+        subtotal,
+        deliveryFee,
+        total,
+        sanitizeText(note || "", { maxLen: 500 }),
+      ]
     );
 
     const orderId = orderR.rows[0].id;
 
-    for (const it of items) {
+    for (const it of sanitizedItems) {
       await client.query(
         `INSERT INTO order_items (order_id, menu_item_key, name, unit_price, qty, item_snapshot_json)
          VALUES ($1,$2,$3,$4,$5,$6)`,
-        [orderId, it.menuItemKey ?? null, it.name, it.unitPrice, it.qty, it.options ?? {}]
+        [
+          orderId,
+          it.menuItemKey ?? null,
+          it.name,
+          it.unitPrice,
+          it.qty,
+          it.options ?? {},
+        ]
       );
     }
 
@@ -134,18 +156,18 @@ router.post("/orders/:id/pay", async (req, res) => {
 
 router.post("/orders/:id/review", async (req, res) => {
   const { id } = req.params;
-  const { customerId, courierId, rating, comment } = req.body;
-  try {
-    await pool.query(
-      `INSERT INTO reviews (order_id, customer_id, courier_id, rating, comment)
-       VALUES ($1,$2,$3,$4,$5)
-       ON CONFLICT (order_id) DO UPDATE
-         SET rating = EXCLUDED.rating,
-             comment = EXCLUDED.comment,
-             courier_id = EXCLUDED.courier_id`,
-      [id, customerId, courierId ?? null, rating, comment ?? null]
-    );
-    res.json({ ok: true });
+    const { customerId, courierId, rating, comment } = req.body;
+    try {
+      await pool.query(
+        `INSERT INTO reviews (order_id, customer_id, courier_id, rating, comment)
+         VALUES ($1,$2,$3,$4,$5)
+         ON CONFLICT (order_id) DO UPDATE
+           SET rating = EXCLUDED.rating,
+               comment = EXCLUDED.comment,
+               courier_id = EXCLUDED.courier_id`,
+        [id, customerId, courierId ?? null, rating, sanitizeText(comment || "", { maxLen: 1000 })]
+      );
+      res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

@@ -3,6 +3,7 @@ import { pool } from "../db.js";
 import { requireAuth } from "../utils/auth.js";
 import { ensureStorageTables } from "../utils/storage.js";
 import { assertUuid } from "../utils/validation.js";
+import { sanitizeText } from "../utils/sanitize.js";
 
 const router = Router();
 
@@ -64,7 +65,7 @@ router.post("/ratings", requireAuth, async (req, res) => {
     );
     const courierId = courierRes.rows[0]?.courier_id || null;
 
-    const commentSafe = String(comment || "").trim();
+    const commentSafe = sanitizeText(comment, { maxLen: 1000 });
     const history = await pool.query(
       `INSERT INTO rating_history (order_id, customer_id, courier_id, stars, comment)
        VALUES ($1,$2,$3,$4,$5)

@@ -22,7 +22,7 @@
   .profile-page {
     display: grid;
     grid-template-columns: minmax(0, 3fr) minmax(0, 1.2fr);
-    align-items: start;
+    align-items: stretch;
     width: 100%;
     margin: 0;
     column-gap: 2rem;
@@ -39,7 +39,15 @@
     grid-column: 2;
     margin-top: 0;
     width: 100%;
-    align-self: start;
+    align-self: stretch;
+  }
+
+  .profile-card.reviews {
+    height: 100%;
+  }
+
+  .profile-card.reviews .review-list {
+    flex: 1;
   }
 }
 
@@ -285,6 +293,15 @@
   gap: 0.75rem;
 }
 
+@media (min-width: 64rem) {
+  .profile-card.reviews .review-list {
+    max-height: 14rem;
+    overflow-y: auto;
+    padding-right: 0.35rem;
+    scrollbar-width: thin;
+  }
+}
+
 .review {
   display: flex;
   justify-content: space-between;
@@ -293,6 +310,7 @@
   border-radius: 12px;
   border: 1px solid var(--border);
   background: #fbfbfe;
+  align-items: center;
 }
 
 .review h4 {
@@ -302,6 +320,7 @@
 .review p {
   margin: 0;
   color: var(--muted);
+  word-break: break-word;
 }
 
 .modal-card .review {
@@ -321,6 +340,8 @@
   color: #f59e0b;
   font-weight: 700;
   align-self: center;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .profile-page .btn,

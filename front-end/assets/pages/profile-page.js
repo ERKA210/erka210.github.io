@@ -219,10 +219,10 @@ class ProfilePage extends HTMLElement {
 
   loadProfileData() {
     return {
-      name: 'Чигцалмаа',
-      phone: '99001234',
-      email: 'student@num.edu.mn',
-      id: '23b1num0245',
+      name: '',
+      phone: '',
+      email: '',
+      id: '',
       avatar: 'assets/img/profile.jpg',
     };
   }
@@ -295,14 +295,37 @@ class ProfilePage extends HTMLElement {
     if (!list.length) {
       return `<p class="muted">Сэтгэгдэл байхгүй</p>`;
     }
-    return list.map((r) => `
+    const safeItems = list
+      .map((r) => ({ ...r, safeText: this.cleanReviewText(r.text) }))
+      .filter((r) => r.safeText);
+    if (!safeItems.length) {
+      return `<p class="muted">Сэтгэгдэл байхгүй</p>`;
+    }
+    return safeItems.map((r) => `
       <div class="review">
         <div>
-          ${r.text ? `<p>${r.text}</p>` : ""}
+          <p>${r.safeText}</p>
         </div>
         <span class="stars">${r.stars}</span>
       </div>
     `).join('');
+  }
+
+  escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  cleanReviewText(value) {
+    const raw = String(value ?? "").trim();
+    if (!raw) return "";
+    if (/<[^>]*>/.test(raw)) return "";
+    if (/&lt;|&gt;|&#60;|&#62;/i.test(raw)) return "";
+    return this.escapeHtml(raw);
   }
 
   buildHistoryMarkup(list, emptyText) {
@@ -343,13 +366,25 @@ class ProfilePage extends HTMLElement {
     nameEls.forEach((el) => { el.textContent = name; });
 
     const phoneEl = this.querySelector('.profile-phone');
-    if (phoneEl) phoneEl.textContent = phone;
+    if (phoneEl) {
+      phoneEl.textContent = phone;
+      const row = phoneEl.closest('div');
+      if (row) row.style.display = phone ? '' : 'none';
+    }
 
     const emailEl = this.querySelector('.profile-email');
-    if (emailEl) emailEl.textContent = email;
+    if (emailEl) {
+      emailEl.textContent = email;
+      const row = emailEl.closest('div');
+      if (row) row.style.display = email ? '' : 'none';
+    }
 
     const idEl = this.querySelector('.profile-id');
-    if (idEl) idEl.textContent = id;
+    if (idEl) {
+      idEl.textContent = id;
+      const row = idEl.closest('div');
+      if (row) row.style.display = id ? '' : 'none';
+    }
 
     const avatarEl = this.querySelector('.profile-avatar');
     if (avatarEl) avatarEl.src = avatar || 'assets/img/profile.jpg';

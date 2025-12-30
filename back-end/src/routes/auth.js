@@ -2,6 +2,7 @@ import { Router } from "express";
 import { pool } from "../db.js";
 import { signJwt } from "../utils/jwt.js";
 import { requireAuth } from "../utils/auth.js";
+import { sanitizeText } from "../utils/sanitize.js";
 
 const router = Router();
 const jwtSecret = process.env.JWT_SECRET || "dev-secret-change-me";
@@ -14,8 +15,8 @@ router.post("/auth/login", async (req, res) => {
     return res.status(400).json({ error: "phone is required" });
   }
 
-  const fullName = String(name || "Зочин хэрэглэгч").trim() || "Зочин хэрэглэгч";
-  const studentSafe = String(studentId || "").trim();
+  const fullName = sanitizeText(name || "Зочин хэрэглэгч", { maxLen: 80 }) || "Зочин хэрэглэгч";
+  const studentSafe = sanitizeText(studentId || "", { maxLen: 32 });
   const roleSafe = role === "courier" ? "courier" : "customer";
 
   try {
@@ -76,10 +77,11 @@ router.post("/auth/login", async (req, res) => {
       jwtSecret
     );
 
+    const isProd = process.env.NODE_ENV === "production";
     res.cookie("auth_token", token, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false,
+      sameSite: "strict",
+      secure: isProd,
       maxAge: weekMs,
     });
 
@@ -118,9 +120,9 @@ router.put("/auth/me", requireAuth, async (req, res) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
   const { name, phone, studentId } = req.body || {};
-  const fullName = String(name || "").trim();
+  const fullName = sanitizeText(name || "", { maxLen: 80 });
   const phoneSafe = String(phone || "").trim();
-  const studentSafe = String(studentId || "").trim();
+  const studentSafe = sanitizeText(studentId || "", { maxLen: 32 });
   if (!fullName || !phoneSafe) {
     return res.status(400).json({ error: "name and phone are required" });
   }

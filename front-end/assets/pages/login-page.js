@@ -22,7 +22,7 @@ class LoginPage extends HTMLElement {
         </div>
 
         <div class="subtitle">
-          Бид таны дугаарыг баталгаажуулахын тулд утсаар залгах эсвэл мессеж илгээх болно.
+          Нэр болон нууц үгээ ашиглан нэвтэрнэ.
         </div>
 
         <div class="auth-layout">
@@ -38,28 +38,10 @@ class LoginPage extends HTMLElement {
             </div>
             <input type="hidden" name="role" value="customer">
           </div>
-          <div class="form-group register-only">
+          <div class="form-group">
             <label for="name">Нэр</label>
             <input id="name" name="name" type="text" placeholder="Нэр" required>
           </div>
-
-          <div class="form-group">
-            <label for="phone">Утасны дугаар</label>
-            <div class="phone-wrap">
-              <div class="country">
-                <select name="country">
-                  <option value="+976">Монгол (+976)</option>
-                </select>
-              </div>
-              <input id="phone" class="phone" type="tel" name="phone" required placeholder="Phone number">
-            </div>
-          </div>
-
-          <div class="form-group register-only">
-            <label for="studentId">Оюутны ID</label>
-            <input id="studentId" name="studentId" type="text" placeholder="23b1num0245" required>
-          </div>
-
           <div class="form-group">
             <label for="password">Нууц үг</label>
             <input id="password" name="password" type="password" placeholder="••••••••" required>
@@ -149,8 +131,7 @@ class LoginPage extends HTMLElement {
     const submitBtn = this.querySelector(".continue-btn");
     const subtitleEl = this.querySelector(".subtitle");
     const nameInput = this.querySelector("#name");
-    const studentInput = this.querySelector("#studentId");
-    const registerOnlyBlocks = this.querySelectorAll(".register-only");
+const registerOnlyBlocks = this.querySelectorAll(".register-only");
     const paymentSection = this.querySelector(".payment-section");
     const paymentMethods = this.querySelectorAll('input[name="paymentMethod"]');
     const payBtn = this.querySelector(".pay-btn");
@@ -177,12 +158,14 @@ class LoginPage extends HTMLElement {
         registerOnlyBlocks.forEach((el) => {
           el.style.display = isRegister ? "" : "none";
         });
+        if (isRegister && roleInput) {
+          roleInput.value = this.currentRole;
+        }
         this.classList.remove("show-payment");
         if (paymentSection) paymentSection.hidden = true;
         if (payStatus) payStatus.hidden = true;
         if (payBtn) payBtn.disabled = false;
-        if (nameInput) nameInput.required = isRegister;
-        if (studentInput) studentInput.required = isRegister;
+        if (nameInput) nameInput.required = true;
 
         if (titleEl) titleEl.textContent = isRegister ? "Бүртгүүлэх" : "Нэвтрэх";
         if (submitBtn) {
@@ -194,7 +177,7 @@ class LoginPage extends HTMLElement {
         }
         if (subtitleEl) {
           subtitleEl.textContent = isRegister
-            ? "Бид таны дугаарыг баталгаажуулахын тулд утсаар залгах эсвэл мессеж илгээх болно."
+            ? "Нэр болон нууц үгээ ашиглан нэвтэрнэ."
             : "Утасны дугаар, нууц үгээ оруулна уу.";
         }
       });
@@ -228,7 +211,7 @@ class LoginPage extends HTMLElement {
     }
     if (titleEl) titleEl.textContent = "Нэвтрэх";
     if (submitBtn) submitBtn.textContent = "Нэвтрэх";
-    if (subtitleEl) subtitleEl.textContent = "Утасны дугаар, нууц үгээ оруулна уу.";
+    if (subtitleEl) subtitleEl.textContent = "Нэр, нууц үгээ оруулна уу.";
 
     if (payBtn) {
       payBtn.addEventListener("click", () => {
@@ -253,13 +236,11 @@ class LoginPage extends HTMLElement {
     if (form) {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const phone = this.querySelector("#phone")?.value?.trim() || "";
         const password = this.querySelector("#password")?.value?.trim() || "";
         const isRegister = this.currentMode === "register";
         const isCourier = isRegister && (roleInput?.value || "customer") === "courier";
-        const name = isRegister ? this.querySelector("#name")?.value?.trim() || "Нэргүй" : "Нэргүй";
-        const idVal = isRegister ? this.querySelector("#studentId")?.value?.trim() || "" : "";
-        const role = isRegister ? roleInput?.value || "customer" : "customer";
+        const name = this.querySelector("#name")?.value?.trim() || "";
+        const role = isRegister && this.currentRole === "courier" ? "courier" : "customer";
 
         if (isCourier && paymentSection) {
           if (paymentSection.hidden) {
@@ -286,9 +267,7 @@ class LoginPage extends HTMLElement {
             credentials: "include",
             body: JSON.stringify({
               name: fullName,
-              phone,
-              studentId: idVal,
-              role,
+                            role,
               password,
             }),
           });
