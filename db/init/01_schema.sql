@@ -31,10 +31,14 @@ CREATE TABLE IF NOT EXISTS users (
   full_name     TEXT NOT NULL,
   phone         TEXT NOT NULL UNIQUE,
   student_id    TEXT,                 -- login дээрх ID
+  avatar_url    TEXT,
   password_hash TEXT,                 -- хэрэглэх бол
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_student_id_unique
+  ON users ((NULLIF(student_id, '')));
 
 -- -----------------------------
 -- PLACES (хаанаас/хаашаа dropdown)
@@ -177,6 +181,58 @@ CREATE TABLE IF NOT EXISTS ratings (
   stars       INT NOT NULL CHECK(stars BETWEEN 1 AND 5),
   comment     TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- -----------------------------
+-- REVIEWS (orders/:id/review endpoint-д зориулсан)
+-- -----------------------------
+CREATE TABLE IF NOT EXISTS reviews (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id    UUID NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
+  customer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  courier_id  UUID REFERENCES users(id) ON DELETE SET NULL,
+  rating      INT NOT NULL CHECK(rating BETWEEN 1 AND 5),
+  comment     TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- -----------------------------
+-- RATING_HISTORY (ratings history)
+-- -----------------------------
+CREATE TABLE IF NOT EXISTS rating_history (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id    UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  customer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  courier_id  UUID REFERENCES users(id) ON DELETE SET NULL,
+  stars       INT NOT NULL CHECK(stars BETWEEN 1 AND 5),
+  comment     TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- -----------------------------
+-- DELIVERY_CART_ITEMS (delivery-cart)
+-- -----------------------------
+CREATE TABLE IF NOT EXISTS delivery_cart_items (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title      TEXT,
+  meta       TEXT,
+  price      TEXT,
+  thumb      TEXT,
+  sub        JSONB NOT NULL DEFAULT '[]'::jsonb,
+  qty        INT NOT NULL DEFAULT 1,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (user_id, title, meta, price)
+);
+
+-- -----------------------------
+-- ACTIVE_ORDERS (draft order state)
+-- -----------------------------
+CREATE TABLE IF NOT EXISTS active_orders (
+  user_id    UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  order_json JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 COMMIT;

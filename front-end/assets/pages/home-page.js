@@ -460,6 +460,12 @@ class HomePage extends HTMLElement {
         title: `${this.pendingOrder.from} - ${this.pendingOrder.to}`,
         price: this.formatPrice((data?.total ?? this.pendingOffer.total) || 0),
         thumb: this.pendingOffer.thumb || "assets/img/box.svg",
+        customer: {
+          name: user.name || "Зочин хэрэглэгч",
+          phone: user.phone || "00000000",
+          studentId: user.student_id || "",
+          avatar: user.avatar || "assets/img/profile.jpg",
+        },
         sub: this.pendingOffer.items.map((it) => ({
           name: `${it.name} x${it.qty}`,
           price: this.formatPrice(it.price * it.qty)

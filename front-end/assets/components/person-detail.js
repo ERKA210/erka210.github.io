@@ -28,11 +28,10 @@ class PersonDetail extends HTMLElement {
 
     render() {
       const orderCustomer = this.orderCustomer || null;
-      const currentUser = this.currentUser || null;
-      const rawName = orderCustomer?.name || currentUser?.name || "Чигцалмаа";
+      const rawName = orderCustomer?.name || "Чигцалмаа";
       const name = this.normalizeName(rawName);
-      const phone = orderCustomer?.phone || currentUser?.phone || "99001234";
-      const displayId = orderCustomer?.studentId || currentUser?.student_id || "23b1num0245";
+      const phone = orderCustomer?.phone || "99001234";
+      const displayId = orderCustomer?.studentId || "23b1num0245";
       const avatar = orderCustomer?.avatar || "assets/img/profile.jpg";
 
       this.innerHTML=`

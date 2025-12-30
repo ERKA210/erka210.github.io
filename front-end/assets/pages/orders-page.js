@@ -21,15 +21,7 @@ class OrdersPage extends HTMLElement {
   }
 
   async loadCourierForOrder(order) {
-    let courier = null;
-    try {
-      const res = await fetch(`${API}/api/courier/me`);
-      if (res.ok) {
-        courier = await res.json();
-      }
-    } catch {
-      courier = null;
-    }
+    const courier = order?.courier || null;
     this.renderCourier(courier);
   }
 
@@ -46,7 +38,7 @@ class OrdersPage extends HTMLElement {
           </section>
 
           <section class="delivery-info">
-            <del-order-details id="courierBox"></del-order-details>
+            <couriers-card id="courierBox"></couriers-card>
           </section>
         </section>
 
@@ -166,6 +158,7 @@ class OrdersPage extends HTMLElement {
 
     this.selectedOrder = orders[0] || null;
     this.setProgressFromStatus(orders[0]?.status);
+    this.loadCourierForOrder(orders[0] || null);
   }
 
   bindClicks() {

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { pool } from "../db.js";
 import { ensureCustomerUser } from "../utils/customer.js";
 import { sanitizeText } from "../utils/sanitize.js";
+import { requireAuth } from "../utils/auth.js";
 
 const router = Router();
 
@@ -99,6 +100,13 @@ router.get("/orders", async (req, res) => {
         o.created_at,
         fp.name AS from_name,
         tp.name AS to_name,
+        CASE WHEN cu.id IS NULL THEN NULL ELSE json_build_object(
+          'id', cu.id,
+          'name', cu.full_name,
+          'phone', cu.phone,
+          'student_id', cu.student_id,
+          'avatar', cu.avatar_url
+        ) END AS courier,
         COALESCE(
           json_agg(
             json_build_object(
@@ -112,13 +120,62 @@ router.get("/orders", async (req, res) => {
       JOIN places fp ON fp.id = o.from_place_id
       JOIN places tp ON tp.id = o.to_place_id
       LEFT JOIN order_items oi ON oi.order_id = o.id
+      LEFT JOIN order_couriers oc ON oc.order_id = o.id
+      LEFT JOIN users cu ON cu.id = oc.courier_id
       ${customerId ? "WHERE o.customer_id = $1" : ""}
-      GROUP BY o.id, fp.name, tp.name
+      GROUP BY o.id, fp.name, tp.name, cu.id, cu.full_name, cu.phone, cu.student_id, cu.avatar_url
       ORDER BY o.created_at DESC
     `;
 
     const r = await pool.query(q, customerId ? [customerId] : []);
     res.json(r.rows);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.post("/orders/:id/assign-courier", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user?.sub;
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+  if (req.user?.role !== "courier") {
+    return res.status(403).json({ error: "Forbidden: courier only" });
+  }
+
+  try {
+    await pool.query(
+      `INSERT INTO order_couriers (order_id, courier_id)
+       VALUES ($1, $2)
+       ON CONFLICT (order_id) DO UPDATE
+         SET courier_id = EXCLUDED.courier_id,
+             assigned_at = now()`,
+      [id, userId]
+    );
+
+    const detail = await pool.query(
+      `SELECT o.id,
+              o.created_at,
+              fp.name AS from_name,
+              tp.name AS to_name,
+              json_build_object(
+                'name', cu.full_name,
+                'phone', cu.phone,
+                'studentId', cu.student_id,
+                'avatar', cu.avatar_url
+              ) AS customer
+         FROM orders o
+         JOIN places fp ON fp.id = o.from_place_id
+         JOIN places tp ON tp.id = o.to_place_id
+         JOIN users cu ON cu.id = o.customer_id
+        WHERE o.id = $1
+        LIMIT 1`,
+      [id]
+    );
+    if (!detail.rows.length) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    res.json({ order: detail.rows[0] });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

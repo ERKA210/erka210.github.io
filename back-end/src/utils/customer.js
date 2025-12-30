@@ -8,6 +8,7 @@ export async function ensureCustomerUser(client, { id, name, phone, studentId })
   const fullName = (name || "Зочин хэрэглэгч").trim() || "Зочин хэрэглэгч";
   const phoneSafe = (phone || "00000000").trim() || "00000000";
   const studentSafe = (studentId || "").trim();
+  const studentValue = studentSafe ? studentSafe : null;
 
   const existing = await client.query(
     `SELECT id FROM users WHERE phone = $1 AND role = 'customer' LIMIT 1`,
@@ -18,9 +19,9 @@ export async function ensureCustomerUser(client, { id, name, phone, studentId })
     await client.query(
       `UPDATE users
          SET full_name = $2,
-             student_id = CASE WHEN $3 <> '' THEN $3 ELSE student_id END
+             student_id = COALESCE($3::text, student_id)
        WHERE id = $1`,
-      [existingId, fullName, studentSafe]
+      [existingId, fullName, studentValue]
     );
     return existingId;
   }
@@ -31,8 +32,8 @@ export async function ensureCustomerUser(client, { id, name, phone, studentId })
      ON CONFLICT (id) DO UPDATE
        SET full_name = EXCLUDED.full_name,
            phone = CASE WHEN EXCLUDED.phone <> '' THEN EXCLUDED.phone ELSE users.phone END,
-           student_id = CASE WHEN EXCLUDED.student_id <> '' THEN EXCLUDED.student_id ELSE users.student_id END`,
-    [id, fullName, phoneSafe, studentSafe]
+           student_id = COALESCE(EXCLUDED.student_id, users.student_id)`,
+    [id, fullName, phoneSafe, studentValue]
   );
 
   return id;

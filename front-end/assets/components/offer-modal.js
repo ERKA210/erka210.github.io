@@ -317,20 +317,24 @@ class OfferModal extends HTMLElement {
     return null;
   }
 
-  buildActiveOrder(data) {
+  buildActiveOrder(data, orderDetail) {
     const [fromRaw = '', toRaw = ''] = (data.title || '').split('-').map((s) => s.trim());
     const firstItem = Array.isArray(data.sub) && data.sub.length ? data.sub[0] : null;
-    const customerName = this.currentUser?.name || "Чигцалмаа";
-    const customerPhone = this.currentUser?.phone || "99001234";
-    const customerId = this.currentUser?.student_id || "23b1num0245";
-    const customerAvatar = this.currentUser?.avatar || "assets/img/profile.jpg";
+    const customer = orderDetail?.customer || data?.customer || null;
+    const customerName = customer?.name || "Чигцалмаа";
+    const customerPhone = customer?.phone || "99001234";
+    const customerId = customer?.studentId || "23b1num0245";
+    const customerAvatar = customer?.avatar || "assets/img/profile.jpg";
+    const from = orderDetail?.from_name || fromRaw;
+    const to = orderDetail?.to_name || toRaw;
+    const createdAt = orderDetail?.created_at || this.parseMetaToISO(data.meta) || new Date().toISOString();
     return {
-      from: fromRaw,
-      to: toRaw,
+      from,
+      to,
       item: firstItem?.name || '',
       items: Array.isArray(data.sub) ? data.sub : [],
       total: data.price || '',
-      createdAt: this.parseMetaToISO(data.meta) || new Date().toISOString(),
+      createdAt,
       customer: {
         name: this.normalizeName(customerName),
         phone: customerPhone,
@@ -354,7 +358,30 @@ class OfferModal extends HTMLElement {
     }
 
     await this.fetchCurrentUser();
-    const activeOrder = this.buildActiveOrder(this.currentData);
+    const isCourier = this.currentUser?.role === "courier";
+    if (!isCourier) {
+      localStorage.setItem("login_prefill_role", "courier");
+      localStorage.setItem("login_prefill_mode", "register");
+      location.hash = "#login";
+      return;
+    }
+    let orderDetail = null;
+    const orderId = this.currentData?.orderId;
+    if (orderId) {
+      try {
+        const assignRes = await fetch(`/api/orders/${encodeURIComponent(orderId)}/assign-courier`, {
+          method: "POST",
+          credentials: "include",
+        });
+        if (assignRes.ok) {
+          const payload = await assignRes.json();
+          orderDetail = payload?.order || null;
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    const activeOrder = this.buildActiveOrder(this.currentData, orderDetail);
     const added = await this.addToDeliveryCart(this.currentData);
     if (!added) {
       return;

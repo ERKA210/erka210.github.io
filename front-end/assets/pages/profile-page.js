@@ -239,6 +239,7 @@ class ProfilePage extends HTMLElement {
         name: user.name || this.profileData.name,
         phone: user.phone || this.profileData.phone,
         id: user.student_id || this.profileData.id,
+        avatar: user.avatar || this.profileData.avatar,
       };
       this.bindProfileData();
     } catch (e) {
@@ -522,6 +523,7 @@ class ProfilePage extends HTMLElement {
           name: this.profileData.name,
           phone: this.profileData.phone,
           studentId: this.profileData.id,
+          avatar: this.profileData.avatar,
         }),
       });
     } catch (e) {
