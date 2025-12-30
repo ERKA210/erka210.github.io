@@ -37,15 +37,17 @@ class OrdersPage extends HTMLElement {
     this.innerHTML = `
   <link rel="stylesheet" href="assets/css/order.css">
       <main class="container">
-        <section class="orders">
-          <h2>Миний захиалга</h2>
-          <div class="order-list" id="orderList">
-            <p class="muted">Захиалга ачааллаж байна...</p>
-          </div>
-          <div class="delivery-info">
-            <h2>Хүргэгчийн мэдээлэл</h2>
+        <section class="order-side">
+          <section class="orders">
+            <h2>Миний захиалга</h2>
+            <div class="order-list" id="orderList">
+              <p class="muted">Захиалга ачааллаж байна...</p>
+            </div>
+          </section>
+
+          <section class="delivery-info">
             <del-order-details id="courierBox"></del-order-details>
-          </div>
+          </section>
         </section>
 
         <section class="details">

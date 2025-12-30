@@ -16,22 +16,33 @@ orders-page {
   }
 
   .container {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.6fr);
+    gap: 30px;
+    max-width: 1300px;
+    margin: 80px auto;
+    padding: 0 30px;
+    align-items: start;
+  }
+
+  .order-side {
+    grid-column: 1;
     display: flex;
-    gap: 40px;
-    width: 90%;
-    margin-left: 5%;
-    align-items: flex-start;
-    justify-content: center;
-    margin-top: 5rem;
+    flex-direction: column;
+    gap: 30px;
   }
 
   .orders {
-    flex: 0.5;
+    flex: 1;
     background: var(--color-bg);
     border-radius: var(--radius-lg);
     box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
     padding: 25px 30px;
-    height: 30rem;
+    min-height: 18rem;
+    height: 26rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .orders h2 {
@@ -42,16 +53,21 @@ orders-page {
   .order-list {
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
-    scrollbar-width: none;
-    height: 20rem;
+    gap: 1rem;
+    overflow-y: auto;
+    max-height: 16.5rem;
+    padding-right: 0.35rem;
+    scrollbar-width: thin;
+    flex: 1;
   }
   .delivery-info{
-    margin-top: 5rem;
-
-    border-radius: var(--radius);
-    width: 30rem;
-    height: 10rem;
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
+    padding: 25px 30px;
+    width: 100%;
+    height: auto;
+    margin-top: 0;
   }
 
   .order-list button {
@@ -65,18 +81,23 @@ orders-page {
 
   .order-card {
     background: var(--color-bg);
-    border-radius: var(--radius);
-    padding: 10px 15px;
-    display: flex;
-    justify-content: space-between;
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 12px;
     align-items: center;
-    border: 1px solid var(--color-accent);
+    border: 1px solid var(--color-border);
     transition: var(--transition);
+    position: relative;
   }
 
   .order-card img {
-    width: 8rem;
-    height: 8rem;
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    grid-column: 1;
+    grid-row: 1 / span 2;
   }
 
   .order-card:hover {
@@ -85,31 +106,30 @@ orders-page {
   }
 
   .order-info h3 {
-    font-size: 16px;
+    font-size: 1rem;
     color: var(--color-text);
+    margin: 0 0 0.2rem;
   }
   .order-info h4 {
-    font-size: 14px;
+    font-size: 0.92rem;
     color: var(--color-muted);
-    margin-top: 0.5rem;
+    margin: 0 0 0.3rem;
   }
 
 .order-total{
     font-weight: var(--font-weight-bold);
-    margin-top: 0.5rem;
-    color: #a70b29;
+    color: var(--color-accent);
+    font-size: 1.05rem;
+    margin-top: 0.35rem;
+    display: block;
 }
 
   .order-info p {
-    font-size: 13px;
+    font-size: 0.95rem;
     color: var(--color-muted);
-    border: 1px solid var(--color-border);
-    border-top: none;
-    border-right: none;
-    border-left: none;
-    border-radius: var(--radius);
-    padding: 5px;
-    word-spacing: 1rem;
+    border: none;
+    padding: 0;
+    margin: 0;
   }
 
   .order-info img {
@@ -139,12 +159,14 @@ orders-page {
   }
 
   .details {
-    width: 30rem;
+    grid-column: 2;
+    flex: 1.5;
     background: var(--color-bg);
     border-radius: var(--radius-lg);
-    box-shadow: 0 5px 10px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
     padding: 30px;
-    width: 24rem;
+    width: 100%;
+    align-self: start;
   }
 
   .details h2 {
@@ -374,11 +396,12 @@ order-progress {
   }
 
   .details {
-    grid-area: det;
+    grid-column: 2;
     background: var(--color-bg);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
     padding: 30px;
+    align-self: start;
   }
 
   .order-step {
@@ -413,11 +436,11 @@ order-progress {
   }
 
   .detail-header {
-    background: var(--color-bg-light);
-    padding: 15px 20px;
-    border-radius: var(--radius);
-    margin-bottom: 25px;
-    border: 1px solid var(--color-border);
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    margin-bottom: 20px;
+    border: none;
   }
 
   .date {
@@ -519,6 +542,7 @@ order-progress {
 
   @media (max-width: 756px) {
     .container {
+      display: flex;
       flex-direction: column;
       align-items: stretch;
       width: calc(100% - 2rem);
@@ -536,12 +560,19 @@ order-progress {
       height: auto;
       max-height: none;
       overflow: visible;
+      padding-right: 0;
+      grid-template-columns: 1fr;
+      gap: 0.6rem;
     }
 
     .delivery-info {
       width: 100%;
       height: auto;
-      margin-top: 1.5rem;
+      margin-top: 0;
+    }
+
+    .order-side {
+      gap: 1.5rem;
     }
   }
 
