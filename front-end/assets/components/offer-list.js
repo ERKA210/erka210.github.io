@@ -61,7 +61,7 @@ customElements.define('offers-list', OffersList);
 
 // --- data ---
 document.addEventListener('DOMContentLoaded', () => {
-  const offers = [
+  const seedOffers = [
     { thumb: 'assets/img/box.svg', 
       title: 'GL burger - 7-р байр 207', 
       meta: '11/21/25 • 14:00', 
@@ -92,7 +92,20 @@ document.addEventListener('DOMContentLoaded', () => {
       { name: "Сүү", price: "2000₮" },] },
   ];
 
-  localStorage.setItem('offers', JSON.stringify(offers));
+  let offers = [];
+  const stored = localStorage.getItem('offers');
+  if (stored) {
+    try {
+      offers = JSON.parse(stored) || [];
+    } catch (e) {
+      offers = [];
+    }
+  }
+  if (!Array.isArray(offers) || offers.length === 0) {
+    offers = seedOffers;
+    localStorage.setItem('offers', JSON.stringify(offers));
+  }
+
   const offerList = document.querySelector('#offers');
   if (offerList) {
     offerList.items = offers;

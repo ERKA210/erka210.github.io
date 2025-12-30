@@ -256,15 +256,6 @@ class OfferModal extends HTMLElement {
             <span class="pill" id="price">0₮</span>
           </div>
 
-          <div class="courier" id="courier">
-            <img src="assets/img/profile.jpg" alt="courier">
-            <div>
-              <h4 id="courier-name">Хүргэгч</h4>
-              <p id="courier-phone"></p>
-              <p id="courier-id"></p>
-            </div>
-          </div>
-
           <div class="actions">
             <button class="delete" type="button">Устгах</button>
             <button class="confirm" type="button">Хүргэх</button>
@@ -282,10 +273,6 @@ class OfferModal extends HTMLElement {
     this.thumbEl = this.shadowRoot.getElementById('thumb');
     this.subEl = this.shadowRoot.getElementById('sub');
     this.priceEl = this.shadowRoot.getElementById('price');
-    this.courierWrap = this.shadowRoot.getElementById('courier');
-    this.courierNameEl = this.shadowRoot.getElementById('courier-name');
-    this.courierPhoneEl = this.shadowRoot.getElementById('courier-phone');
-    this.courierIdEl = this.shadowRoot.getElementById('courier-id');
     this.closeBtn = this.shadowRoot.querySelector('.close-btn');
     this.deleteBtn = this.shadowRoot.querySelector('.delete');
     this.confirmBtn = this.shadowRoot.querySelector('.confirm');
@@ -315,7 +302,6 @@ class OfferModal extends HTMLElement {
     }).join('') || '<li><span>Бараа алга</span><span class="price">-</span></li>';
     this.priceEl.textContent = data.price ? String(data.price) : '0₮';
 
-    this.populateCourier(data);
     this.modal.classList.add('open');
   }
 
@@ -482,25 +468,7 @@ class OfferModal extends HTMLElement {
   }
 
   async populateCourier(data) {
-    if (!this.courierWrap) return;
-    let courier = null;
-    try {
-      const res = await fetch(`${this.API}/api/courier/me`);
-      if (res.ok) {
-        courier = await res.json();
-      }
-    } catch (e) {
-      courier = null;
-    }
-
-    if (courier) {
-      this.courierWrap.style.display = 'grid';
-      this.courierNameEl.textContent = courier.name || 'Хүргэгч';
-      this.courierPhoneEl.textContent = courier.phone ? `Утас: ${courier.phone}` : '';
-      this.courierIdEl.textContent = courier.student_id ? `ID: ${courier.student_id}` : '';
-    } else {
-      this.courierWrap.style.display = 'none';
-    }
+    // courier details removed
   }
 }
 
