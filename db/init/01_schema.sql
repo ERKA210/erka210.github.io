@@ -2,9 +2,6 @@ BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
--- -----------------------------
--- ENUMs
--- -----------------------------
 DO $$ BEGIN
   CREATE TYPE user_role AS ENUM ('customer','courier','admin');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
@@ -32,7 +29,7 @@ CREATE TABLE IF NOT EXISTS users (
   phone         TEXT NOT NULL UNIQUE,
   student_id    TEXT,                 -- login дээрх ID
   avatar_url    TEXT,
-  password_hash TEXT,                 -- хэрэглэх бол
+  password_hash TEXT,                
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -133,7 +130,6 @@ CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
 -- 1) Захиалга бэлтгэх
 -- 2) Хүргэлтэнд гарсан
 -- 3) Амжилттай хүргэгдсэн
--- (status_history хэлбэрээр хадгалбал UI-д яг тохирно)
 -- -----------------------------
 CREATE TABLE IF NOT EXISTS order_status_history (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
