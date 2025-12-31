@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { 
       thumb: 'assets/img/tor.svg', 
       title: 'GL burger - 7-р байр 207', 
-      meta: '12/31/25 • 22:00', 
+      meta: '12/31/25 • 22:20', 
       price: '10,000₮', 
       sub: [
         { name: "Бууз", price: "5000₮" },
@@ -172,4 +172,38 @@ document.addEventListener('DOMContentLoaded', () => {
   if (offerList) {
     offerList.items = nonExpiredOffers;
   }
+});
+document.addEventListener('DOMContentLoaded', () => {
+  function loadOffers() {
+    const raw = localStorage.getItem('offers');
+    let offers = [];
+    
+    if (raw) {
+      try {
+        offers = JSON.parse(raw) || [];
+      } catch (e) {
+        offers = [];
+      }
+    }
+    
+    if (!Array.isArray(offers) || offers.length === 0) {
+      offers = seedOffers;
+      localStorage.setItem('offers', JSON.stringify(offers));
+    }
+    
+    const nonExpiredOffers = offers.filter(offer => !isOfferExpired(offer));
+    
+    if (nonExpiredOffers.length !== offers.length) {
+      localStorage.setItem('offers', JSON.stringify(nonExpiredOffers));
+    }
+    
+    const offerList = document.querySelector('#offers');
+    if (offerList) {
+      offerList.items = nonExpiredOffers;
+    }
+  }
+  
+  loadOffers();
+  
+  window.addEventListener('offers-updated', loadOffers);
 });

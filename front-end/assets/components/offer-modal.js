@@ -278,14 +278,46 @@ class OfferModal extends HTMLElement {
     this.confirmBtn = this.shadowRoot.querySelector('.confirm');
   }
 
-  bindEvents() {
-    this.closeBtn.addEventListener('click', () => this.close());
-    this.modal.addEventListener('click', (e) => {
-      if (e.target === this.modal) this.close();
-    });
-    this.deleteBtn.addEventListener('click', () => this.close());
-    this.confirmBtn.addEventListener('click', () => this.handleConfirm());
+bindEvents() {
+  this.closeBtn.addEventListener('click', () => this.close());
+  this.modal.addEventListener('click', (e) => {
+    if (e.target === this.modal) this.close();
+  });
+  
+  // Устгах товч дарсан үед санал устгах
+  this.deleteBtn.addEventListener('click', () => {
+    if (this.currentData) {
+      this.removeOfferFromList(this.currentData);
+      this.refreshOffersList();
+    }
+    this.close();
+  });
+  
+  this.confirmBtn.addEventListener('click', () => this.handleConfirm());
+}
+
+// Offers жагсаалтыг шинэчлэх туслах арга
+refreshOffersList() {
+  const raw = localStorage.getItem('offers');
+  let offers = [];
+  if (raw) {
+    try {
+      offers = JSON.parse(raw) || [];
+    } catch (e) {
+      offers = [];
+    }
   }
+  
+  const nonExpiredOffers = offers.filter(offer => !isOfferExpired(offer));
+  
+  localStorage.setItem('offers', JSON.stringify(nonExpiredOffers));
+  
+  const offerList = document.querySelector('#offers');
+  if (offerList) {
+    offerList.items = nonExpiredOffers;
+  }
+}
+
 
   show(data) {
     if (!this.modal) return;
@@ -351,67 +383,101 @@ class OfferModal extends HTMLElement {
     return tokens.length ? tokens.join(" ") : raw;
   }
 
-  async handleConfirm() {
-    if (!this.currentData) {
-      this.close();
-      return;
-    }
+async handleConfirm() {
+  if (!this.currentData) {
+    this.close();
+    return;
+  }
 
-    await this.fetchCurrentUser();
-    const isCourier = this.currentUser?.role === "courier";
-    if (!isCourier) {
-      localStorage.setItem("login_prefill_role", "courier");
-      localStorage.setItem("login_prefill_mode", "register");
-      location.hash = "#login";
-      return;
-    }
-    let orderDetail = null;
-    const orderId = this.currentData?.orderId;
-    if (orderId) {
-      try {
-        const assignRes = await fetch(`/api/orders/${encodeURIComponent(orderId)}/assign-courier`, {
-          method: "POST",
-          credentials: "include",
-        });
-        if (assignRes.ok) {
-          const payload = await assignRes.json();
-          orderDetail = payload?.order || null;
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
-    const activeOrder = this.buildActiveOrder(this.currentData, orderDetail);
-    const added = await this.addToDeliveryCart(this.currentData);
-    if (!added) {
-      return;
-    }
-    await this.saveActiveOrder(activeOrder);
-    this.removeOfferFromList(this.currentData);
-
+  await this.fetchCurrentUser();
+  const isCourier = this.currentUser?.role === "courier";
+  if (!isCourier) {
+    localStorage.setItem("login_prefill_role", "courier");
+    localStorage.setItem("login_prefill_mode", "register");
+    location.hash = "#login";
+    return;
+  }
+  
+  let orderDetail = null;
+  const orderId = this.currentData?.orderId;
+  
+  // ✅ ХҮРГЭХ товч дарсан үед offers жагсаалтаас устгах
+  this.removeOfferFromList(this.currentData);
+  
+  if (orderId) {
     try {
-      const res = await fetch(`${this.API}/api/courier/me`, {
+      const assignRes = await fetch(`/api/orders/${encodeURIComponent(orderId)}/assign-courier`, {
+        method: "POST",
         credentials: "include",
       });
-
-      if (res.ok) {
-        const courier = await res.json();
+      if (assignRes.ok) {
+        const payload = await assignRes.json();
+        orderDetail = payload?.order || null;
       }
     } catch (e) {
-      console.warn('courier fetch failed', e);
-    }
-
-    this.close();
-    window.dispatchEvent(new Event('order-updated'));
-    window.dispatchEvent(new Event('delivery-cart-updated'));
-    const cartEl = document.querySelector('delivery-cart');
-    if (cartEl && typeof cartEl.load === 'function') {
-      cartEl.load();
-    }
-    if (!document.querySelector('delivery-cart')) {
-      location.hash = '#delivery';
+      // алдааг үл тоомсорлоно
     }
   }
+  
+  const activeOrder = this.buildActiveOrder(this.currentData, orderDetail);
+  const added = await this.addToDeliveryCart(this.currentData);
+  
+  if (!added) {
+    // Хэрэв хүргэлтийн сагсанд нэмэхэд бүтэлгүйтвэл модалыг хаана
+    this.close();
+    return;
+  }
+  
+  await this.saveActiveOrder(activeOrder);
+  
+  // Дахин устгах (давхардсан ч цэвэрлэгээний үүднээс)
+  this.removeOfferFromList(this.currentData);
+
+  try {
+    const res = await fetch(`${this.API}/api/courier/me`, {
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      const courier = await res.json();
+    }
+  } catch (e) {
+    console.warn('courier fetch failed', e);
+  }
+
+  this.close();
+  
+  // UI-г шинэчлэх үйл явдлуудыг илгээх
+  window.dispatchEvent(new Event('order-updated'));
+  window.dispatchEvent(new Event('delivery-cart-updated'));
+  window.dispatchEvent(new Event('offers-updated')); // ✅ Offers жагсаалтыг шинэчлэх шинэ үйл явдал
+  
+  // Хүргэлтийн сагсыг шинэчлэх
+  const cartEl = document.querySelector('delivery-cart');
+  if (cartEl && typeof cartEl.load === 'function') {
+    cartEl.load();
+  }
+  
+  // Offers жагсаалтыг шинэчлэх
+  const offerList = document.querySelector('#offers');
+  if (offerList) {
+    const raw = localStorage.getItem('offers');
+    let offers = [];
+    if (raw) {
+      try {
+        offers = JSON.parse(raw) || [];
+      } catch (e) {
+        offers = [];
+      }
+    }
+    offerList.items = offers.filter(offer => !isOfferExpired(offer));
+  }
+  
+  if (!document.querySelector('delivery-cart')) {
+    location.hash = '#delivery';
+  }
+}
+
 
   async addToDeliveryCart(data) {
     const title = data.title || '';
@@ -473,26 +539,57 @@ class OfferModal extends HTMLElement {
     return this.currentUser;
   }
 
-  removeOfferFromList(data) {
-    const raw = localStorage.getItem('offers');
-    if (!raw) return;
-    let offers = [];
-    try {
-      offers = JSON.parse(raw) || [];
-    } catch (e) {
-      return;
-    }
-    const key = `${data.title || ''}|${data.meta || ''}|${data.price || ''}`;
-    const next = offers.filter((item) => {
-      const itemKey = `${item.title || ''}|${item.meta || ''}|${item.price || ''}`;
-      return itemKey !== key;
-    });
-    localStorage.setItem('offers', JSON.stringify(next));
-    const offerList = document.querySelector('#offers');
-    if (offerList && 'items' in offerList) {
-      offerList.items = next;
-    }
+removeOfferFromList(data) {
+  // Validate input
+  if (!data || typeof data !== 'object') return false;
+  
+  // Get offers from localStorage
+  const raw = localStorage.getItem('offers');
+  if (!raw) return false;
+  
+  // Parse offers
+  let offers = [];
+  try {
+    offers = JSON.parse(raw) || [];
+  } catch (e) {
+    console.error('Failed to parse offers from localStorage:', e);
+    return false;
   }
+  
+  // Create unique key for comparison
+  const key = `${data.title || ''}|${data.meta || ''}|${data.price || ''}`;
+  const originalLength = offers.length;
+  
+  // Filter out the matching offer
+  const next = offers.filter(item => {
+    const itemKey = `${item.title || ''}|${item.meta || ''}|${item.price || ''}`;
+    return itemKey !== key;
+  });
+  
+  // Check if anything was actually removed
+  if (next.length === originalLength) {
+    return false; // No offer was removed
+  }
+  
+  // Save to localStorage
+  localStorage.setItem('offers', JSON.stringify(next));
+  
+  // Update DOM if element exists
+  const offerList = document.querySelector('#offers');
+  if (offerList && 'items' in offerList) {
+    offerList.items = next;
+  }
+  
+  // Dispatch event for other parts of the app
+  window.dispatchEvent(new CustomEvent('offer-removed', { 
+    detail: { 
+      removedOffer: data,
+      remainingOffers: next
+    } 
+  }));
+  
+  return true;
+}
 
   async populateCourier(data) {
     // courier details removed
