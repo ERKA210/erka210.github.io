@@ -1,137 +1,249 @@
-pay-page {
-    body {
-        font-family: var(--font-family);
-        margin: 0;
-        background: var(--color-bg-light);
-        color: var(--color-text);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 32px;
-        color: var(--color-text);
-    }
+/* ===== Root vars (login.css-тэй ойролцоо) ===== */
+:root {
+  --bg: #f6f7fb;
+  --card-bg: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --border: #e5e7eb;
+  --radius: 14px;
+  --shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
 
-    .pay {
-        width: 500px;
-        background: var(--color-bg);
-        border-radius: 18px;
-        box-shadow: var(--shadow-light);
-        padding: 22px;
-    }
+/* ===== Page ===== */
+.pay-wrap {
+  min-height: calc(100vh - 4rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg);
+}
 
-    .container {
-        display: flex;
-        gap: 40px;
-        max-width: 1200px;
-        margin: 40px auto;
-        padding: 0 40px;
-        align-items: flex-start;
-    }
+/* ===== Card ===== */
+.pay-card {
+  width: 100%;
+  max-width: 920px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
 
-    .orders {
-        flex: 1;
-        background: var(--color-bg);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-card);
-        padding: 25px 30px;
-    }
+/* ===== Header ===== */
+.pay-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
 
-    .orders h2 {
-        margin-bottom: 20px;
-        color: var(--color-text);
-    }
+.pay-head h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--text);
+}
 
-    .order-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
+.btn-close {
+  border: none;
+  background: transparent;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: var(--muted);
+}
 
-    .order-card {
-        background: var(--color-bg-light);
-        border-radius: var(--radius);
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border: 1px solid var(--color-border);
-        transition: var(--transition);
-    }
+.btn-close:hover {
+  color: var(--text);
+}
 
-    .order-card:hover {
-        background: var(--color-bg-light);
-        border-left: 5px solid var(--color-hover);
-    }
+/* ===== Note ===== */
+.pay-note {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
 
-    .order-info h3 {
-        font-size: 16px;
-        color: var(--color-text);
-        margin: 0;
-    }
+/* ===== Grid ===== */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
 
-    .order-info p {
-        font-size: 13px;
-        color: var(--color-muted);
-        margin: 2px 0;
-    }
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
 
-    /* ---------- ТӨЛБӨР ХЭСЭГ ---------- */
-    article {
-        max-width: 900px;
-        margin: 50px auto;
-        background: var(--color-bg);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-card);
-        padding: 30px;
-        text-align: center;
-    }
+/* ===== Blocks ===== */
+.block h4 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: var(--text);
+}
 
-    article h2 {
-        margin-bottom: 25px;
-        color: var(--color-primary);
-        font-size: 22px;
-    }
+/* ===== Plan cards ===== */
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
 
-    .bank-options {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 25px;
-    }
+@media (max-width: 600px) {
+  .plan-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
-    .bank-options a {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 180px;
-        height: 90px;
-        background: var(--color-bg-light);
-        border-radius: var(--radius);
-        border: 1px solid var(--color-border);
-        transition: var(--transition);
-        text-decoration: none;
-    }
+.plan-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
 
-    .bank-options a:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        border-color: var(--color-primary);
-    }
+.plan-card:hover {
+  border-color: var(--primary);
+}
 
-    .bank-options img {
-        width: 120px;
-        max-height: 60px;
-        object-fit: contain;
-    }
+.plan-card input {
+  accent-color: var(--primary);
+}
 
-    @media (max-width: 600px) {
-        .container {
-            flex-direction: column;
-            padding: 0 20px;
-        }
+.plan-card input:checked + span {
+  font-weight: 600;
+  color: var(--primary);
+}
 
-        .bank-options a {
-            width: 45%;
-        }
-    }
+/* ===== Payment method ===== */
+.method-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.method-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.method-card input {
+  accent-color: var(--primary);
+}
+
+.method-card input:checked + span {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* ===== Form ===== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.form-group input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ===== QPay ===== */
+.qpay-box {
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.qpay-qr {
+  width: 90px;
+  height: 90px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ===== Actions ===== */
+.actions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-pay,
+.btn-go {
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-pay {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-pay:hover {
+  background: var(--primary-hover);
+}
+
+.btn-pay:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.btn-go {
+  background: #10b981;
+  color: #fff;
+}
+
+.btn-go:hover {
+  background: #059669;
+}
+
+/* ===== Status ===== */
+.status {
+  font-size: 0.9rem;
+  color: #059669;
+  font-weight: 600;
 }

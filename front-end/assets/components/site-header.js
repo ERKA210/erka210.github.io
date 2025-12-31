@@ -11,7 +11,7 @@ class SiteHeader extends HTMLElement {
     window.addEventListener('hashchange', this.updateActive);
     window.addEventListener('user-updated', this.handleUserUpdated);
     this.loadUser();
-    this.updateActive(); 
+    this.updateActive();
   }
 
   disconnectedCallback() {
@@ -66,9 +66,8 @@ class SiteHeader extends HTMLElement {
         </nav>
 
         <div class="header-actions">
-          ${
-            isAuthed
-              ? `
+          ${isAuthed
+        ? `
                 <div class="avatar-menu">
                   <button class="avatar-btn" type="button" aria-label="Профайл цэс нээх"></button>
                   <div class="avatar-dropdown" role="menu" aria-label="Профайл цэс">
@@ -77,8 +76,8 @@ class SiteHeader extends HTMLElement {
                 </div>
                 <button class="logout-btn" type="button">Гарах</button>
               `
-              : `<button class="login-btn" type="button">Хүргэгч болох</button>`
-          }
+        : `<button class="login-btn" type="button">Хүргэгч болох</button>`
+      }
         </div>
       </header>
     `;
@@ -129,10 +128,21 @@ class SiteHeader extends HTMLElement {
         } catch (e) {
           // ignore
         }
+        // 🔐 AUTH RESET (logout)
         localStorage.removeItem("auth_token");
+
+        localStorage.removeItem("authLoggedIn");
+        localStorage.removeItem("authRole");
+        localStorage.removeItem("authPhone");
+        localStorage.removeItem("authStudentId");
+
+        // ⚠️ courierPaid-г ЗААВАЛ reset
+        localStorage.setItem("courierPaid", "0");
+
         this.currentUser = null;
         window.dispatchEvent(new Event("user-updated"));
         location.hash = "#home";
+
       });
     });
   }

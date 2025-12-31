@@ -146,7 +146,8 @@ class LoginPage extends HTMLElement {
     const paymentMethods = this.querySelectorAll('input[name="paymentMethod"]');
     const payBtn = this.querySelector(".pay-btn");
     const payStatus = this.querySelector(".pay-status");
-    const isPaid = () => localStorage.getItem("courier_payment_paid") === "true";
+    const isPaid = () =>
+      localStorage.getItem("courierPaid") === "1";
 
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
@@ -282,21 +283,16 @@ class LoginPage extends HTMLElement {
         const roleValue = roleInput?.value || this.currentRole || "customer";
         const role = isRegister && roleValue === "courier" ? "courier" : "customer";
 
-        if (isCourier && paymentSection) {
-          if (paymentSection.hidden) {
-            paymentSection.hidden = false;
-            this.classList.add("show-payment");
-            if (paymentMethods.length) {
-              paymentMethods[0].dispatchEvent(new Event("change"));
-            }
-          }
-          if (isPaid()) {
-            if (payStatus) payStatus.hidden = false;
-            if (payBtn) payBtn.disabled = true;
-          } else {
+        if (isCourier) {
+          // төлбөр төлөөгүй бол pay page руу явуулна
+          if (!isPaid()) {
+            localStorage.setItem("login_prefill_mode", "register");
+            localStorage.setItem("login_prefill_role", "courier");
+            location.hash = "#pay";
             return;
           }
         }
+
 
         const fullName = name.trim() || "Зочин хэрэглэгч";
 
@@ -321,6 +317,14 @@ class LoginPage extends HTMLElement {
           }
 
           const data = await res.json();
+
+          localStorage.setItem("authLoggedIn", "1");
+          localStorage.setItem("authRole", role);
+
+          if (role !== "courier") {
+            localStorage.setItem("courierPaid", "0");
+          }
+          
           window.dispatchEvent(new Event("user-updated"));
 
           const hasDraft = localStorage.getItem("pendingOrderDraft");
