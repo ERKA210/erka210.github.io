@@ -92,8 +92,7 @@ class ProfilePage extends HTMLElement {
             <div class="hero-stats">
               <div class="stat-card">
                 <p>Нийт захиалга</p>
-                <strong>26</strong>
-                <small>Сүүлийн 30 хоногт 5</small>
+                <strong id="orderTotal">0</strong>
               </div>
               <div class="stat-card">
                 <p>Дундаж үнэлгээ</p>
@@ -211,6 +210,7 @@ class ProfilePage extends HTMLElement {
     this.attachModalHandlers();
     this.hydrateProfileFromApi();
     this.loadActiveOrder();
+    this.loadOrderStats();
     this.handleReviewsUpdated = this.loadReviews.bind(this);
     window.addEventListener("reviews-updated", this.handleReviewsUpdated);
     this.loadReviews();
@@ -551,6 +551,54 @@ class ProfilePage extends HTMLElement {
     } catch (e) {
       // ignore
     }
+  }
+
+  async loadOrderStats() {
+    const totalEl = this.querySelector("#orderTotal");
+    if (!totalEl) return;
+
+    const userId = this.currentUser?.id;
+    if (!userId) return;
+
+    try {
+      const res = await fetch(`/api/orders?customerId=${encodeURIComponent(userId)}`, {
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => []);
+      if (!res.ok || !Array.isArray(data)) return;
+
+      const total = data.length;
+      totalEl.textContent = String(total);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  getOrderTimestamp(o) {
+    const raw =
+      o.scheduled_at ||
+      o.scheduledAt ||
+      o.created_at ||
+      o.createdAt ||
+      o.meta ||
+      null;
+    return this.parseDate(raw);
+  }
+
+  parseDate(val) {
+    if (!val) return null;
+    const parsed = Date.parse(val);
+    if (!Number.isNaN(parsed)) return parsed;
+
+    const m = String(val).match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4}).*?(\d{1,2}:\d{2}\s*[AP]M)/i);
+    if (m) {
+      const [_, mm, dd, yyRaw, time] = m;
+      const yy = yyRaw.length === 2 ? `20${yyRaw}` : yyRaw;
+      const d = new Date(`${yy}-${mm}-${dd} ${time}`);
+      if (!Number.isNaN(d.getTime())) return d.getTime();
+    }
+
+    return null;
   }
 
   toggleModal(id, open) {
