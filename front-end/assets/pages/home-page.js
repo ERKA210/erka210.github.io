@@ -477,6 +477,7 @@ class HomePage extends HTMLElement {
       if (offersEl && "items" in offersEl) {
         offersEl.items = existingOffers;
       }
+      window.dispatchEvent(new Event("offers-updated"));
 
       this.hideConfirmModal();
 

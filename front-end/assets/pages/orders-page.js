@@ -97,7 +97,7 @@ class OrdersPage extends HTMLElement {
 
     let userId = "";
     try {
-      const resUser = await fetch("/api/auth/me");
+      const resUser = await fetch("/api/auth/me", { credentials: "include" });
       if (resUser.ok) {
         const data = await resUser.json();
         userId = data?.user?.id || "";
@@ -105,24 +105,21 @@ class OrdersPage extends HTMLElement {
     } catch (e) {
       userId = "";
     }
+    if (!userId) {
+      location.hash = "#login";
+      return;
+    }
     const qs = userId ? `?customerId=${encodeURIComponent(userId)}` : "";
 
     try {
-      const res = await fetch(`${API}/api/orders${qs}`);
-      
+      const res = await fetch(`${API}/api/orders${qs}`, { credentials: "include" });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Алдаа");
 
-      const filtered = this.filterExpired(data);
-      const list = filtered.length ? filtered : (data.length ? data : this.readLocalOffers());
-      this.renderOrders(list);
+      const filtered = this.filterExpired(Array.isArray(data) ? data : []);
+      this.renderOrders(filtered);
     } catch (e) {
-      const fallback = this.readLocalOffers();
-      if (fallback.length) {
-        this.renderOrders(fallback);
-      } else {
-        listEl.innerHTML = `<p class="muted">Захиалга уншихад алдаа: ${e.message}</p>`;
-      }
+      listEl.innerHTML = `<p class="muted">Захиалга уншихад алдаа: ${e.message}</p>`;
     }
   }
 
@@ -141,7 +138,10 @@ class OrdersPage extends HTMLElement {
   const ts = this.getOrderTimestamp(o) || Date.now();
   const dt = new Date(ts);
   const meta = `${dt.toLocaleDateString()} • ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
-  const itemsTxt = (o.items || []).map(it => `${it.name} ×${it.qty}`).join(" · ");
+  const items = Array.isArray(o.items) ? o.items : [];
+  const itemsTxt = items.map(it => `${it.name} ×${it.qty}`).join(" · ");
+  const totalQty = items.reduce((sum, it) => sum + (Number(it?.qty) || 0), 0);
+  const iconSrc = this.getOfferThumb(o?.id) || this.getDeliveryIcon(totalQty);
 
   return `
     <div class="order-card" data-order='${encodeURIComponent(JSON.stringify(o))}'>
@@ -151,7 +151,7 @@ class OrdersPage extends HTMLElement {
         <p>${itemsTxt || "Бараа байхгүй"}</p>
         <p class="order-total">Дүн: ${this.formatPrice(o.total_amount || 0)}</p>
       </div>
-      <img src="assets/img/tor.svg" alt="hemjee">
+      <img src="${iconSrc}" alt="hemjee">
     </div>
   `;
 }).join("");
@@ -207,6 +207,27 @@ class OrdersPage extends HTMLElement {
 
   formatPrice(v) {
     return Number(v || 0).toLocaleString("mn-MN") + "₮";
+  }
+
+  getOfferThumb(orderId) {
+    if (!orderId) return "";
+    try {
+      const raw = localStorage.getItem("offers");
+      const offers = raw ? JSON.parse(raw) : [];
+      const match = Array.isArray(offers)
+        ? offers.find((o) => (o?.orderId || o?.id) === orderId)
+        : null;
+      return match?.thumb || "";
+    } catch {
+      return "";
+    }
+  }
+
+  getDeliveryIcon(totalQty) {
+    if (totalQty > 10) return "assets/img/box.svg";
+    if (totalQty >= 2) return "assets/img/tor.svg";
+    if (totalQty === 1) return "assets/img/document.svg";
+    return "assets/img/box.svg";
   }
 
   mapStatusToStep(status) {

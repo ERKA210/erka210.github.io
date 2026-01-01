@@ -298,24 +298,7 @@ bindEvents() {
 
 // Offers жагсаалтыг шинэчлэх туслах арга
 refreshOffersList() {
-  const raw = localStorage.getItem('offers');
-  let offers = [];
-  if (raw) {
-    try {
-      offers = JSON.parse(raw) || [];
-    } catch (e) {
-      offers = [];
-    }
-  }
-  
-  const nonExpiredOffers = offers.filter(offer => !isOfferExpired(offer));
-  
-  localStorage.setItem('offers', JSON.stringify(nonExpiredOffers));
-  
-  const offerList = document.querySelector('#offers');
-  if (offerList) {
-    offerList.items = nonExpiredOffers;
-  }
+  window.dispatchEvent(new Event('offers-updated'));
 }
 
 
@@ -459,20 +442,6 @@ async handleConfirm() {
   }
   
   // Offers жагсаалтыг шинэчлэх
-  const offerList = document.querySelector('#offers');
-  if (offerList) {
-    const raw = localStorage.getItem('offers');
-    let offers = [];
-    if (raw) {
-      try {
-        offers = JSON.parse(raw) || [];
-      } catch (e) {
-        offers = [];
-      }
-    }
-    offerList.items = offers.filter(offer => !isOfferExpired(offer));
-  }
-  
   if (!document.querySelector('delivery-cart')) {
     location.hash = '#delivery';
   }
@@ -556,12 +525,15 @@ removeOfferFromList(data) {
     return false;
   }
   
-  // Create unique key for comparison
+  const orderId = data.orderId || data.id || null;
   const key = `${data.title || ''}|${data.meta || ''}|${data.price || ''}`;
   const originalLength = offers.length;
   
   // Filter out the matching offer
   const next = offers.filter(item => {
+    if (orderId && (item.orderId || item.id) === orderId) {
+      return false;
+    }
     const itemKey = `${item.title || ''}|${item.meta || ''}|${item.price || ''}`;
     return itemKey !== key;
   });
@@ -573,12 +545,6 @@ removeOfferFromList(data) {
   
   // Save to localStorage
   localStorage.setItem('offers', JSON.stringify(next));
-  
-  // Update DOM if element exists
-  const offerList = document.querySelector('#offers');
-  if (offerList && 'items' in offerList) {
-    offerList.items = next;
-  }
   
   // Dispatch event for other parts of the app
   window.dispatchEvent(new CustomEvent('offer-removed', { 

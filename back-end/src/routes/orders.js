@@ -97,6 +97,7 @@ router.get("/orders", async (req, res) => {
         o.id,
         o.status,
         o.total_amount,
+        o.scheduled_at,
         o.created_at,
         fp.name AS from_name,
         tp.name AS to_name,

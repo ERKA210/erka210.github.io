@@ -247,3 +247,52 @@
   color: #059669;
   font-weight: 600;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0f14;
+    --card-bg: #0f172a;
+    --text: #e5e7eb;
+    --muted: #9aa4b2;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --border: #223044;
+    --shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+  }
+
+  .pay-wrap {
+    background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.14), transparent 55%),
+      radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.12), transparent 50%),
+      var(--bg);
+  }
+
+  .plan-card,
+  .method-card,
+  .form-group input,
+  .qpay-box {
+    background: #0b1220;
+    border-color: var(--border);
+    color: var(--text);
+  }
+
+  .form-group input::placeholder {
+    color: #6b7280;
+  }
+
+  .qpay-qr {
+    background: #111827;
+    color: var(--muted);
+  }
+
+  .btn-close {
+    color: var(--muted);
+  }
+
+  .btn-close:hover {
+    color: var(--text);
+  }
+
+  .status {
+    color: #34d399;
+  }
+}
