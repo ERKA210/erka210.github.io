@@ -13,7 +13,7 @@ class DelOrderProgress extends HTMLElement {
 
     this.render();
 
-      document.addEventListener("order-select", (e) => {
+    document.addEventListener("order-select", (e) => {
       this.currentId = e.detail.id;
       this.render();
     });
@@ -29,6 +29,10 @@ class DelOrderProgress extends HTMLElement {
   }
 
   render() {
+    if (this.getAttribute("data-empty") === "1") {
+      this.innerHTML = "";
+      return;
+    }
     const stepIndex = this.getCurrentStep();
     const order = getOrderById(this.currentId);
 
@@ -53,10 +57,10 @@ class DelOrderProgress extends HTMLElement {
               <div class="step-label">${label}</div>
               <p class="step-desc">
                 ${idx === 0
-                  ? "Захиалгыг бэлтгэж дууссаны дараа дараагийн алхам руу шилжинэ."
-                  : idx === 1
-                    ? "Хүргэлтэнд гарсан үед дараагийн алхамыг дарна."
-                    : "Хэрэглэгчид хүлээлгэн өгч дууссан үед төгсөнө."}
+        ? "Захиалгыг бэлтгэж дууссаны дараа дараагийн алхам руу шилжинэ."
+        : idx === 1
+          ? "Хүргэлтэнд гарсан үед дараагийн алхамыг дарна."
+          : "Хэрэглэгчид хүлээлгэн өгч дууссан үед төгсөнө."}
               </p>
             </div>
           </div>

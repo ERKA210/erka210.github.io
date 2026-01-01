@@ -112,8 +112,22 @@ class DeliveryPage extends HTMLElement {
 
     if (!items.length) {
       listEl.innerHTML = '<p class="muted">Хүргэлт сонгоогүй байна.</p>';
+
+      // ✅ details + progress доторхийг empty болгож үлдээнэ (section title үлдэнэ)
+      const details = this.querySelector("del-order-details");
+      const progress = this.querySelector("del-order-progress");
+      if (details) details.setAttribute("data-empty", "1");
+      if (progress) progress.setAttribute("data-empty", "1");
+
       return;
     }
+
+    // ✅ items байгаа үед empty mode-г салгана
+    const details = this.querySelector("del-order-details");
+    const progress = this.querySelector("del-order-progress");
+    if (details) details.removeAttribute("data-empty");
+    if (progress) progress.removeAttribute("data-empty");
+
 
     listEl.innerHTML = items.map((item) => {
       const qty = Number(item.qty || 1);
