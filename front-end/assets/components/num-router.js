@@ -14,6 +14,7 @@ class NumRouter extends HTMLElement {
     const loggedIn = localStorage.getItem("authLoggedIn");
     if (hash === "delivery") {
       if (loggedIn !== "1" || role !== "courier" || paid !== "1") {
+        alert("Энэ хэсэг зөвхөн хүргэгчид нээлттэй");
         location.hash = "#login";
         return;
       }

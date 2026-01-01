@@ -1,25 +1,14 @@
 class DeliveryPage extends HTMLElement {
   constructor() {
     super();
-  }
-  connectedCallback() {
-    this.render();
-    this.applyActiveOrder();
-    this.renderDeliveryCart();
-    const loggedIn = localStorage.getItem("authLoggedIn");
-    const role = localStorage.getItem("authRole");
-    const paid = localStorage.getItem("courierPaid");
-
-    if (loggedIn !== "1" || role !== "courier" || paid !== "1") {
-      location.hash = "#login";
-      return;
-    }
     this.handleRouteChange = this.handleRouteChange.bind(this);
     this.applyActiveOrderBound = this.applyActiveOrder.bind(this);
     this.renderDeliveryCartBound = this.renderDeliveryCart.bind(this);
+    this._initialized = false;
+  }
+  connectedCallback() {
     window.addEventListener('hashchange', this.handleRouteChange);
-    window.addEventListener('order-updated', this.applyActiveOrderBound);
-    window.addEventListener('delivery-cart-updated', this.renderDeliveryCartBound);
+    this.handleRouteChange();
   }
 
   disconnectedCallback() {
@@ -29,10 +18,26 @@ class DeliveryPage extends HTMLElement {
   }
 
   handleRouteChange() {
-    if (location.hash === '#delivery') {
-      this.applyActiveOrder();
-      this.renderDeliveryCart();
+    if (location.hash !== '#delivery') return;
+
+    const loggedIn = localStorage.getItem("authLoggedIn");
+    const role = localStorage.getItem("authRole");
+    const paid = localStorage.getItem("courierPaid");
+
+    if (loggedIn !== "1" || role !== "courier" || paid !== "1") {
+      location.hash = "#login";
+      return;
     }
+
+    if (!this._initialized) {
+      this.render();
+      window.addEventListener('order-updated', this.applyActiveOrderBound);
+      window.addEventListener('delivery-cart-updated', this.renderDeliveryCartBound);
+      this._initialized = true;
+    }
+
+    this.applyActiveOrder();
+    this.renderDeliveryCart();
   }
 
   render() {

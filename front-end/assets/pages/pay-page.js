@@ -1,11 +1,22 @@
 class PayPage extends HTMLElement {
   connectedCallback() {
+    this.handleRouteChange = this.handleRouteChange.bind(this);
+    window.addEventListener("hashchange", this.handleRouteChange);
+    this.handleRouteChange();
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener("hashchange", this.handleRouteChange);
+  }
+
+  handleRouteChange() {
+    if (location.hash !== "#pay") return;
+
     // 🔐 ROLE GUARD (only logged-in courier)
     const loggedIn = localStorage.getItem("authLoggedIn");
     const role = localStorage.getItem("authRole");
 
     if (loggedIn !== "1" || role !== "courier") {
-      alert("Энэ хэсэг зөвхөн хүргэгчид нээлттэй");
       location.hash = "#login";
       return;
     }
