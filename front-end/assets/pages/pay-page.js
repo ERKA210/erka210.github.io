@@ -10,7 +10,18 @@ class PayPage extends HTMLElement {
       return;
     }
 
-    const isPaid = () => localStorage.getItem("courierPaid") === "1";
+    // ✅ identify user (login-page дээр authPhone/authStudentId set хийсэн байх ёстой)
+    const phone = (localStorage.getItem("authPhone") || "").trim();
+    const studentId = (localStorage.getItem("authStudentId") || "").trim(); // login дээр нэмээрэй
+    const paidKey = `courierPaid:${studentId || phone}`;
+
+    if (!studentId && !phone) {
+      alert("Хэрэглэгчийн мэдээлэл олдсонгүй. Дахин нэвтэрнэ үү.");
+      location.hash = "#login";
+      return;
+    }
+
+    const isPaid = () => localStorage.getItem(paidKey) === "1";
 
     this.innerHTML = `
       <link rel="stylesheet" href="assets/css/pay.css">
@@ -100,49 +111,49 @@ class PayPage extends HTMLElement {
     const methodRadios = this.querySelectorAll('input[name="paymentMethod"]');
 
     const showPaidUI = () => {
-      if (statusEl) statusEl.hidden = false;
+      statusEl && (statusEl.hidden = false);
       if (payBtn) {
         payBtn.disabled = true;
         payBtn.textContent = "Төлбөр төлөгдсөн";
       }
-      if (goBtn) goBtn.hidden = false;
+      goBtn && (goBtn.hidden = false);
     };
 
     const showUnpaidUI = () => {
-      if (statusEl) statusEl.hidden = true;
+      statusEl && (statusEl.hidden = true);
       if (payBtn) {
         payBtn.disabled = false;
         payBtn.textContent = "Төлбөр төлөх";
       }
-      if (goBtn) goBtn.hidden = true;
+      goBtn && (goBtn.hidden = true);
     };
 
     const syncMethodUI = () => {
       const method = this.querySelector('input[name="paymentMethod"]:checked')?.value || "card";
       const card = this.querySelector(".payment-details--card");
       const qpay = this.querySelector(".payment-details--qpay");
-      if (card) card.hidden = method !== "card";
-      if (qpay) qpay.hidden = method !== "qpay";
+      card && (card.hidden = method !== "card");
+      qpay && (qpay.hidden = method !== "qpay");
     };
 
     closeBtn?.addEventListener("click", () => (location.hash = "#profile"));
-
     methodRadios.forEach((r) => r.addEventListener("change", syncMethodUI));
     syncMethodUI();
 
-    // Init state
+    // ✅ init paid sync for current session (delivery guard uses courierPaid)
+    localStorage.setItem("courierPaid", isPaid() ? "1" : "0");
     if (isPaid()) showPaidUI();
     else showUnpaidUI();
 
     payBtn?.addEventListener("click", () => {
-      // ✅ энд бодит интеграци (банк/QPay API) байх ёстой, одоогоор mock
-      localStorage.setItem("courierPaid", "1");
+      // mock payment success
+      localStorage.setItem(paidKey, "1");     // ✅ per-user
+      localStorage.setItem("courierPaid", "1"); // ✅ current session sync
       showPaidUI();
       window.dispatchEvent(new Event("user-updated"));
     });
 
     goBtn?.addEventListener("click", () => {
-      // delivery-page guard чинь courierPaid === "1" гэж шалгана
       location.hash = "#delivery";
     });
   }

@@ -253,8 +253,7 @@ class LoginPage extends HTMLElement {
 
     if (payBtn) {
       payBtn.addEventListener("click", () => {
-        localStorage.setItem("courier_payment_paid", "true");
-        payBtn.disabled = true;
+        localStorage.setItem("courierPaid", "1"); payBtn.disabled = true;
         if (payStatus) payStatus.hidden = false;
       });
     }
@@ -282,18 +281,6 @@ class LoginPage extends HTMLElement {
         const studentId = this.querySelector("#studentId")?.value?.trim() || "";
         const roleValue = roleInput?.value || this.currentRole || "customer";
         const role = isRegister && roleValue === "courier" ? "courier" : "customer";
-
-        if (isCourier) {
-          // төлбөр төлөөгүй бол pay page руу явуулна
-          if (!isPaid()) {
-            localStorage.setItem("login_prefill_mode", "register");
-            localStorage.setItem("login_prefill_role", "courier");
-            location.hash = "#pay";
-            return;
-          }
-        }
-
-
         const fullName = name.trim() || "Зочин хэрэглэгч";
 
         try {
@@ -318,17 +305,37 @@ class LoginPage extends HTMLElement {
 
           const data = await res.json();
 
+          // ✅ auth state (pay-page guard-д хэрэгтэй)
           localStorage.setItem("authLoggedIn", "1");
           localStorage.setItem("authRole", role);
+          localStorage.setItem("authPhone", phone);
+          localStorage.setItem("authStudentId", studentId);
 
-          if (role !== "courier") {
+
+          // ✅ courierPaid-г default 0 болгож тогтооно (null биш)
+          if (role === "courier") {
+            if (localStorage.getItem("courierPaid") !== "1") {
+              localStorage.setItem("courierPaid", "0");
+            }
+          } else {
             localStorage.setItem("courierPaid", "0");
           }
-          
+
           window.dispatchEvent(new Event("user-updated"));
 
+          // ✅ redirect rules
+          if (role === "courier") {
+            // төлбөр төлөөгүй бол pay, төлсөн бол delivery
+            location.hash = localStorage.getItem("courierPaid") === "1" ? "#delivery" : "#pay";
+            return;
+          }
+
+          // customer
           const hasDraft = localStorage.getItem("pendingOrderDraft");
           location.hash = hasDraft ? "#home" : "#profile";
+          return;
+
+
         } catch (err) {
           alert(err.message || "Нэвтрэх үед алдаа гарлаа");
         }

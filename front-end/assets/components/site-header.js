@@ -135,6 +135,8 @@ class SiteHeader extends HTMLElement {
         localStorage.removeItem("authRole");
         localStorage.removeItem("authPhone");
         localStorage.removeItem("authStudentId");
+        localStorage.removeItem("courierPaid");
+        localStorage.removeItem("courier_payment_paid");
 
         // ⚠️ courierPaid-г ЗААВАЛ reset
         localStorage.setItem("courierPaid", "0");
