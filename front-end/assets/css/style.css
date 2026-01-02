@@ -124,10 +124,6 @@
     border-color: var(--color-border);
   }
 
-  .brand-logo {
-    content: url("assets/img/logo_dark.png");
-  }
-
   .top-menu a {
     color: var(--color-muted);
   }
