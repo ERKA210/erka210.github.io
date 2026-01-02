@@ -26,10 +26,7 @@
     margin: 0;
     column-gap: 2rem;
     row-gap: 1.5rem;
-<<<<<<< HEAD
-    padding: 5rem 2rem 2rem;
-=======
->>>>>>> 27546721093359b76806fff197fc7a6810f0e7f3
+    padding: 2rem 2rem;
   }
 
   .profile-hero {
@@ -732,3 +729,4 @@
     width: 100%;
   }
 }
+
