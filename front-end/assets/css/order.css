@@ -49,7 +49,9 @@ orders-page {
     margin-bottom: 20px;
     color: var(--color-text);
   }
-
+  .courier-info h3{
+    height: 3rem;
+  }
   .order-list {
     display: flex;
     flex-direction: column;
@@ -63,11 +65,11 @@ orders-page {
   .delivery-info{
     background: var(--color-bg);
     border-radius: var(--radius-lg);
-    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
     padding: 25px 30px;
     width: 100%;
     height: auto;
     margin-top: 0;
+    box-shadow:  0 20px 10px rgba(0, 0, 0, 0.08)
   }
 
   .order-list button {
@@ -163,7 +165,6 @@ orders-page {
     flex: 1.5;
     background: var(--color-bg);
     border-radius: var(--radius-lg);
-    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
     padding: 30px;
     width: 100%;
     align-self: start;
@@ -399,7 +400,6 @@ order-progress {
     grid-column: 2;
     background: var(--color-bg);
     border-radius: var(--radius-lg);
-    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
     padding: 30px;
     align-self: start;
   }
@@ -533,12 +533,15 @@ order-progress {
   .step.active .step-desc {
     visibility: inherit;
   }
-
+  .section-orders{
+    height: 5rem;
+  }
   .delivery img {
-    width: 10rem;
-    height: 10rem;
+    width: 9rem;
+    height: 9rem;
     border-radius: 100%;
-    margin-top: 30%;
+    margin-top: -10%;
+    margin-left: -5%;
   }
 
   @media (max-width: 756px) {
@@ -551,7 +554,6 @@ order-progress {
       gap: 1.25rem;
     }
 
-    .orders,
     .details {
       width: 100%;
       height: auto;
@@ -565,14 +567,6 @@ order-progress {
       grid-template-columns: 1fr;
       gap: 0.6rem;
     }
-
-    .delivery-info {
-      margin-left: 2rem;
-      width: 80%;
-      height: auto;
-      margin-top: 0;
-    }
-
     .order-side {
       gap: 1.5rem;
     }
@@ -584,6 +578,10 @@ order-progress {
       padding: 30px;
       width: 27rem;
     }
-    
   }
-  
+
+  @media screen and (max-width: 460px) {
+    .orders {
+      margin-top: 4rem;
+    }
+  }

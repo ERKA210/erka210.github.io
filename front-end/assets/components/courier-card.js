@@ -42,8 +42,8 @@ class Couriers extends HTMLElement {
           <div class="avatar">
             <img src="assets/img/profile.jpg" alt="Хүргэгчийн зураг">
           </div>
-          <div class="delivery-info">
-            <h3>${this.escape(name || "Хүргэгч")}</h3>
+          <div class="courier-info">
+            <h3>Нэр : ${this.escape(name || "Хүргэгч")}</h3>
             <p>${phone ? `Утас: ${this.escape(phone)}` : ""}</p>
             <p>${displayId ? `Хүргэгчийн ID: ${this.escape(displayId)}` : ""}</p>
             ${courier_id ? `<p class="small-text">Бүртгэлийн дугаар: ${this.escape(courier_id)}</p>` : ''}
