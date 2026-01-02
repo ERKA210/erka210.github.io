@@ -7,7 +7,6 @@ home-page {
   }
 
   .filter-section {
-    margin-top: 6rem;
     margin-left: 2rem;
     margin-right: 2rem;
     background: var(--color-bg);
@@ -811,7 +810,6 @@ home-page {
     }
 
     .filter-section {
-      margin-top: 4.5rem;
       margin-left: .75rem;
       margin-right: .75rem;
       margin-bottom: .75rem;

@@ -319,7 +319,6 @@ delivery-page {
       'det det stp';
     gap: 30px;
     max-width: 1300px;
-    margin: 80px auto;
     padding: 0 30px;
   }
 
@@ -336,7 +335,6 @@ delivery-page {
       gap: 1.2rem;
       width: 100%;
       padding: 0 1rem;
-      margin-top: 7ch;
       padding-bottom: 0ch;
     }
 
