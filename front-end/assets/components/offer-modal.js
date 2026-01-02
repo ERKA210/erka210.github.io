@@ -278,28 +278,28 @@ class OfferModal extends HTMLElement {
     this.confirmBtn = this.shadowRoot.querySelector('.confirm');
   }
 
-bindEvents() {
-  this.closeBtn.addEventListener('click', () => this.close());
-  this.modal.addEventListener('click', (e) => {
-    if (e.target === this.modal) this.close();
-  });
-  
-  // Устгах товч дарсан үед санал устгах
-  this.deleteBtn.addEventListener('click', () => {
-    if (this.currentData) {
-      this.removeOfferFromList(this.currentData);
-      this.refreshOffersList();
-    }
-    this.close();
-  });
-  
-  this.confirmBtn.addEventListener('click', () => this.handleConfirm());
-}
+  bindEvents() {
+    this.closeBtn.addEventListener('click', () => this.close());
+    this.modal.addEventListener('click', (e) => {
+      if (e.target === this.modal) this.close();
+    });
 
-// Offers жагсаалтыг шинэчлэх туслах арга
-refreshOffersList() {
-  window.dispatchEvent(new Event('offers-updated'));
-}
+    // Устгах товч дарсан үед санал устгах
+    this.deleteBtn.addEventListener('click', () => {
+      if (this.currentData) {
+        this.removeOfferFromList(this.currentData);
+        this.refreshOffersList();
+      }
+      this.close();
+    });
+
+    this.confirmBtn.addEventListener('click', () => this.handleConfirm());
+  }
+
+  // Offers жагсаалтыг шинэчлэх туслах арга
+  refreshOffersList() {
+    window.dispatchEvent(new Event('offers-updated'));
+  }
 
 
   show(data) {
@@ -366,86 +366,89 @@ refreshOffersList() {
     return tokens.length ? tokens.join(" ") : raw;
   }
 
-async handleConfirm() {
-  if (!this.currentData) {
-    this.close();
-    return;
-  }
+  async handleConfirm() {
+    if (!this.currentData) {
+      this.close();
+      return;
+    }
 
-  await this.fetchCurrentUser();
-  const isCourier = this.currentUser?.role === "courier";
-  if (!isCourier) {
-    localStorage.setItem("login_prefill_role", "courier");
-    localStorage.setItem("login_prefill_mode", "register");
-    location.hash = "#login";
-    return;
-  }
-  
-  let orderDetail = null;
-  const orderId = this.currentData?.orderId;
-  
-  // ✅ ХҮРГЭХ товч дарсан үед offers жагсаалтаас устгах
-  this.removeOfferFromList(this.currentData);
-  
-  if (orderId) {
+    await this.fetchCurrentUser();
+    const isCourier = this.currentUser?.role === "courier";
+    if (!isCourier) {
+      localStorage.setItem("login_prefill_role", "courier");
+      localStorage.setItem("login_prefill_mode", "register");
+      location.hash = "#login";
+      return;
+    }
+
+    let orderDetail = null;
+    const orderId = this.currentData?.orderId;
+
+    // ✅ ХҮРГЭХ товч дарсан үед offers жагсаалтаас устгах
+    this.removeOfferFromList(this.currentData);
+
+    if (orderId) {
+      try {
+        const assignRes = await fetch(`/api/orders/${encodeURIComponent(orderId)}/assign-courier`, {
+          method: "POST",
+          credentials: "include",
+        });
+        if (assignRes.ok) {
+          const payload = await assignRes.json();
+          orderDetail = payload?.order || null;
+        }
+      } catch (e) {
+        // алдааг үл тоомсорлоно
+      }
+    }
+
+    const activeOrder = this.buildActiveOrder(this.currentData, orderDetail);
+    const added = await this.addToDeliveryCart(this.currentData);
+
+    if (!added) {
+      // Хэрэв хүргэлтийн сагсанд нэмэхэд бүтэлгүйтвэл модалыг хаана
+      this.close();
+      return;
+    }
+
+    await this.saveActiveOrder(activeOrder);
+    // ✅ appState: хүргэлт эхэлсэн тул courier болгоно
+    window.NumAppState?.setState("courier", "delivery_started");
+
+
+    // Дахин устгах (давхардсан ч цэвэрлэгээний үүднээс)
+    this.removeOfferFromList(this.currentData);
+
     try {
-      const assignRes = await fetch(`/api/orders/${encodeURIComponent(orderId)}/assign-courier`, {
-        method: "POST",
+      const res = await fetch(`${this.API}/api/courier/me`, {
         credentials: "include",
       });
-      if (assignRes.ok) {
-        const payload = await assignRes.json();
-        orderDetail = payload?.order || null;
+
+      if (res.ok) {
+        const courier = await res.json();
       }
     } catch (e) {
-      // алдааг үл тоомсорлоно
+      console.warn('courier fetch failed', e);
     }
-  }
-  
-  const activeOrder = this.buildActiveOrder(this.currentData, orderDetail);
-  const added = await this.addToDeliveryCart(this.currentData);
-  
-  if (!added) {
-    // Хэрэв хүргэлтийн сагсанд нэмэхэд бүтэлгүйтвэл модалыг хаана
+
     this.close();
-    return;
-  }
-  
-  await this.saveActiveOrder(activeOrder);
-  
-  // Дахин устгах (давхардсан ч цэвэрлэгээний үүднээс)
-  this.removeOfferFromList(this.currentData);
 
-  try {
-    const res = await fetch(`${this.API}/api/courier/me`, {
-      credentials: "include",
-    });
+    // UI-г шинэчлэх үйл явдлуудыг илгээх
+    window.dispatchEvent(new Event('order-updated'));
+    window.dispatchEvent(new Event('delivery-cart-updated'));
+    window.dispatchEvent(new Event('offers-updated')); // ✅ Offers жагсаалтыг шинэчлэх шинэ үйл явдал
 
-    if (res.ok) {
-      const courier = await res.json();
+    // Хүргэлтийн сагсыг шинэчлэх
+    const cartEl = document.querySelector('delivery-cart');
+    if (cartEl && typeof cartEl.load === 'function') {
+      cartEl.load();
     }
-  } catch (e) {
-    console.warn('courier fetch failed', e);
-  }
 
-  this.close();
-  
-  // UI-г шинэчлэх үйл явдлуудыг илгээх
-  window.dispatchEvent(new Event('order-updated'));
-  window.dispatchEvent(new Event('delivery-cart-updated'));
-  window.dispatchEvent(new Event('offers-updated')); // ✅ Offers жагсаалтыг шинэчлэх шинэ үйл явдал
-  
-  // Хүргэлтийн сагсыг шинэчлэх
-  const cartEl = document.querySelector('delivery-cart');
-  if (cartEl && typeof cartEl.load === 'function') {
-    cartEl.load();
+    // Offers жагсаалтыг шинэчлэх
+    if (!document.querySelector('delivery-cart')) {
+      location.hash = '#delivery';
+    }
   }
-  
-  // Offers жагсаалтыг шинэчлэх
-  if (!document.querySelector('delivery-cart')) {
-    location.hash = '#delivery';
-  }
-}
 
 
   async addToDeliveryCart(data) {
@@ -508,54 +511,54 @@ async handleConfirm() {
     return this.currentUser;
   }
 
-removeOfferFromList(data) {
-  // Validate input
-  if (!data || typeof data !== 'object') return false;
-  
-  // Get offers from localStorage
-  const raw = localStorage.getItem('offers');
-  if (!raw) return false;
-  
-  // Parse offers
-  let offers = [];
-  try {
-    offers = JSON.parse(raw) || [];
-  } catch (e) {
-    console.error('Failed to parse offers from localStorage:', e);
-    return false;
-  }
-  
-  const orderId = data.orderId || data.id || null;
-  const key = `${data.title || ''}|${data.meta || ''}|${data.price || ''}`;
-  const originalLength = offers.length;
-  
-  // Filter out the matching offer
-  const next = offers.filter(item => {
-    if (orderId && (item.orderId || item.id) === orderId) {
+  removeOfferFromList(data) {
+    // Validate input
+    if (!data || typeof data !== 'object') return false;
+
+    // Get offers from localStorage
+    const raw = localStorage.getItem('offers');
+    if (!raw) return false;
+
+    // Parse offers
+    let offers = [];
+    try {
+      offers = JSON.parse(raw) || [];
+    } catch (e) {
+      console.error('Failed to parse offers from localStorage:', e);
       return false;
     }
-    const itemKey = `${item.title || ''}|${item.meta || ''}|${item.price || ''}`;
-    return itemKey !== key;
-  });
-  
-  // Check if anything was actually removed
-  if (next.length === originalLength) {
-    return false; // No offer was removed
+
+    const orderId = data.orderId || data.id || null;
+    const key = `${data.title || ''}|${data.meta || ''}|${data.price || ''}`;
+    const originalLength = offers.length;
+
+    // Filter out the matching offer
+    const next = offers.filter(item => {
+      if (orderId && (item.orderId || item.id) === orderId) {
+        return false;
+      }
+      const itemKey = `${item.title || ''}|${item.meta || ''}|${item.price || ''}`;
+      return itemKey !== key;
+    });
+
+    // Check if anything was actually removed
+    if (next.length === originalLength) {
+      return false; // No offer was removed
+    }
+
+    // Save to localStorage
+    localStorage.setItem('offers', JSON.stringify(next));
+
+    // Dispatch event for other parts of the app
+    window.dispatchEvent(new CustomEvent('offer-removed', {
+      detail: {
+        removedOffer: data,
+        remainingOffers: next
+      }
+    }));
+
+    return true;
   }
-  
-  // Save to localStorage
-  localStorage.setItem('offers', JSON.stringify(next));
-  
-  // Dispatch event for other parts of the app
-  window.dispatchEvent(new CustomEvent('offer-removed', { 
-    detail: { 
-      removedOffer: data,
-      remainingOffers: next
-    } 
-  }));
-  
-  return true;
-}
 
   async populateCourier(data) {
     // courier details removed

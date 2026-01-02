@@ -187,7 +187,7 @@ class HomePage extends HTMLElement {
     if (this.currentUser) return this.currentUser;
     try {
       const res = await fetch("/api/auth/me", {
-        credentials: "include", 
+        credentials: "include",
       });
       if (!res.ok) return null;
       const data = await res.json();
@@ -447,6 +447,8 @@ class HomePage extends HTMLElement {
       } catch (e) {
         // ignore
       }
+      // ✅ appState: захиалга үүссэн тул customer болгоно
+      window.NumAppState?.setState("customer", "order_created");
       window.dispatchEvent(new Event("order-updated"));
 
       const existingOffers = JSON.parse(localStorage.getItem("offers") || "[]");

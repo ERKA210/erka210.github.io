@@ -117,13 +117,18 @@ class OrdersPage extends HTMLElement {
       if (!res.ok) throw new Error(data?.error || "Алдаа");
 
       const filtered = this.filterExpired(Array.isArray(data) ? data : []);
+      // ✅ Хэрвээ серверээс захиалга ирсэн ч бүгд expired бол guest рүү буцаана
+      if (Array.isArray(data) && data.length > 0 && filtered.length === 0) {
+        window.NumAppState?.resetToGuest("order_expired");
+      }
+
       this.renderOrders(filtered);
     } catch (e) {
       listEl.innerHTML = `<p class="muted">Захиалга уншихад алдаа: ${e.message}</p>`;
     }
   }
 
-  
+
 
   renderOrders(orders) {
     const listEl = this.querySelector("#orderList");
@@ -134,16 +139,16 @@ class OrdersPage extends HTMLElement {
       return;
     }
 
-   listEl.innerHTML = orders.map((o) => {
-  const ts = this.getOrderTimestamp(o) || Date.now();
-  const dt = new Date(ts);
-  const meta = `${dt.toLocaleDateString()} • ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
-  const items = Array.isArray(o.items) ? o.items : [];
-  const itemsTxt = items.map(it => `${it.name} ×${it.qty}`).join(" · ");
-  const totalQty = items.reduce((sum, it) => sum + (Number(it?.qty) || 0), 0);
-  const iconSrc = this.getOfferThumb(o?.id) || this.getDeliveryIcon(totalQty);
+    listEl.innerHTML = orders.map((o) => {
+      const ts = this.getOrderTimestamp(o) || Date.now();
+      const dt = new Date(ts);
+      const meta = `${dt.toLocaleDateString()} • ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      const items = Array.isArray(o.items) ? o.items : [];
+      const itemsTxt = items.map(it => `${it.name} ×${it.qty}`).join(" · ");
+      const totalQty = items.reduce((sum, it) => sum + (Number(it?.qty) || 0), 0);
+      const iconSrc = this.getOfferThumb(o?.id) || this.getDeliveryIcon(totalQty);
 
-  return `
+      return `
     <div class="order-card" data-order='${encodeURIComponent(JSON.stringify(o))}'>
       <div class="order-info">
         <h3 class="order-title">${o.from_name || ""} - ${o.to_name || ""}</h3>
@@ -154,29 +159,35 @@ class OrdersPage extends HTMLElement {
       <img src="${iconSrc}" alt="hemjee">
     </div>
   `;
-}).join("");
+    }).join("");
 
     this.selectedOrder = orders[0] || null;
     this.setProgressFromStatus(orders[0]?.status);
     this.loadCourierForOrder(orders[0] || null);
+    // ✅ Delivered бол guest рүү буцаана
+    const st = String(orders[0]?.status || "").toLowerCase();
+    if (st === "delivered") {
+      window.NumAppState?.resetToGuest("order_delivered");
+    }
+
   }
 
   bindClicks() {
-  this.addEventListener("click", (e) => {
-    const card = e.target.closest(".order-card");
-    if (!card) return;
+    this.addEventListener("click", (e) => {
+      const card = e.target.closest(".order-card");
+      if (!card) return;
 
-    const raw = card.getAttribute("data-order");
-    if (!raw) return;
+      const raw = card.getAttribute("data-order");
+      if (!raw) return;
 
-    const order = JSON.parse(decodeURIComponent(raw));
-    this.selectedOrder = order;
+      const order = JSON.parse(decodeURIComponent(raw));
+      this.selectedOrder = order;
 
-    this.setProgressFromStatus(order.status);
-    this.loadCourierForOrder(order);
+      this.setProgressFromStatus(order.status);
+      this.loadCourierForOrder(order);
 
-  });
-}
+    });
+  }
 
   readLocalOffers() {
     try {

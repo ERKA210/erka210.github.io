@@ -79,7 +79,10 @@ class DelOrderProgress extends HTMLElement {
       saveSteps(this.stepsState);
 
       localStorage.setItem("orderStep", String(nextIdx));
-
+      // ✅ Сүүлийн алхам хүрвэл хүргэлт дууссан гэж үзээд guest рүү буцаана
+      if (nextIdx === maxIndex) {
+        window.NumAppState?.resetToGuest("delivery_completed");
+      }
       this.render();
     });
   }
