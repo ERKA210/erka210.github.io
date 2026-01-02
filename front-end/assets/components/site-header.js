@@ -25,12 +25,16 @@ class SiteHeader extends HTMLElement {
 
     document.removeEventListener("click", this.handleDocClick);
 
-    const logoSrc = "assets/img/logo_light_last.png";
+    const logoPng = "assets/img/logo_light_last.png";
+    const logoWebp = "assets/img/logo_light_last.webp";
 
     this.innerHTML = `
       <header class="site-top">
         <div class="brand">
-          <img src="${logoSrc}" alt="Logo" class="brand-logo" width="250" height="74" />
+          <picture>
+            <source srcset="${logoWebp}" type="image/webp" />
+            <img src="${logoPng}" alt="Logo" class="brand-logo" width="250" height="74" decoding="async" />
+          </picture>
         </div>
 
         <nav class="top-menu">
@@ -70,7 +74,7 @@ class SiteHeader extends HTMLElement {
                 <div class="avatar-menu">
                   <button class="avatar-btn" type="button" aria-label="Профайл цэс нээх"></button>
                   <div class="avatar-dropdown" role="menu" aria-label="Профайл цэс">
-                    <button class="avatar-action avatar-logout" type="button">Гарах</button>
+                    <button class="avatar-action avatar-logout" type="button" role="menuitem">Гарах</button>
                   </div>
                 </div>
                 <button class="logout-btn" type="button">Гарах</button>
@@ -93,7 +97,7 @@ class SiteHeader extends HTMLElement {
       const logo = this.querySelector(".brand-logo");
       if (logo) {
         const updateLogo = () => {
-          logo.src = "assets/img/logo_light_last.png";
+          logo.src = logoPng;
         };
         updateLogo(media);
         if (media.addEventListener) {

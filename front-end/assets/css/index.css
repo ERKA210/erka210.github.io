@@ -422,12 +422,18 @@ home-page {
 
   .offer-meta {
     font-size: 0.9rem;
-    color: var(--color-muted);
+    color: #4b5563;
     margin-bottom: 0.25rem;
   }
 
   .offer-price {
     font-weight: 700;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .offer-meta {
+      color: var(--color-muted);
+    }
   }
 
   @media (max-width: 56.25rem) {
