@@ -472,24 +472,34 @@ class ProfilePage extends HTMLElement {
   }
 
   async loadReviews() {
-    try {
-      const res = await fetch("/api/ratings/me");
-      if (!res.ok) return;
-      const data = await res.json();
-      const items = Array.isArray(data?.items) ? data.items : [];
-      const reviews = items.map((r) => ({
-        text: (r.comment || "").trim(),
-        stars: this.toStars(r.stars),
-      }));
-      const avg =
-        items.length > 0
-          ? items.reduce((sum, r) => sum + (Number(r.stars) || 0), 0) / items.length
-          : 0;
-      this.updateReviewsUI(reviews);
-      this.updateAverageRating(avg);
-    } catch (e) {
-      // ignore
+  try {
+    const res = await fetch("/api/ratings/me");
+    if (!res.ok) return;
+    const data = await res.json();
+    const items = Array.isArray(data?.items) ? data.items : [];
+    
+    // Group by target user for better display
+    const reviews = items.map((r) => ({
+      text: r.comment || "",
+      stars: r.stars,
+      targetName: r.targetUser?.name || "Хэрэглэгч",
+      date: new Date(r.createdAt).toLocaleDateString('mn-MN')
+    }));
+    
+    this.updateReviewsUI(reviews);
+    
+    // If user is a courier, show their average rating
+    if (this.currentUser?.role === 'courier') {
+      const courierRes = await fetch(`/api/ratings/courier/${this.currentUser.id}`);
+      if (courierRes.ok) {
+        const courierData = await courierRes.json();
+        this.updateAverageRating(courierData.courier.rating_avg);
+      }
     }
+
+  } catch (e) {
+    console.error('Load reviews error:', e);
+  }
   }
 
   updateReviewsUI(reviews) {

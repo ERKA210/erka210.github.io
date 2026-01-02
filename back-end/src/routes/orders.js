@@ -40,9 +40,40 @@ router.post("/orders", async (req, res) => {
     await client.query("BEGIN");
 
     const orderR = await client.query(
-      `INSERT INTO orders (customer_id, from_place_id, to_place_id, scheduled_at, subtotal_amount, delivery_fee, total_amount, note)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-       RETURNING id`,
+      `  SELECT 
+    o.*,
+    f.name as from_name,
+    t.name as to_name,
+    json_build_object(
+      'id', u.id,
+      'name', u.full_name,
+      'avatar', u.avatar_url,
+      'rating', c.rating_avg,
+      'rating_count', c.rating_count
+    ) as courier,
+    COALESCE(
+      json_agg(
+        json_build_object(
+          'id', oi.id,
+          'name', oi.name,
+          'qty', oi.qty,
+          'unit_price', oi.unit_price,
+          'line_total', oi.line_total
+        )
+      ) FILTER (WHERE oi.id IS NOT NULL),
+      '[]'
+    ) as items
+  FROM orders o
+  JOIN places f ON o.from_place_id = f.id
+  JOIN places t ON o.to_place_id = t.id
+  LEFT JOIN order_couriers oc ON o.id = oc.order_id
+  LEFT JOIN users u ON oc.courier_id = u.id
+  LEFT JOIN couriers c ON u.id = c.user_id
+  LEFT JOIN order_items oi ON o.id = oi.order_id
+  WHERE o.customer_id = $1
+  AND o.status != 'cancelled'
+  GROUP BY o.id, f.id, t.id, u.id, c.rating_avg, c.rating_count
+  ORDER BY o.created_at DESC`,
       [
         resolvedCustomerId,
         fromPlaceId,
