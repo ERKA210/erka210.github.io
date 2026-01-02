@@ -24,8 +24,16 @@ class DeliveryPage extends HTMLElement {
     const role = localStorage.getItem("authRole");
     const paid = localStorage.getItem("courierPaid");
 
-    if (loggedIn !== "1" || role !== "courier" || paid !== "1") {
+    if (loggedIn !== "1") {
       location.hash = "#login";
+      return;
+    }
+    if (role !== "courier") {
+      location.hash = "#home";
+      return;
+    }
+    if (paid !== "1") {
+      location.hash = "#pay";
       return;
     }
 

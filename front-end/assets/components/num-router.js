@@ -28,9 +28,19 @@ class NumRouter extends HTMLElement {
     }
 
     if (hash === "delivery") {
-      if (loggedIn !== "1" || role !== "courier" || paid !== "1") {
+      if (loggedIn !== "1") {
         alert("Энэ хэсэг зөвхөн хүргэгчид нээлттэй");
         location.hash = "#login";
+        return;
+      }
+      if (role !== "courier") {
+        alert("Энэ хэсэг зөвхөн хүргэгчид нээлттэй");
+        location.hash = "#home";
+        return;
+      }
+      if (paid !== "1") {
+        alert("Төлбөр төлсний дараа хүргэлтийн хэсэг нээгдэнэ");
+        location.hash = "#pay";
         return;
       }
     }
