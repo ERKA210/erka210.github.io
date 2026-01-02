@@ -28,7 +28,8 @@ router.put("/active-order", requireAuth, async (req, res) => {
     const userId = req.user?.sub;
     const order = req.body?.order;
     if (!order) {
-      return res.status(400).json({ error: "order is required" });
+      await pool.query(`DELETE FROM active_orders WHERE user_id = $1`, [userId]);
+      return res.json({ order: null });
     }
     const orderSafe = {
       ...order,

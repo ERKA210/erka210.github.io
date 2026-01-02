@@ -26,7 +26,7 @@
     margin: 0;
     column-gap: 2rem;
     row-gap: 1.5rem;
-    padding: 2rem 2rem;
+    padding: 0rem 2rem 2rem;
   }
 
   .profile-hero {
@@ -727,6 +727,19 @@
   .btn-order,
   .btn-delivery{
     width: 100%;
+  }
+}
+
+@media (max-width: 30rem) {
+  .history-card {
+    grid-template-columns: auto 1fr;
+    align-items: start;
+  }
+
+  .history-price {
+    grid-column: 2 / -1;
+    justify-self: start;
+    margin-top: 0.35rem;
   }
 }
 

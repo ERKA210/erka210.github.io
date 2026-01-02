@@ -121,7 +121,7 @@ class HomePage extends HTMLElement {
             </select>
           </div>
 
-          <span><img src="assets/img/arrow.svg" alt="icon" width="67" height="67" /></span>
+          <span class="arrow-icon"><img src="assets/img/arrow.svg" alt="icon" width="67" height="67" /></span>
 
           <div class="ctrl">
             <span><img src="assets/img/map_pin.svg" alt="icon" width="16" height="16" /></span>

@@ -179,6 +179,65 @@ router.get("/orders", async (req, res) => {
   }
 });
 
+router.get("/orders/history/customer", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user?.sub;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    if (req.user?.role !== "customer") {
+      return res.status(403).json({ error: "Forbidden: customer only" });
+    }
+
+    const r = await pool.query(
+      `SELECT o.id,
+              o.status,
+              o.total_amount,
+              o.scheduled_at,
+              o.created_at,
+              fp.name AS from_name,
+              tp.name AS to_name
+         FROM orders o
+         JOIN places fp ON fp.id = o.from_place_id
+         JOIN places tp ON tp.id = o.to_place_id
+        WHERE o.customer_id = $1
+        ORDER BY o.created_at DESC`,
+      [userId]
+    );
+    res.json({ items: r.rows });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get("/orders/history/courier", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user?.sub;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    if (req.user?.role !== "courier") {
+      return res.status(403).json({ error: "Forbidden: courier only" });
+    }
+
+    const r = await pool.query(
+      `SELECT o.id,
+              o.status,
+              o.total_amount,
+              o.scheduled_at,
+              o.created_at,
+              fp.name AS from_name,
+              tp.name AS to_name
+         FROM orders o
+         JOIN places fp ON fp.id = o.from_place_id
+         JOIN places tp ON tp.id = o.to_place_id
+         JOIN order_couriers oc ON oc.order_id = o.id
+        WHERE oc.courier_id = $1
+        ORDER BY o.created_at DESC`,
+      [userId]
+    );
+    res.json({ items: r.rows });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.post("/orders/:id/assign-courier", requireAuth, async (req, res) => {
   const { id } = req.params;
   const userId = req.user?.sub;
@@ -188,6 +247,17 @@ router.post("/orders/:id/assign-courier", requireAuth, async (req, res) => {
   }
 
   try {
+    const orderRow = await pool.query(
+      `SELECT customer_id FROM orders WHERE id = $1`,
+      [id]
+    );
+    if (!orderRow.rows.length) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    if (String(orderRow.rows[0]?.customer_id) === String(userId)) {
+      return res.status(403).json({ error: "Forbidden: self delivery" });
+    }
+
     await pool.query(
       `INSERT INTO order_couriers (order_id, courier_id)
        VALUES ($1, $2)

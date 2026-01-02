@@ -24,7 +24,7 @@ app.use((req, res, next) => {
       `script-src 'self' 'nonce-${nonce}'`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data:",
-      "connect-src 'self'",
+      "connect-src 'self' http://localhost:3000",
       "font-src 'self'",
       "object-src 'none'",
       "base-uri 'self'",

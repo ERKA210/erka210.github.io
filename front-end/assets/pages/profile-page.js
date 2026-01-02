@@ -68,7 +68,6 @@ class ProfilePage extends HTMLElement {
     const reviewsModalMarkup = this.buildReviewsMarkup(reviews);
     const orderHistory = this.getOrderHistory();
     const deliveryHistory = this.getDeliveryHistory();
-
     this.innerHTML = `
       <link rel="stylesheet" href="assets/css/profile.css" />
       <section class="profile-page">
@@ -193,7 +192,7 @@ class ProfilePage extends HTMLElement {
             </div>
             <button class="icon-btn close-modal" data-close="ordersModal">×</button>
           </header>
-          <div class="modal-body modal-scroll history-list">
+          <div class="modal-body modal-scroll history-list" data-history="orders">
             ${this.buildHistoryMarkup(orderHistory, 'Захиалга байхгүй')}
           </div>
         </div>
@@ -207,7 +206,7 @@ class ProfilePage extends HTMLElement {
             </div>
             <button class="icon-btn close-modal" data-close="deliveryModal">×</button>
           </header>
-          <div class="modal-body modal-scroll history-list">
+          <div class="modal-body modal-scroll history-list" data-history="deliveries">
             ${this.buildHistoryMarkup(deliveryHistory, 'Хүргэлт байхгүй')}
           </div>
         </div>
@@ -215,10 +214,16 @@ class ProfilePage extends HTMLElement {
       <div class="history">
         <section class="btn-order" data-modal-open="ordersModal" id="openOrderBtn">
           Миний захиалга
-          <p>${this.buildHistoryMarkup(orderHistory, 'Захиалга байхгүй')}</p>
+          <div class="history-inline" data-history="orders">
+            ${this.buildHistoryMarkup(orderHistory, 'Захиалга байхгүй')}
+          </div>
         </section>
-        <section class="btn-delivery" data-modal-open="deliveryModal" id="openDeliveryBtn">Миний хүргэлт
-        <p>${this.buildHistoryMarkup(deliveryHistory, 'Хүргэлт байхгүй')}</p></section>
+        <section class="btn-delivery" data-modal-open="deliveryModal" id="openDeliveryBtn">
+          Миний хүргэлт
+          <div class="history-inline" data-history="deliveries">
+            ${this.buildHistoryMarkup(deliveryHistory, 'Хүргэлт байхгүй')}
+          </div>
+        </section>
       </div>
     `;
 
@@ -231,6 +236,8 @@ class ProfilePage extends HTMLElement {
     this.handleReviewsUpdated = this.loadReviews.bind(this);
     window.addEventListener("reviews-updated", this.handleReviewsUpdated);
     this.loadReviews();
+    this.loadOrderHistory();
+    this.loadDeliveryHistory();
   }
 
   disconnectedCallback() {
@@ -278,29 +285,11 @@ class ProfilePage extends HTMLElement {
   }
 
   getOrderHistory() {
-    try {
-      const raw = localStorage.getItem('orderHistory');
-      if (raw) return JSON.parse(raw);
-    } catch (e) {
-      console.error('orderHistory алдаа', e);
-    }
-    return [
-      { title: 'GL burger - 7-р байр 207', detail: '11/21/25 · 14:00', price: '10,000₮' },
-      { title: 'CU → МУИС 1-р байр', detail: '04/02/24 · 12:30', price: '8,500₮' },
-    ];
+    return [];
   }
 
   getDeliveryHistory() {
-    try {
-      const raw = localStorage.getItem('deliveryHistory');
-      if (raw) return JSON.parse(raw);
-    } catch (e) {
-      console.error('deliveryHistory алдаа', e);
-    }
-    return [
-      { title: 'МУИС 2-р байр → Сүхбаатар', detail: '03/28/24 · 10:15', price: '5,000₮' },
-      { title: 'GL Burger → МУИС 4-р байр', detail: '03/25/24 · 14:45', price: '12,000₮' },
-    ];
+    return [];
   }
 
   buildActiveOrdersMarkup(orders) {
@@ -329,7 +318,7 @@ class ProfilePage extends HTMLElement {
         <div>
           <p>${r.safeText}</p>
         </div>
-        <span class="stars">${r.stars}</span>
+        <span class="stars" aria-label="${r.stars} од">${this.toStars(r.stars)}</span>
       </div>
     `).join('');
   }
@@ -353,7 +342,7 @@ class ProfilePage extends HTMLElement {
 
   buildHistoryMarkup(list, emptyText) {
     if (!list.length) {
-      return `<p class="muted">${emptyText}</p>`;
+      return `<div class="muted">${emptyText}</div>`;
     }
     return list.map((item, idx) => {
       const icon = this.getHistoryIcon(idx);
@@ -370,6 +359,75 @@ class ProfilePage extends HTMLElement {
       </div>
     `;
     }).join('');
+  }
+
+  formatPrice(amount) {
+    return Number(amount || 0).toLocaleString("mn-MN") + "₮";
+  }
+
+  formatHistoryDetail(item) {
+    const ts = this.getOrderTimestamp(item);
+    if (!ts) return "";
+    const dt = new Date(ts);
+    return `${dt.toLocaleDateString()} · ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  }
+
+  async loadOrderHistory() {
+    try {
+      if (this.currentUser?.role && this.currentUser.role !== "customer") {
+        this.updateHistoryUI("orders", [], "Захиалга байхгүй");
+        return;
+      }
+      this.updateHistoryMessage("orders", "Ачааллаж байна...");
+      const res = await fetch("/api/orders/history/customer", { credentials: "include" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return;
+      const items = Array.isArray(data?.items) ? data.items : [];
+      const list = items.map((item) => ({
+        title: `${item.from_name || ""} → ${item.to_name || ""}`.trim(),
+        detail: this.formatHistoryDetail(item),
+        price: this.formatPrice(item.total_amount || 0),
+      }));
+      this.updateHistoryUI("orders", list, "Захиалга байхгүй");
+    } catch (e) {
+      this.updateHistoryMessage("orders", "Ачааллаж чадсангүй");
+    }
+  }
+
+  async loadDeliveryHistory() {
+    try {
+      if (this.currentUser?.role && this.currentUser.role !== "courier") {
+        this.updateHistoryUI("deliveries", [], "Хүргэлт байхгүй");
+        return;
+      }
+      this.updateHistoryMessage("deliveries", "Ачааллаж байна...");
+      const res = await fetch("/api/orders/history/courier", { credentials: "include" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return;
+      const items = Array.isArray(data?.items) ? data.items : [];
+      const list = items.map((item) => ({
+        title: `${item.from_name || ""} → ${item.to_name || ""}`.trim(),
+        detail: this.formatHistoryDetail(item),
+        price: this.formatPrice(item.total_amount || 0),
+      }));
+      this.updateHistoryUI("deliveries", list, "Хүргэлт байхгүй");
+    } catch (e) {
+      this.updateHistoryMessage("deliveries", "Ачааллаж чадсангүй");
+    }
+  }
+
+  updateHistoryUI(type, list, emptyText) {
+    const html = this.buildHistoryMarkup(list, emptyText);
+    this.querySelectorAll(`[data-history="${type}"]`).forEach((el) => {
+      el.innerHTML = html;
+    });
+  }
+
+  updateHistoryMessage(type, message) {
+    const html = `<div class="muted">${this.escapeHtml(message)}</div>`;
+    this.querySelectorAll(`[data-history="${type}"]`).forEach((el) => {
+      el.innerHTML = html;
+    });
   }
 
   getHistoryIcon(idx = 0) {
