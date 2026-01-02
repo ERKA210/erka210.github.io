@@ -37,7 +37,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.static("front-end", { index: false }));
 
-app.get("/", (_req, res) => {
+app.get("/", (req, res) => {
   const nonce = res.locals.cspNonce || "";
   const indexPath = path.join("front-end", "index.html");
   let html = fs.readFileSync(indexPath, "utf8");
