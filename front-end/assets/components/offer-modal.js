@@ -258,7 +258,7 @@ class OfferModal extends HTMLElement {
 
           <div class="actions">
             <button class="delete" type="button">Устгах</button>
-            <button class="confirm" type="button">Хүргэх</button>
+            <button class="confirm" type="button" data-role="courier-action">Хүргэх</button>
           </div>
         </div>
       </div>

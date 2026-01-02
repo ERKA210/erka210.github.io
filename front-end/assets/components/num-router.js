@@ -12,6 +12,20 @@ class NumRouter extends HTMLElement {
     const role = localStorage.getItem("authRole");
     const paid = localStorage.getItem("courierPaid");
     const loggedIn = localStorage.getItem("authLoggedIn");
+    const appState = localStorage.getItem("appState") || "guest";
+
+    if (appState === "courier" && hash === "orders") {
+      alert("Хүргэлт хийж байх үед захиалгын хэсэгт орох боломжгүй");
+      location.hash = "#home";
+      return;
+    }
+
+    if (appState === "customer" && hash === "delivery") {
+      alert("Захиалга өгсөн үед хүргэлтийн хэсэгт орох боломжгүй");
+      location.hash = "#home";
+      return;
+    }
+
     if (hash === "delivery") {
       if (loggedIn !== "1" || role !== "courier" || paid !== "1") {
         alert("Энэ хэсэг зөвхөн хүргэгчид нээлттэй");

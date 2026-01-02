@@ -145,7 +145,7 @@ class HomePage extends HTMLElement {
         <sh-cart class="cart"></sh-cart>
 
         <div class="top-row">
-          <button class="btn btn--accent order-btn">Захиалах</button>
+          <button class="btn btn--accent order-btn" data-role="order-action">Захиалах</button>
         </div>
       </section>
 
