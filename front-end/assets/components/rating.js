@@ -1,7 +1,6 @@
 import express from 'express';
 import pool from './db'; 
 const router = express.Router();
-const pool = require('./db'); // Your PostgreSQL connection pool
 
 // POST /api/ratings - Submit rating and complete order
 router.post('/', async (req, res) => {
