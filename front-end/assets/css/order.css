@@ -20,7 +20,6 @@ orders-page {
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.6fr);
     gap: 30px;
     max-width: 1300px;
-    margin: 80px auto;
     padding: 0 30px;
     align-items: start;
   }
