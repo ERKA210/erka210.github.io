@@ -106,8 +106,14 @@ class ProfilePage extends HTMLElement {
         </div>
 
         <div class="profile-actions-desktop">
-          <button class="btn primary" data-modal-open="ordersModal">Миний захиалга</button>
-          <button class="btn ghost" data-modal-open="deliveryModal">Миний хүргэлт</button>
+          <button class="action-card" type="button" data-modal-open="ordersModal">
+            <span class="action-title">Миний захиалга</span>
+            <span class="action-subtitle">Түүх, төлөвийг харах</span>
+          </button>
+          <button class="action-card" type="button" data-modal-open="deliveryModal">
+            <span class="action-title">Миний хүргэлт</span>
+            <span class="action-subtitle">Хүргэлтийн мэдээлэл</span>
+          </button>
         </div>
 
         <div class="profile-grid">

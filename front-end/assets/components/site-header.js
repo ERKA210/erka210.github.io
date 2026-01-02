@@ -76,7 +76,7 @@ class SiteHeader extends HTMLElement {
                 </div>
                 <button class="logout-btn" type="button">Гарах</button>
               `
-        : `<button class="login-btn" type="button">Хүргэгч болох</button>`
+        : `<button class="login-btn" type="button">Нэвтрэх</button>`
       }
         </div>
       </header>
