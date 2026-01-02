@@ -156,7 +156,7 @@ class OrdersPage extends HTMLElement {
         <p>${itemsTxt || "Бараа байхгүй"}</p>
         <p class="order-total">Дүн: ${this.formatPrice(o.total_amount || 0)}</p>
       </div>
-      <img src="${iconSrc}" alt="hemjee">
+      <img src="${iconSrc}" alt="hemjee" width="57" height="57" decoding="async">
     </div>
   `;
     }).join("");

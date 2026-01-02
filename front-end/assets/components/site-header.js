@@ -31,7 +31,7 @@ class SiteHeader extends HTMLElement {
     this.innerHTML = `
       <header class="site-top">
         <div class="brand">
-          <img src="${logoSrc}" alt="Logo" class="brand-logo" />
+          <img src="${logoSrc}" alt="Logo" class="brand-logo" width="272" height="74" />
         </div>
 
         <nav class="top-menu">
@@ -107,7 +107,7 @@ class SiteHeader extends HTMLElement {
 
     const avatarBtn = this.querySelector(".avatar-btn");
     if (avatarBtn) {
-      avatarBtn.innerHTML = `<img src="assets/img/profile.jpg" alt="Профайл">`;
+      avatarBtn.innerHTML = `<img src="assets/img/profile.jpg" alt="Профайл" width="40" height="40" decoding="async">`;
       avatarBtn.addEventListener("click", () => {
         location.hash = "#profile";
       });

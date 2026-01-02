@@ -3,7 +3,7 @@ class OfferCard extends HTMLElement {
     this.innerHTML = `
       <article class="offer-card">
         <div class="offer-thumb">
-          <img src="${this.getAttribute('thumb') || 'assets/img/box.svg'}" alt="icon"/>
+          <img src="${this.getAttribute('thumb') || 'assets/img/box.svg'}" alt="icon" width="57" height="57" decoding="async"/>
         </div>
         <div class="offer-info">
           <div class="offer-title">${this.getAttribute('title') || ''}</div>

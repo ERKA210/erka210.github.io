@@ -6,6 +6,7 @@ class ProfilePage extends HTMLElement {
 
   renderAccessGate() {
     this.innerHTML = `
+      <link rel="stylesheet" href="assets/css/profile.css" />
       <section class="profile-page">
         <div class="profile-hero">
           <div class="profile-hero__content">
@@ -42,6 +43,7 @@ class ProfilePage extends HTMLElement {
 
   redirectToLogin() {
     this.innerHTML = `
+      <link rel="stylesheet" href="assets/css/profile.css" />
       <section class="profile-page">
         <div class="profile-hero">
           <div class="profile-hero__content">
@@ -68,11 +70,12 @@ class ProfilePage extends HTMLElement {
     const deliveryHistory = this.getDeliveryHistory();
 
     this.innerHTML = `
+      <link rel="stylesheet" href="assets/css/profile.css" />
       <section class="profile-page">
         <div class="profile-hero">
           <div class="profile-hero__content">
             <div class="avatar-wrap">
-              <img src="${this.profileData.avatar || 'assets/img/profile.jpg'}" alt="Профайл зураг" class="avatar profile-avatar" />
+              <img src="${this.profileData.avatar || 'assets/img/profile.jpg'}" alt="Профайл зураг" class="avatar profile-avatar" width="120" height="120" decoding="async" />
             </div>
 
             <div class="profile-meta">
@@ -357,7 +360,7 @@ class ProfilePage extends HTMLElement {
       return `
       <div class="history-card">
         <div class="history-icon" aria-hidden="true">
-          <img src="${icon}" alt="">
+          <img src="${icon}" alt="" width="32" height="32" decoding="async">
         </div>
         <div class="history-info">
           <h4>${item.title}</h4>

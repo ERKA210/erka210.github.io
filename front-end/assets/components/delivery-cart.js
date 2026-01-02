@@ -106,7 +106,7 @@ class DeliveryCart extends HTMLElement {
       row.dataset.id = item.id || "";
       row.innerHTML = `
         <div class="delivery-cart__thumb">
-          <img src="${this.escapeAttr(item.thumb || "assets/img/box.svg")}" alt="">
+          <img src="${this.escapeAttr(item.thumb || "assets/img/box.svg")}" alt="" width="57" height="57" decoding="async">
         </div>
         <div class="delivery-cart__info">
           <div class="delivery-cart__title">${this.escapeHtml(item.title || "")}</div>

@@ -39,7 +39,7 @@ class ShCart extends HTMLElement {
             <div></div>
             <div class="delivery-box">
               <p><b>Хүргэлт:</b></p>
-              <img src="assets/img/box.svg" alt="delivery">
+              <img src="assets/img/box.svg" alt="delivery" width="57" height="57" decoding="async">
               <p>1500₮</p>
             </div>
 

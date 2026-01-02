@@ -115,16 +115,16 @@ class HomePage extends HTMLElement {
       <section class="filter-section">
         <div class="middle-row">
           <div class="ctrl">
-            <span><img src="assets/img/map_pin.svg" alt="icon"/></span>
+            <span><img src="assets/img/map_pin.svg" alt="icon" width="16" height="16" /></span>
             <select id="fromPlace">
               <option value="" disabled selected hidden>Хаанаас</option>
             </select>
           </div>
 
-          <span><img src="assets/img/arrow.svg" alt="icon"/></span>
+          <span><img src="assets/img/arrow.svg" alt="icon" width="67" height="67" /></span>
 
           <div class="ctrl">
-            <span><img src="assets/img/map_pin.svg" alt="icon"/></span>
+            <span><img src="assets/img/map_pin.svg" alt="icon" width="16" height="16" /></span>
             <select id="toPlace">
               <option value="" disabled selected hidden>Хаашаа</option>
             </select>
@@ -135,7 +135,7 @@ class HomePage extends HTMLElement {
 
         <div class="bottom-row">
           <div class="ctrl wide">
-            <span><img src="assets/img/fork.svg" alt="icon" /></span>
+            <span><img src="assets/img/fork.svg" alt="icon" width="40" height="38" /></span>
             <select id="what">
               <option value="" disabled selected hidden>Юуг</option>
             </select>

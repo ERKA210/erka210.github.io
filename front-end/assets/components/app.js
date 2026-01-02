@@ -1,27 +1,2 @@
-// Components
-import './offer-list.js';
-import './sh-cart.js';
-import './delivery-cart.js';
-import './date-time-picker.js';
-import '../js/modal.js';
-import './d-orders.js';
-import './del-order-details.js';
-import './del-order-progress.js';
-import './offer-modal.js';
 import './site-header.js';
-import './order-form.js';
 import './num-router.js';
-import './courier-card.js';
-import './delivery-order-page.js';
-import './rating.js';
-import './order-progress.js';
-import './person-detail.js';
-import './order-courier.js';
-
-// Pages
-import '../pages/home-page.js';
-import '../pages/delivery-page.js';
-import '../pages/orders-page.js';
-import '../pages/profile-page.js';
-import '../pages/pay-page.js';
-import '../pages/login-page.js';
