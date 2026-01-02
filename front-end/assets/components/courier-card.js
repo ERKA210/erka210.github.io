@@ -33,8 +33,9 @@ class Couriers extends HTMLElement {
     `;
   }
 
-  setData({ name, phone, id, student_id }) {
-    const code = id || "";
+  setData({ name, phone, courier_id}) {
+    const displayId = courier_id || this.generateDisplayId(name, phone);
+    
     this.innerHTML = `
       <article class="courier-card">
         <div class="delivery">
@@ -44,7 +45,8 @@ class Couriers extends HTMLElement {
           <div class="delivery-info">
             <h3>${this.escape(name || "Хүргэгч")}</h3>
             <p>${phone ? `Утас: ${this.escape(phone)}` : ""}</p>
-            <p>${code ? `ID: ${this.escape(code)}` : ""}</p>
+            <p>${displayId ? `Хүргэгчийн ID: ${this.escape(displayId)}` : ""}</p>
+            ${courier_id ? `<p class="small-text">Бүртгэлийн дугаар: ${this.escape(courier_id)}</p>` : ''}
           </div>
         </div>
       </article>
@@ -61,6 +63,13 @@ class Couriers extends HTMLElement {
 
   escape(s) {
     return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;");
+  }
+
+  generateDisplayId(name, phone) {
+    if (!name || !phone) return '';
+    const namePart = name.substring(0, 3).toUpperCase();
+    const phonePart = phone.substring(phone.length - 4);
+    return `${namePart}${phonePart}`;
   }
 }
 

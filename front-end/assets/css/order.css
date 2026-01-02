@@ -538,6 +538,7 @@ order-progress {
     width: 10rem;
     height: 10rem;
     border-radius: 100%;
+    margin-top: 30%;
   }
 
   @media (max-width: 756px) {
@@ -566,7 +567,8 @@ order-progress {
     }
 
     .delivery-info {
-      width: 100%;
+      margin-left: 2rem;
+      width: 80%;
       height: auto;
       margin-top: 0;
     }
