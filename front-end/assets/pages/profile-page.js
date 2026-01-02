@@ -209,6 +209,14 @@ class ProfilePage extends HTMLElement {
           </div>
         </div>
       </div>
+      <div class="history">
+        <section class="btn-order" data-modal-open="ordersModal" id="openOrderBtn">
+          Миний захиалга
+          <p>${this.buildHistoryMarkup(orderHistory, 'Захиалга байхгүй')}</p>
+        </section>
+        <section class="btn-delivery" data-modal-open="deliveryModal" id="openDeliveryBtn">Миний хүргэлт
+        <p>${this.buildHistoryMarkup(deliveryHistory, 'Хүргэлт байхгүй')}</p></section>
+      </div>
     `;
 
     this.bindProfileData();

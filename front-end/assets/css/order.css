@@ -584,4 +584,10 @@ order-progress {
     .orders {
       margin-top: 4rem;
     }
+    .delivery img {
+      width: 7.7rem;
+      height: 7.3rem;
+      margin-top: -3%;
+      margin-left: -2%;
+    }
   }

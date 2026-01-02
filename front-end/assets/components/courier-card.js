@@ -34,7 +34,6 @@ class Couriers extends HTMLElement {
   }
 
   setData({ name, phone, courier_id}) {
-    const displayId = courier_id || this.generateDisplayId(name, phone);
     
     this.innerHTML = `
       <article class="courier-card">
@@ -44,9 +43,8 @@ class Couriers extends HTMLElement {
           </div>
           <div class="courier-info">
             <h3>Нэр : ${this.escape(name || "Хүргэгч")}</h3>
-            <p>${phone ? `Утас: ${this.escape(phone)}` : ""}</p>
-            <p>${displayId ? `Хүргэгчийн ID: ${this.escape(displayId)}` : ""}</p>
-            ${courier_id ? `<p class="small-text">Бүртгэлийн дугаар: ${this.escape(courier_id)}</p>` : ''}
+            <p>${phone ? `Утас: ${this.escape(phone || "Хүргэгч")}` : ""}</p>
+            <p>${courier_id ? `Хүргэгчийн ID: ${this.escape(courier_id || "Хүргэгч")}` : ""}</p>
           </div>
         </div>
       </article>
