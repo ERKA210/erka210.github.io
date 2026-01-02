@@ -90,4 +90,40 @@ router.post("/ratings", requireAuth, async (req, res) => {
   }
 });
 
+router.get("/ratings/courier/:id", requireAuth, async (req, res) => {
+  try {
+    await ensureStorageTables();
+    const courierId = req.params.id;
+    assertUuid(courierId, "courierId must be UUID");
+
+    const itemsRes = await pool.query(
+      `SELECT r.id,
+              r.stars,
+              r.comment,
+              r.created_at,
+              u.full_name AS customer_name
+         FROM rating_history r
+         LEFT JOIN users u ON u.id = r.customer_id
+        WHERE r.courier_id = $1
+        ORDER BY r.created_at DESC`,
+      [courierId]
+    );
+
+    const avgRes = await pool.query(
+      `SELECT COALESCE(AVG(stars), 0) AS rating_avg,
+              COUNT(*)::int AS rating_count
+         FROM ratings
+        WHERE courier_id = $1`,
+      [courierId]
+    );
+
+    res.json({
+      items: itemsRes.rows,
+      courier: avgRes.rows[0] || { rating_avg: 0, rating_count: 0 },
+    });
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.message });
+  }
+});
+
 export default router;

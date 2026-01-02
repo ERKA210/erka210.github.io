@@ -256,6 +256,18 @@ class OfferModal extends HTMLElement {
             <span class="pill" id="price">0₮</span>
           </div>
 
+          <div>
+            <p class="meta" style="margin:0 0 0.4rem;">Захиалагч</p>
+            <div class="courier" id="customerCard">
+              <img id="customerAvatar" alt="Захиалагчийн зураг" />
+              <div>
+                <h4 id="customerName"></h4>
+                <p id="customerPhone"></p>
+                <p id="customerId"></p>
+              </div>
+            </div>
+          </div>
+
           <div class="actions">
             <button class="delete" type="button">Устгах</button>
             <button class="confirm" type="button" data-role="courier-action">Хүргэх</button>
@@ -273,6 +285,11 @@ class OfferModal extends HTMLElement {
     this.thumbEl = this.shadowRoot.getElementById('thumb');
     this.subEl = this.shadowRoot.getElementById('sub');
     this.priceEl = this.shadowRoot.getElementById('price');
+    this.customerCard = this.shadowRoot.getElementById('customerCard');
+    this.customerAvatar = this.shadowRoot.getElementById('customerAvatar');
+    this.customerName = this.shadowRoot.getElementById('customerName');
+    this.customerPhone = this.shadowRoot.getElementById('customerPhone');
+    this.customerId = this.shadowRoot.getElementById('customerId');
     this.closeBtn = this.shadowRoot.querySelector('.close-btn');
     this.deleteBtn = this.shadowRoot.querySelector('.delete');
     this.confirmBtn = this.shadowRoot.querySelector('.confirm');
@@ -317,6 +334,21 @@ class OfferModal extends HTMLElement {
     }).join('') || '<li><span>Бараа алга</span><span class="price">-</span></li>';
     this.priceEl.textContent = data.price ? String(data.price) : '0₮';
 
+    const customer = data?.customer || {};
+    const customerName = customer?.name || "Тодорхойгүй";
+    const customerPhone = customer?.phone || "Утасгүй";
+    const customerId = customer?.student_id || customer?.studentId || "ID байхгүй";
+    if (this.customerCard) {
+      this.customerCard.style.display = customerName || customerPhone || customerId ? "" : "none";
+    }
+    if (this.customerAvatar) {
+      this.customerAvatar.src = customer?.avatar || "assets/img/profile.jpg";
+      this.customerAvatar.alt = customerName;
+    }
+    if (this.customerName) this.customerName.textContent = customerName;
+    if (this.customerPhone) this.customerPhone.textContent = customerPhone;
+    if (this.customerId) this.customerId.textContent = `ID: ${customerId}`;
+
     this.modal.classList.add('open');
   }
 
@@ -344,6 +376,7 @@ class OfferModal extends HTMLElement {
     const to = orderDetail?.to_name || toRaw;
     const createdAt = orderDetail?.created_at || this.parseMetaToISO(data.meta) || new Date().toISOString();
     return {
+      orderId: data?.orderId || null,
       from,
       to,
       item: firstItem?.name || '',
@@ -381,6 +414,19 @@ class OfferModal extends HTMLElement {
       return;
     }
 
+    const customer = this.currentData?.customer || {};
+    const customerId = customer?.id || customer?.customer_id || null;
+    const customerStudentId = customer?.student_id || customer?.studentId || null;
+    const selfId = this.currentUser?.id || null;
+    const selfStudentId = this.currentUser?.student_id || this.currentUser?.studentId || null;
+    if (
+      (customerId && selfId && String(customerId) === String(selfId)) ||
+      (customerStudentId && selfStudentId && String(customerStudentId) === String(selfStudentId))
+    ) {
+      alert("Өөрийн захиалгыг өөрөө хүргэх боломжгүй.");
+      return;
+    }
+
     let orderDetail = null;
     const orderId = this.currentData?.orderId;
 
@@ -414,6 +460,7 @@ class OfferModal extends HTMLElement {
     await this.saveActiveOrder(activeOrder);
     // ✅ appState: хүргэлт эхэлсэн тул courier болгоно
     window.NumAppState?.setState("courier", "delivery_started");
+    localStorage.setItem("deliveryActive", "1");
 
 
     // Дахин устгах (давхардсан ч цэвэрлэгээний үүднээс)

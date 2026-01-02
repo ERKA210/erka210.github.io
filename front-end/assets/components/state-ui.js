@@ -10,11 +10,13 @@ function getState() {
  */
 export function applyStateUI(root = document) {
   const state = getState();
+  const role = localStorage.getItem("authRole") || "";
+  const deliveryActive = localStorage.getItem("deliveryActive") === "1";
 
   // 1) Order related (place order / checkout)
   // Add data-role="order-action" to buttons/sections you want blocked while courier
   root.querySelectorAll('[data-role="order-action"]').forEach((el) => {
-    const blocked = state === "courier";
+    const blocked = state === "courier" && deliveryActive;
     if ("disabled" in el) el.disabled = blocked;
     el.style.pointerEvents = blocked ? "none" : "";
     el.style.opacity = blocked ? "0.5" : "";
@@ -24,11 +26,11 @@ export function applyStateUI(root = document) {
   // 2) Courier accept related (accept offer buttons etc.)
   // Add data-role="courier-action" to accept buttons you want blocked while customer
   root.querySelectorAll('[data-role="courier-action"]').forEach((el) => {
-    const blocked = state === "customer";
+    const blocked = role !== "courier";
     if ("disabled" in el) el.disabled = blocked;
     el.style.pointerEvents = blocked ? "none" : "";
     el.style.opacity = blocked ? "0.5" : "";
-    el.title = blocked ? "Захиалга өгсөн үед хүргэлт авах боломжгүй" : "";
+    el.title = blocked ? "Хүргэгчээр нэвтэрсний дараа хүргэлт авах боломжтой" : "";
   });
 
   // 3) Optional: hide/show whole sections

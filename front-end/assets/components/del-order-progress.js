@@ -10,22 +10,61 @@ class DelOrderProgress extends HTMLElement {
   connectedCallback() {
     this.stepsState = loadSteps();
     this.currentId = ORDERS[0]?.id || null;
-
-    this.render();
-
-    document.addEventListener("order-select", (e) => {
+    this.activeOrder = null;
+    this.handleOrderSelect = (e) => {
       this.currentId = e.detail.id;
       this.render();
-    });
+    };
+    this.handleOrderUpdated = this.loadActiveOrder.bind(this);
+
+    this.render();
+    this.loadActiveOrder();
+
+    document.addEventListener("order-select", this.handleOrderSelect);
+    window.addEventListener("order-updated", this.handleOrderUpdated);
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener("order-select", this.handleOrderSelect);
+    window.removeEventListener("order-updated", this.handleOrderUpdated);
+  }
+
+  async loadActiveOrder() {
+    try {
+      const res = await fetch("/api/active-order");
+      if (!res.ok) return;
+      const data = await res.json();
+      const order = data?.order || null;
+      this.activeOrder = order;
+      const activeId = order?.orderId || order?.id || null;
+      if (activeId) this.currentId = activeId;
+      this.render();
+    } catch (e) {
+      // ignore
+    }
   }
 
   getCurrentStep() {
-    const order = getOrderById(this.currentId);
+    const order = this.getCurrentOrder();
     if (!order) return 0;
 
     const saved = this.stepsState[order.id];
     if (saved === 0 || saved) return saved;
     return order.defaultStep || 0;
+  }
+
+  getCurrentOrder() {
+    if (this.activeOrder) {
+      const id = this.activeOrder.orderId || this.activeOrder.id || null;
+      if (id) return { id, defaultStep: 0 };
+    }
+    return getOrderById(this.currentId);
+  }
+
+  isUuid(value) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      String(value || "")
+    );
   }
 
   render() {
@@ -34,7 +73,7 @@ class DelOrderProgress extends HTMLElement {
       return;
     }
     const stepIndex = this.getCurrentStep();
-    const order = getOrderById(this.currentId);
+    const order = this.getCurrentOrder();
 
     if (!order) {
       this.innerHTML = "<p>Захиалга олдсонгүй.</p>";
@@ -79,12 +118,33 @@ class DelOrderProgress extends HTMLElement {
       saveSteps(this.stepsState);
 
       localStorage.setItem("orderStep", String(nextIdx));
+      const orderId = order.id;
+      if (this.isUuid(orderId)) {
+        this.updateOrderStatus(orderId, nextIdx);
+      }
       // ✅ Сүүлийн алхам хүрвэл хүргэлт дууссан гэж үзээд guest рүү буцаана
       if (nextIdx === maxIndex) {
         window.NumAppState?.resetToGuest("delivery_completed");
       }
       this.render();
     });
+  }
+
+  async updateOrderStatus(orderId, stepIndex) {
+    const status = stepIndex === 2 ? "delivered" : stepIndex === 1 ? "on_the_way" : "created";
+    try {
+      const res = await fetch(`/api/orders/${encodeURIComponent(orderId)}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.warn("status update failed", err?.error || res.status);
+      }
+    } catch (e) {
+      console.warn("status update error", e);
+    }
   }
 }
 

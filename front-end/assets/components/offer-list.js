@@ -15,12 +15,20 @@ class OfferCard extends HTMLElement {
     this.addEventListener('click', () => {
       const modal = document.querySelector('offer-modal');
       const subRaw = this.getAttribute('sub');
+      const customerRaw = this.getAttribute('customer');
       const orderId = this.getAttribute('order-id') || '';
       let sub = [];
+      let customer = {};
         try {
           sub = JSON.parse(subRaw);  
         } catch (e) {
           sub = []; 
+        }
+        try {
+          const decoded = customerRaw ? decodeURIComponent(customerRaw) : "";
+          customer = decoded ? JSON.parse(decoded) : {};
+        } catch (e) {
+          customer = {};
         }
       modal.show({
         thumb: this.getAttribute('thumb'),
@@ -28,7 +36,8 @@ class OfferCard extends HTMLElement {
         meta: this.getAttribute('meta'),
         sub,
         price: this.getAttribute('price'),
-        orderId
+        orderId,
+        customer
       });
     });
   }
@@ -65,7 +74,8 @@ class OffersList extends HTMLElement {
       const meta = item.meta || '';
       const price = item.price || '';
       const orderId = item.orderId || item.id || '';
-      content += `<offer-card thumb="${thumb}" title="${title}" meta="${meta}" sub='${JSON.stringify(item.sub || [])}' price="${price}" order-id="${orderId}"></offer-card>`;
+      const customer = encodeURIComponent(JSON.stringify(item.customer || {}));
+      content += `<offer-card thumb="${thumb}" title="${title}" meta="${meta}" sub='${JSON.stringify(item.sub || [])}' price="${price}" order-id="${orderId}" customer="${customer}"></offer-card>`;
     });
     row.innerHTML = content;
   }
@@ -200,12 +210,14 @@ function mapOrdersToOffers(orders) {
       const meta = ts ? formatMetaFromDate(ts) : "";
       const items = Array.isArray(order?.items) ? order.items : [];
       const totalQty = items.reduce((sum, it) => sum + (Number(it?.qty) || 0), 0);
+      const customer = order?.customer || {};
       return {
         orderId: order.id,
         title: `${order.from_name || ""} - ${order.to_name || ""}`.trim(),
         meta,
         price: formatPrice(order.total_amount || 0),
         thumb: getDeliveryIcon(totalQty),
+        customer,
         sub: items.map((it) => ({
           name: `${it.name || ""} x${it.qty || 1}`.trim(),
           price: "",

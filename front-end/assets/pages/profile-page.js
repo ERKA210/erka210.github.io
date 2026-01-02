@@ -489,34 +489,33 @@ class ProfilePage extends HTMLElement {
   }
 
   async loadReviews() {
-  try {
-    const res = await fetch("/api/ratings/me");
-    if (!res.ok) return;
-    const data = await res.json();
-    const items = Array.isArray(data?.items) ? data.items : [];
-    
-    // Group by target user for better display
-    const reviews = items.map((r) => ({
-      text: r.comment || "",
-      stars: r.stars,
-      targetName: r.targetUser?.name || "Хэрэглэгч",
-      date: new Date(r.createdAt).toLocaleDateString('mn-MN')
-    }));
-    
-    this.updateReviewsUI(reviews);
-    
-    // If user is a courier, show their average rating
-    if (this.currentUser?.role === 'courier') {
-      const courierRes = await fetch(`/api/ratings/courier/${this.currentUser.id}`);
-      if (courierRes.ok) {
+    try {
+      if (this.currentUser?.role === "courier") {
+        const courierRes = await fetch(`/api/ratings/courier/${this.currentUser.id}`);
+        if (!courierRes.ok) return;
         const courierData = await courierRes.json();
-        this.updateAverageRating(courierData.courier.rating_avg);
+        const items = Array.isArray(courierData?.items) ? courierData.items : [];
+        const reviews = items.map((r) => ({
+          text: r.comment || "",
+          stars: r.stars,
+        }));
+        this.updateReviewsUI(reviews);
+        this.updateAverageRating(courierData?.courier?.rating_avg);
+        return;
       }
-    }
 
-  } catch (e) {
-    console.error('Load reviews error:', e);
-  }
+      const res = await fetch("/api/ratings/me");
+      if (!res.ok) return;
+      const data = await res.json();
+      const items = Array.isArray(data?.items) ? data.items : [];
+      const reviews = items.map((r) => ({
+        text: r.comment || "",
+        stars: r.stars,
+      }));
+      this.updateReviewsUI(reviews);
+    } catch (e) {
+      console.error("Load reviews error:", e);
+    }
   }
 
   updateReviewsUI(reviews) {

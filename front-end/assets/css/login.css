@@ -1,7 +1,6 @@
 login-page {
     display: flex;
     justify-content: center;
-    margin-top: 12ch;
     body {
         margin: 0;
         background: var(--color-bg);

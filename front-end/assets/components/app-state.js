@@ -22,6 +22,7 @@ export function setState(state, reason = "") {
 
 export async function resetToGuest(reason = "") {
   setState("guest", reason);
+  localStorage.setItem("deliveryActive", "0");
 
   // active-order цэвэрлэх
   try {

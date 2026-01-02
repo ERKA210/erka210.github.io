@@ -3,8 +3,34 @@ import { pool } from "../db.js";
 import { ensureCustomerUser } from "../utils/customer.js";
 import { sanitizeText } from "../utils/sanitize.js";
 import { requireAuth } from "../utils/auth.js";
+import { broadcastOrderEvent, registerSseClient, removeSseClient } from "../utils/sse.js";
 
 const router = Router();
+
+router.get("/orders/stream", requireAuth, (req, res) => {
+  const userId = req.user?.sub;
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
+  if (res.flushHeaders) res.flushHeaders();
+
+  const clientId = registerSseClient(res, {
+    userId,
+    role: req.user?.role || "",
+  });
+
+  const heartbeat = setInterval(() => {
+    res.write(": ping\n\n");
+  }, 25000);
+
+  req.on("close", () => {
+    clearInterval(heartbeat);
+    removeSseClient(clientId);
+  });
+});
 
 router.post("/orders", async (req, res) => {
   const client = await pool.connect();
@@ -110,6 +136,13 @@ router.get("/orders", async (req, res) => {
         o.created_at,
         fp.name AS from_name,
         tp.name AS to_name,
+        json_build_object(
+          'id', c.id,
+          'name', c.full_name,
+          'phone', c.phone,
+          'student_id', c.student_id,
+          'avatar', c.avatar_url
+        ) AS customer,
         CASE WHEN cu.id IS NULL THEN NULL ELSE json_build_object(
           'id', cu.id,
           'name', cu.full_name,
@@ -129,11 +162,13 @@ router.get("/orders", async (req, res) => {
       FROM orders o
       JOIN places fp ON fp.id = o.from_place_id
       JOIN places tp ON tp.id = o.to_place_id
+      JOIN users c ON c.id = o.customer_id
       LEFT JOIN order_items oi ON oi.order_id = o.id
       LEFT JOIN order_couriers oc ON oc.order_id = o.id
       LEFT JOIN users cu ON cu.id = oc.courier_id
       ${customerId ? "WHERE o.customer_id = $1" : ""}
-      GROUP BY o.id, fp.name, tp.name, cu.id, cu.full_name, cu.phone, cu.student_id, cu.avatar_url
+      GROUP BY o.id, fp.name, tp.name, c.id, c.full_name, c.phone, c.student_id, c.avatar_url,
+               cu.id, cu.full_name, cu.phone, cu.student_id, cu.avatar_url
       ORDER BY o.created_at DESC
     `;
 
@@ -165,6 +200,7 @@ router.post("/orders/:id/assign-courier", requireAuth, async (req, res) => {
     const detail = await pool.query(
       `SELECT o.id,
               o.created_at,
+              o.customer_id,
               fp.name AS from_name,
               tp.name AS to_name,
               json_build_object(
@@ -185,7 +221,69 @@ router.post("/orders/:id/assign-courier", requireAuth, async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
 
+    broadcastOrderEvent({
+      event: "order-updated",
+      orderId: id,
+      courierId: userId,
+      customerId: detail.rows[0]?.customer_id || null,
+    });
+
     res.json({ order: detail.rows[0] });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.patch("/orders/:id/status", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user?.sub;
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+  if (req.user?.role !== "courier") {
+    return res.status(403).json({ error: "Forbidden: courier only" });
+  }
+
+  const status = String(req.body?.status || "").toLowerCase();
+  const allowed = new Set(["created", "on_the_way", "on-the-way", "delivered"]);
+  if (!allowed.has(status)) {
+    return res.status(400).json({ error: "Invalid status" });
+  }
+  const normalizedStatus = status === "on-the-way" ? "on_the_way" : status;
+
+  try {
+    const meta = await pool.query(
+      `SELECT o.customer_id, oc.courier_id
+         FROM orders o
+         LEFT JOIN order_couriers oc ON oc.order_id = o.id
+        WHERE o.id = $1`,
+      [id]
+    );
+    if (!meta.rows.length) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    const { customer_id: customerId, courier_id: courierId } = meta.rows[0];
+    if (!courierId || courierId !== userId) {
+      return res.status(403).json({ error: "Forbidden: not assigned courier" });
+    }
+
+    await pool.query(
+      `UPDATE orders SET status = $1 WHERE id = $2`,
+      [normalizedStatus, id]
+    );
+    await pool.query(
+      `INSERT INTO order_status_history (order_id, status, note)
+       VALUES ($1,$2,$3)`,
+      [id, normalizedStatus, "Courier status update"]
+    );
+
+    broadcastOrderEvent({
+      event: "order-status",
+      orderId: id,
+      status: normalizedStatus,
+      courierId,
+      customerId,
+    });
+
+    res.json({ ok: true, status: normalizedStatus });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -212,6 +310,22 @@ router.post("/orders/:id/pay", async (req, res) => {
       [id]
     );
     await client.query("COMMIT");
+    const meta = await pool.query(
+      `SELECT o.customer_id, oc.courier_id
+         FROM orders o
+         LEFT JOIN order_couriers oc ON oc.order_id = o.id
+        WHERE o.id = $1`,
+      [id]
+    );
+    const customerId = meta.rows[0]?.customer_id || null;
+    const courierId = meta.rows[0]?.courier_id || null;
+    broadcastOrderEvent({
+      event: "order-status",
+      orderId: id,
+      status: "delivered",
+      courierId,
+      customerId,
+    });
     res.json({ ok: true });
   } catch (e) {
     await client.query("ROLLBACK");

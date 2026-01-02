@@ -7,6 +7,7 @@ class OrdersPage extends HTMLElement {
     this.bindModal();
     this.bindProgress();
     this.bindClicks();
+    this.initOrderStream();
     this.selectedOrder = null;
   }
 
@@ -270,12 +271,10 @@ class OrdersPage extends HTMLElement {
   }
 
   filterExpired(orders) {
-    const now = Date.now();
-    const cutoff = now - 24 * 60 * 60 * 1000;
     return orders.filter((o) => {
       const ts = this.getOrderTimestamp(o);
       if (ts === null) return false;
-      return ts >= cutoff;
+      return ts >= Date.now();
     });
   }
 
@@ -371,6 +370,60 @@ class OrdersPage extends HTMLElement {
       ratingEl.addEventListener('rate', e => {
         console.log('Үнэлгээ:', e.detail);
       });
+    }
+  }
+
+  initOrderStream() {
+    if (this.orderStream) return;
+    const role = localStorage.getItem("authRole");
+    if (role !== "customer") return;
+    if (!window.EventSource) return;
+
+    try {
+      this.orderStream = new EventSource(`${API}/api/orders/stream`, { withCredentials: true });
+    } catch (e) {
+      try {
+        this.orderStream = new EventSource(`${API}/api/orders/stream`);
+      } catch (err) {
+        this.orderStream = null;
+        return;
+      }
+    }
+
+    this.handleOrderStatusEvent = (e) => {
+      try {
+        const data = JSON.parse(e.data || "{}");
+        if (!data.orderId || !data.status) return;
+        if (!this.selectedOrder || String(this.selectedOrder.id) === String(data.orderId)) {
+          if (this.selectedOrder) this.selectedOrder.status = data.status;
+          this.setProgressFromStatus(data.status);
+          if (String(data.status).toLowerCase() === "delivered") {
+            window.NumAppState?.resetToGuest("order_delivered");
+          }
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
+
+    this.handleOrderUpdatedEvent = () => {
+      this.loadOrders();
+    };
+
+    this.orderStream.addEventListener("order-status", this.handleOrderStatusEvent);
+    this.orderStream.addEventListener("order-updated", this.handleOrderUpdatedEvent);
+  }
+
+  disconnectedCallback() {
+    if (this.orderStream) {
+      if (this.handleOrderStatusEvent) {
+        this.orderStream.removeEventListener("order-status", this.handleOrderStatusEvent);
+      }
+      if (this.handleOrderUpdatedEvent) {
+        this.orderStream.removeEventListener("order-updated", this.handleOrderUpdatedEvent);
+      }
+      this.orderStream.close();
+      this.orderStream = null;
     }
   }
 }
