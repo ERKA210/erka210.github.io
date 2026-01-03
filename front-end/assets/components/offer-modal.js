@@ -303,11 +303,7 @@ class OfferModal extends HTMLElement {
 
     // Устгах товч дарсан үед санал устгах
     this.deleteBtn.addEventListener('click', () => {
-      if (this.currentData) {
-        this.removeOfferFromList(this.currentData);
-        this.refreshOffersList();
-      }
-      this.close();
+      this.handleDelete();
     });
 
     this.confirmBtn.addEventListener('click', () => this.handleConfirm());
@@ -497,6 +493,61 @@ class OfferModal extends HTMLElement {
     }
   }
 
+  async handleDelete() {
+    if (!this.currentData) {
+      this.close();
+      return;
+    }
+
+    await this.fetchCurrentUser();
+    const orderId = this.currentData?.orderId || this.currentData?.id || null;
+    const isOwner = this.isOwnerOfOrder(this.currentData);
+
+    if (isOwner && orderId) {
+      const cancelled = await this.cancelOrderOnServer(orderId);
+      if (!cancelled) {
+        return;
+      }
+    }
+
+    this.removeOfferFromList(this.currentData);
+    this.refreshOffersList();
+    this.close();
+  }
+
+  isOwnerOfOrder(data) {
+    const customer = data?.customer || {};
+    const user = this.currentUser || {};
+    const customerId = customer?.id || customer?.customer_id || null;
+    const customerStudentId = customer?.student_id || customer?.studentId || null;
+    const userId = user?.id || null;
+    const userStudentId = user?.student_id || user?.studentId || null;
+    if (customerId && userId && String(customerId) === String(userId)) return true;
+    if (customerStudentId && userStudentId && String(customerStudentId) === String(userStudentId)) return true;
+    return false;
+  }
+
+  async cancelOrderOnServer(orderId) {
+    try {
+      const res = await fetch(`/api/orders/${encodeURIComponent(orderId)}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (res.status === 401) {
+        location.hash = "#login";
+        return false;
+      }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err?.error || "Захиалга устгахад алдаа гарлаа");
+        return false;
+      }
+      return true;
+    } catch (e) {
+      alert("Захиалга устгахад алдаа гарлаа");
+      return false;
+    }
+  }
 
   async addToDeliveryCart(data) {
     const title = data.title || '';
@@ -558,6 +609,13 @@ class OfferModal extends HTMLElement {
     return this.currentUser;
   }
 
+  getRemovedStorageKey(baseKey) {
+    const authKey = localStorage.getItem("authUserKey");
+    const userId = this.currentUser?.id || "";
+    const suffix = authKey || userId || "";
+    return suffix ? `${baseKey}:${suffix}` : baseKey;
+  }
+
   removeOfferFromList(data) {
     // Validate input
     if (!data || typeof data !== 'object') return false;
@@ -590,7 +648,8 @@ class OfferModal extends HTMLElement {
 
     // Track removed offers to avoid rehydrating from API
     if (orderId) {
-      const removedIdsRaw = localStorage.getItem('removed_offer_ids');
+      const removedIdsKey = this.getRemovedStorageKey('removed_offer_ids');
+      const removedIdsRaw = localStorage.getItem(removedIdsKey);
       let removedIds = [];
       try {
         removedIds = JSON.parse(removedIdsRaw) || [];
@@ -600,10 +659,11 @@ class OfferModal extends HTMLElement {
       const normalizedId = String(orderId);
       if (!removedIds.includes(normalizedId)) {
         removedIds.push(normalizedId);
-        localStorage.setItem('removed_offer_ids', JSON.stringify(removedIds));
+        localStorage.setItem(removedIdsKey, JSON.stringify(removedIds));
       }
     } else if (key) {
-      const removedKeysRaw = localStorage.getItem('removed_offer_keys');
+      const removedKeysKey = this.getRemovedStorageKey('removed_offer_keys');
+      const removedKeysRaw = localStorage.getItem(removedKeysKey);
       let removedKeys = [];
       try {
         removedKeys = JSON.parse(removedKeysRaw) || [];
@@ -612,7 +672,7 @@ class OfferModal extends HTMLElement {
       }
       if (!removedKeys.includes(key)) {
         removedKeys.push(key);
-        localStorage.setItem('removed_offer_keys', JSON.stringify(removedKeys));
+        localStorage.setItem(removedKeysKey, JSON.stringify(removedKeys));
       }
     }
 

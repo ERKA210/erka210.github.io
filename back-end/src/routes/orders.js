@@ -179,6 +179,62 @@ router.get("/orders", async (req, res) => {
   }
 });
 
+router.delete("/orders/:id", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user?.sub;
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const meta = await pool.query(
+      `SELECT o.customer_id, o.status, oc.courier_id
+         FROM orders o
+         LEFT JOIN order_couriers oc ON oc.order_id = o.id
+        WHERE o.id = $1`,
+      [id]
+    );
+    if (!meta.rows.length) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    const { customer_id: customerId, status, courier_id: courierId } = meta.rows[0];
+    if (req.user?.role !== "admin" && String(customerId) !== String(userId)) {
+      return res.status(403).json({ error: "Forbidden: owner only" });
+    }
+
+    const normalizedStatus = String(status || "").toLowerCase();
+    if (normalizedStatus === "delivered") {
+      return res.status(400).json({ error: "Delivered orders cannot be cancelled" });
+    }
+
+    if (normalizedStatus !== "cancelled") {
+      await pool.query(
+        `UPDATE orders
+            SET status = 'cancelled',
+                updated_at = now()
+          WHERE id = $1`,
+        [id]
+      );
+      await pool.query(
+        `INSERT INTO order_status_history (order_id, status, note)
+         VALUES ($1,'cancelled','Order cancelled by customer')`,
+        [id]
+      );
+    }
+
+    broadcastOrderEvent({
+      event: "order-status",
+      orderId: id,
+      status: "cancelled",
+      courierId,
+      customerId,
+    });
+
+    res.json({ ok: true, status: "cancelled" });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.get("/orders/history/customer", requireAuth, async (req, res) => {
   try {
     const userId = req.user?.sub;

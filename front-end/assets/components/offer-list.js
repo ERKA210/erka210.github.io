@@ -201,7 +201,7 @@ function mapOrdersToOffers(orders) {
   return orders
     .filter((order) => {
       const status = String(order?.status || "").toLowerCase();
-      if (status === "delivered") return false;
+      if (status === "delivered" || status === "cancelled" || status === "canceled") return false;
       if (order?.courier) return false;
       return !isOrderExpired(order);
     })
@@ -246,8 +246,13 @@ function readLocalOffers() {
   }
 }
 
+function getRemovedStorageKey(baseKey) {
+  const authKey = localStorage.getItem("authUserKey");
+  return authKey ? `${baseKey}:${authKey}` : baseKey;
+}
+
 function readRemovedOfferIds() {
-  const raw = localStorage.getItem('removed_offer_ids');
+  const raw = localStorage.getItem(getRemovedStorageKey('removed_offer_ids'));
   if (!raw) return [];
   try {
     return JSON.parse(raw) || [];
@@ -257,7 +262,7 @@ function readRemovedOfferIds() {
 }
 
 function readRemovedOfferKeys() {
-  const raw = localStorage.getItem('removed_offer_keys');
+  const raw = localStorage.getItem(getRemovedStorageKey('removed_offer_keys'));
   if (!raw) return [];
   try {
     return JSON.parse(raw) || [];
