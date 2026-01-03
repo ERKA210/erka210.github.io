@@ -124,7 +124,7 @@ class DelOrderProgress extends HTMLElement {
         nextBtn.textContent = "Үнэлгээ хүлээж байна";
         nextBtn.style.opacity = "0.6";
         this.startRatingPoll(order.id);
-        alert("Хүргэлт Захиалагч үнэлгээ өгсний дараа автоматаар дуусна дууссан.");
+        alert("Захиалагч үнэлгээ өгсний дараа автоматаар дуусна.");
         return;
       }
 

@@ -9,6 +9,7 @@ class LoginPage extends HTMLElement {
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div style="width:18px"></div>
           <strong id="login-title">Бүртгүүлэх</strong>
+          
           <div class="close">✕</div>
         </div>
 
@@ -128,6 +129,20 @@ class LoginPage extends HTMLElement {
           </div>
         </div>
       </div>
+  <div class="scene">
+    <div class="delivery">
+      <div class="head"></div>
+      <div class="body"></div>
+
+      <div class="arm left"></div>
+      <div class="arm right"></div>
+
+      <div class="leg left"></div>
+      <div class="leg right"></div>
+
+      <div class="box">📦</div>
+    </div>
+  </div>
     `;
 
     const form = this.querySelector("form");
