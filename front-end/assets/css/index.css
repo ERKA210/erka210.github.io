@@ -570,8 +570,7 @@ home-page {
     padding: 1rem;
     display: grid;
     grid-template-columns: 65% 25%;
-    grid-template-rows: 1fr auto;
-    align-items: start;
+    grid-template-rows: auto auto;
     gap: 1.5rem;
     position: relative;
   }

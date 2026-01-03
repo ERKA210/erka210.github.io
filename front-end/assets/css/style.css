@@ -35,8 +35,8 @@
   --shadow-tab-active: 0 0.25rem 0.5rem var(--color-shadow-accent);
   --shadow-tab-icon: 0 0.6rem 1.5rem var(--color-shadow-accent-2);
 
-  --transition: all 0.3s ease;
-  --transition-fast: all 0.2s ease;
+  --transition: 0.3s ease;
+  --transition-fast: 0.2s ease;
   --transition-route: 0.45s ease;
 
   --top-h: 4rem;
