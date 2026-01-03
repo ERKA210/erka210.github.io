@@ -246,15 +246,50 @@ function readLocalOffers() {
   }
 }
 
+function readRemovedOfferIds() {
+  const raw = localStorage.getItem('removed_offer_ids');
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function readRemovedOfferKeys() {
+  const raw = localStorage.getItem('removed_offer_keys');
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function filterRemovedOffers(offers) {
+  const removedIds = readRemovedOfferIds();
+  const removedKeys = readRemovedOfferKeys();
+  if (!removedIds.length && !removedKeys.length) return offers;
+  return offers.filter((offer) => {
+    const offerId = offer?.orderId || offer?.id || null;
+    if (offerId && removedIds.includes(String(offerId))) return false;
+    const key = `${offer?.title || ''}|${offer?.meta || ''}|${offer?.price || ''}`;
+    if (removedKeys.includes(key)) return false;
+    return true;
+  });
+}
+
 async function loadOffers() {
   let offers = [];
   try {
     offers = await fetchOffersFromApi();
+    offers = filterRemovedOffers(offers);
     if (offers.length) {
       localStorage.setItem('offers', JSON.stringify(offers));
     }
   } catch (e) {
     offers = readLocalOffers();
+    offers = filterRemovedOffers(offers);
   }
 
   if (!Array.isArray(offers) || offers.length === 0) {
@@ -272,6 +307,9 @@ async function loadOffers() {
       localStorage.setItem('offers', JSON.stringify(offers));
     }
   }
+
+  offers = filterRemovedOffers(offers);
+  localStorage.setItem('offers', JSON.stringify(offers));
 
   const lists = document.querySelectorAll("offers-list");
   lists.forEach((list) => {
