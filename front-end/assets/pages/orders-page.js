@@ -166,11 +166,15 @@ class OrdersPage extends HTMLElement {
     this.selectedOrder = orders[0] || null;
     this.setProgressFromStatus(orders[0]?.status);
     this.loadCourierForOrder(orders[0] || null);
-    // ✅ Delivered бол guest рүү буцаана
+    // ✅ Delivered бол үнэлгээ нээнэ (resetToGuest хийхгүй)
     const st = String(orders[0]?.status || "").toLowerCase();
+    this.syncRatingUI(st);
+
     if (st === "delivered") {
-      window.NumAppState?.resetToGuest("order_delivered");
+      localStorage.setItem("pendingRatingOrder", String(orders[0]?.id || ""));
+      this.openRatingModal();
     }
+
 
   }
 
@@ -271,6 +275,31 @@ class OrdersPage extends HTMLElement {
     });
   }
 
+  syncRatingUI(status) {
+    const openBtn = this.querySelector("#openModal");
+    if (!openBtn) return;
+
+    const st = String(status || "").toLowerCase();
+    const delivered = st === "delivered";
+
+    openBtn.disabled = !delivered;
+    openBtn.style.opacity = delivered ? "" : "0.5";
+    openBtn.title = delivered ? "" : "Хүргэлт дууссаны дараа үнэлгээ өгнө";
+
+    openBtn.textContent = delivered ? "Үнэлгээ өгөх" : "Бараа хүлээж авсан";
+  }
+
+  openRatingModal() {
+    const modal = this.querySelector("#ratingModal");
+    if (modal) modal.style.display = "block";
+  }
+
+  closeRatingModal() {
+    const modal = this.querySelector("#ratingModal");
+    if (modal) modal.style.display = "none";
+  }
+
+
   filterExpired(orders) {
     return orders.filter((o) => {
       const ts = this.getOrderTimestamp(o);
@@ -320,8 +349,16 @@ class OrdersPage extends HTMLElement {
           alert("Захиалга сонгоно уу.");
           return;
         }
+
+        const st = String(this.selectedOrder?.status || "").toLowerCase();
+        if (st !== "delivered") {
+          alert("Хүргэлт дууссаны дараа үнэлгээ өгнө.");
+          return;
+        }
+
         modal.style.display = "block";
       };
+
     }
     if (closeBtn && modal) {
       closeBtn.onclick = () => modal.style.display = "none";
@@ -359,8 +396,14 @@ class OrdersPage extends HTMLElement {
             alert(err.error || "Сэтгэгдэл хадгалахад алдаа гарлаа");
             return;
           }
-          modal.style.display = "none";
+          this.closeRatingModal();
+          localStorage.removeItem("pendingRatingOrder");
           window.dispatchEvent(new Event("reviews-updated"));
+
+          await window.NumAppState?.resetToGuest("rating_submitted");
+
+          this.loadOrders();
+
         } catch (e) {
           alert("Сэтгэгдэл хадгалахад алдаа гарлаа");
         }
@@ -375,7 +418,7 @@ class OrdersPage extends HTMLElement {
   }
 
   initOrderStream() {
-    if (!window.EventSource) return; 
+    if (!window.EventSource) return;
 
     this.orderStream = new EventSource("/api/orders/stream");
 
@@ -414,9 +457,14 @@ class OrdersPage extends HTMLElement {
         if (!this.selectedOrder || String(this.selectedOrder.id) === String(data.orderId)) {
           if (this.selectedOrder) this.selectedOrder.status = data.status;
           this.setProgressFromStatus(data.status);
-          if (String(data.status).toLowerCase() === "delivered") {
-            window.NumAppState?.resetToGuest("order_delivered");
+          const st = String(data.status).toLowerCase();
+          this.syncRatingUI(st);
+
+          if (st === "delivered") {
+            localStorage.setItem("pendingRatingOrder", String(data.orderId));
+            this.openRatingModal();
           }
+
         }
       } catch (err) {
         // ignore
@@ -430,7 +478,7 @@ class OrdersPage extends HTMLElement {
       }
     }
     );
-    
+
     this.handleOrderUpdatedEvent = () => {
       this.loadOrders();
     };

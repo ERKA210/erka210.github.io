@@ -112,23 +112,33 @@ class DelOrderProgress extends HTMLElement {
     nextBtn.addEventListener("click", () => {
       const current = this.getCurrentStep();
       const maxIndex = STEP_LABELS.length - 1;
-      const nextIdx = current < maxIndex ? current + 1 : maxIndex;
+
+      // ✅ Delivered дээр дахиж Next даруулахгүй
+      if (current >= maxIndex) {
+        alert("Хүргэлт амжилттай дууссан.");
+        return;
+      }
+
+      const nextIdx = current + 1;
 
       this.stepsState[order.id] = nextIdx;
       saveSteps(this.stepsState);
 
       localStorage.setItem("orderStep", String(nextIdx));
+
       const orderId = order.id;
       if (this.isUuid(orderId)) {
         this.updateOrderStatus(orderId, nextIdx);
       }
+
       // ✅ Сүүлийн алхам хүрвэл хүргэлт дууссан гэж үзээд guest рүү буцаана
       if (nextIdx === maxIndex) {
-        document.dispatchEvent(new CustomEvent('show-receive-button'));
         window.NumAppState?.resetToGuest("delivery_completed");
       }
+
       this.render();
     });
+
   }
 
   async updateOrderStatus(orderId, stepIndex) {
