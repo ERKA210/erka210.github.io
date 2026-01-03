@@ -160,7 +160,6 @@
   font-family: var(--font-family);
 }
 
-
 .site-top {
   position: fixed;
   top: 0;
@@ -218,6 +217,17 @@ main {
   padding-top: calc(var(--top-h) + var(--main-top-gap));
 }
 
+@keyframes routeFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 num-router {
   display: block;
 }
@@ -230,6 +240,7 @@ num-router > [data-route] {
 }
 
 num-router > [data-route].is-active {
+  animation: routeFadeUp 260ms ease-out;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
@@ -238,6 +249,12 @@ num-router > [data-route].is-active {
 num-router > [data-route].is-leaving {
   opacity: 0;
   transform: translateY(-0.4rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  num-router > [data-route].is-active {
+    animation: none;
+  }
 }
 
 .header-actions {

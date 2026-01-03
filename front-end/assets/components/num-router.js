@@ -2,7 +2,6 @@ class NumRouter extends HTMLElement {
   connectedCallback() {
     this._views = Array.from(this.querySelectorAll('[data-route]'));
     this._current = null;
-    this._durationMs = 240;
     this._loadedRoutes = new Set();
     window.addEventListener('hashchange', () => this.applyRoute());
     this.applyRoute();
@@ -70,23 +69,11 @@ class NumRouter extends HTMLElement {
     const prev = this._current;
     this._current = next;
 
-    prev.hidden = false;
+    prev.hidden = true;
     prev.classList.remove('is-active');
-    prev.classList.add('is-leaving');
 
     next.hidden = false;
-    next.classList.remove('is-leaving');
-    next.classList.remove('is-active');
-
-    requestAnimationFrame(() => {
-      next.classList.add('is-active');
-    });
-
-    clearTimeout(this._leaveTimer);
-    this._leaveTimer = setTimeout(() => {
-      prev.hidden = true;
-      prev.classList.remove('is-leaving');
-    }, this._durationMs);
+    next.classList.add('is-active');
   }
 
   async loadRoute(route) {
