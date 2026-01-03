@@ -564,15 +564,14 @@ class OfferModal extends HTMLElement {
 
     // Get offers from localStorage
     const raw = localStorage.getItem('offers');
-    if (!raw) return false;
 
     // Parse offers
     let offers = [];
     try {
-      offers = JSON.parse(raw) || [];
+      offers = raw ? (JSON.parse(raw) || []) : [];
     } catch (e) {
       console.error('Failed to parse offers from localStorage:', e);
-      return false;
+      offers = [];
     }
 
     const orderId = data.orderId || data.id || null;
@@ -581,12 +580,41 @@ class OfferModal extends HTMLElement {
 
     // Filter out the matching offer
     const next = offers.filter(item => {
-      if (orderId && (item.orderId || item.id) === orderId) {
+      const itemId = item.orderId || item.id || null;
+      if (orderId && itemId && String(itemId) === String(orderId)) {
         return false;
       }
       const itemKey = `${item.title || ''}|${item.meta || ''}|${item.price || ''}`;
       return itemKey !== key;
     });
+
+    // Track removed offers to avoid rehydrating from API
+    if (orderId) {
+      const removedIdsRaw = localStorage.getItem('removed_offer_ids');
+      let removedIds = [];
+      try {
+        removedIds = JSON.parse(removedIdsRaw) || [];
+      } catch (e) {
+        removedIds = [];
+      }
+      const normalizedId = String(orderId);
+      if (!removedIds.includes(normalizedId)) {
+        removedIds.push(normalizedId);
+        localStorage.setItem('removed_offer_ids', JSON.stringify(removedIds));
+      }
+    } else if (key) {
+      const removedKeysRaw = localStorage.getItem('removed_offer_keys');
+      let removedKeys = [];
+      try {
+        removedKeys = JSON.parse(removedKeysRaw) || [];
+      } catch (e) {
+        removedKeys = [];
+      }
+      if (!removedKeys.includes(key)) {
+        removedKeys.push(key);
+        localStorage.setItem('removed_offer_keys', JSON.stringify(removedKeys));
+      }
+    }
 
     // Check if anything was actually removed
     if (next.length === originalLength) {
