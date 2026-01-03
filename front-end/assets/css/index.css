@@ -401,7 +401,6 @@ home-page {
     gap: var(--offers-row-gap);
     overflow-x: auto;
     overscroll-behavior-x: contain;
-    -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
     padding-bottom: 0.25rem;
   }
