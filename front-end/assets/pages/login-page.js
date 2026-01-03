@@ -305,11 +305,31 @@ class LoginPage extends HTMLElement {
 
           const data = await res.json();
 
-          // ✅ auth state (pay-page guard-д хэрэгтэй)
+          // ✅ auth state (server role/identity ашиглана)
+          const serverRole =
+            (data?.user?.role || data?.role || roleValue || role || "customer") === "courier"
+              ? "courier"
+              : "customer";
+
+          const serverPhone = String(data?.user?.phone || phone || "").trim();
+          const serverStudentId = String(data?.user?.student_id || data?.user?.studentId || studentId || "").trim();
+          const userKey = (serverStudentId || serverPhone).trim();
+
           localStorage.setItem("authLoggedIn", "1");
-          localStorage.setItem("authRole", role);
-          localStorage.setItem("authPhone", phone);
-          localStorage.setItem("authStudentId", studentId);
+          localStorage.setItem("authRole", serverRole);
+          localStorage.setItem("authPhone", serverPhone);
+          localStorage.setItem("authStudentId", serverStudentId);
+          localStorage.setItem("authUserKey", userKey);
+
+          // ✅ courierPaid-г per-user key-ээс сэргээнэ
+          if (serverRole === "courier" && userKey) {
+            const paidKey = `courierPaid:${userKey}`;
+            const paid = localStorage.getItem(paidKey) === "1" ? "1" : "0";
+            localStorage.setItem("courierPaid", paid);
+          } else {
+            localStorage.setItem("courierPaid", "0");
+          }
+
 
 
           // ✅ courierPaid-г default 0 болгож тогтооно (null биш)
@@ -323,12 +343,11 @@ class LoginPage extends HTMLElement {
 
           window.dispatchEvent(new Event("user-updated"));
 
-          // ✅ redirect rules
-          if (role === "courier") {
-            // төлбөр төлөөгүй бол pay, төлсөн бол delivery
+          if (serverRole === "courier") {
             location.hash = localStorage.getItem("courierPaid") === "1" ? "#delivery" : "#pay";
             return;
           }
+
 
           // customer
           const hasDraft = localStorage.getItem("pendingOrderDraft");
