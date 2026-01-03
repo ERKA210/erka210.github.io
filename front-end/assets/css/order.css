@@ -585,8 +585,8 @@ order-progress {
       margin-top: 4rem;
     }
     .delivery img {
-      width: 7.7rem;
-      height: 7.3rem;
+      width: 7rem;
+      height: 7rem;
       margin-top: -3%;
       margin-left: -2%;
     }
@@ -596,7 +596,7 @@ order-progress {
       width: 100%;
       padding: 5px;
     }
-    .delivery-info{
+    .delivery{
       display: flex;
       flex-direction: column;
     }
