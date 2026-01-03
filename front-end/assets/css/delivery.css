@@ -341,7 +341,7 @@ delivery-page {
     .details {
       grid-area: det;
       padding: 1rem;
-      height: max-content;
+      height: auto;
     }
 
     .order-step {

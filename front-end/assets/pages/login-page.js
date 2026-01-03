@@ -347,10 +347,6 @@ class LoginPage extends HTMLElement {
 
           window.dispatchEvent(new Event("user-updated"));
 
-          if (serverRole === "courier") {
-            location.hash = localStorage.getItem("courierPaid") === "1" ? "#delivery" : "#pay";
-            return;
-          }
 
 
           // customer
