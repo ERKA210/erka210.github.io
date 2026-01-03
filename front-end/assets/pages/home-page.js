@@ -5,6 +5,8 @@ class HomePage extends HTMLElement {
     this.currentUser = null;
 
     this.render();
+    this.classList.remove("is-animated");
+    requestAnimationFrame(() => this.classList.add("is-animated"));
     this.setupConfirmModal();
     loadPlaces();
     this.hydrateCustomerFromDb();

@@ -230,6 +230,17 @@ main {
   padding-top: calc(var(--top-h) + var(--main-top-gap));
 }
 
+@keyframes routeFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 num-router {
   display: block;
 }
@@ -237,19 +248,26 @@ num-router {
 num-router > [data-route] {
   transition: opacity var(--transition-route), transform var(--transition-route);
   opacity: 0;
-  transform: translateX(0.4rem);
+  transform: translateY(0.6rem);
   pointer-events: none;
 }
 
 num-router > [data-route].is-active {
+  animation: routeFadeUp 260ms ease-out;
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(0);
   pointer-events: auto;
 }
 
 num-router > [data-route].is-leaving {
   opacity: 0;
-  transform: translateX(-0.4rem);
+  transform: translateY(-0.4rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  num-router > [data-route].is-active {
+    animation: none;
+  }
 }
 
 .header-actions {
