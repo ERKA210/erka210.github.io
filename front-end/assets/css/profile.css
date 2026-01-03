@@ -650,9 +650,13 @@
 @media (max-width: 640px) {
   .profile-page {
     padding: 0.75rem 0.85rem 2rem;
-    margin-top: 5rem;
   }
+}
 
+@media screen and (max-width: 1024px) {
+    .history{
+      margin-top: 1rem;
+    }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -746,4 +750,5 @@
     margin-top: 0.35rem;
   }
 }
+
 

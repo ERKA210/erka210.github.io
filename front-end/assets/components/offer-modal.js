@@ -431,7 +431,7 @@ class OfferModal extends HTMLElement {
 
     if (orderId) {
       try {
-        const assignRes = await fetch(`/api/orders/${encodeURIComponent(orderId)}/assign-courier`, {
+        const assignRes = await fetch(`${this.API}/api/orders/${encodeURIComponent(orderId)}/assign-courier`, {
           method: "POST",
           credentials: "include",
         });
@@ -529,7 +529,7 @@ class OfferModal extends HTMLElement {
 
   async cancelOrderOnServer(orderId) {
     try {
-      const res = await fetch(`/api/orders/${encodeURIComponent(orderId)}`, {
+      const res = await fetch(`${this.API}/api/orders/${encodeURIComponent(orderId)}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -554,7 +554,7 @@ class OfferModal extends HTMLElement {
     const meta = data.meta || '';
     const price = data.price || '';
     try {
-      const res = await fetch("/api/delivery-cart", {
+      const res = await fetch(`${this.API}/api/delivery-cart`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -583,7 +583,7 @@ class OfferModal extends HTMLElement {
 
   async saveActiveOrder(order) {
     try {
-      await fetch("/api/active-order", {
+      await fetch(`${this.API}/api/active-order`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ order }),
@@ -596,7 +596,9 @@ class OfferModal extends HTMLElement {
   async fetchCurrentUser() {
     if (this.currentUser) return this.currentUser;
     try {
-      const res = await fetch("/api/auth/me");
+      const res = await fetch(`${this.API}/api/auth/me`, {
+        credentials: "include",
+      });
       if (!res.ok) {
         this.currentUser = null;
       } else {

@@ -561,14 +561,18 @@ order-progress {
 
     .order-list {
       height: auto;
-      max-height: none;
-      overflow: visible;
       padding-right: 0;
       grid-template-columns: 1fr;
       gap: 0.6rem;
     }
     .order-side {
       gap: 1.5rem;
+    }
+    .orders{
+      margin-top: 4rem;
+      overflow-y: scroll;
+      scrollbar-width: thin;
+      height: 15rem;
     }
   }
 
