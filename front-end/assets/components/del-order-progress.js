@@ -27,6 +27,11 @@ class DelOrderProgress extends HTMLElement {
   disconnectedCallback() {
     document.removeEventListener("order-select", this.handleOrderSelect);
     window.removeEventListener("order-updated", this.handleOrderUpdated);
+    if (this._ratingTimer) {
+      clearInterval(this._ratingTimer);
+      this._ratingTimer = null;
+    }
+
   }
 
   async loadActiveOrder() {
@@ -116,9 +121,10 @@ class DelOrderProgress extends HTMLElement {
       // ✅ Delivered дээр дахиж Next даруулахгүй
       if (current >= maxIndex) {
         nextBtn.disabled = true;
-        nextBtn.textContent = "Дууссан";
+        nextBtn.textContent = "Үнэлгээ хүлээж байна";
         nextBtn.style.opacity = "0.6";
-        alert("Хүргэлт амжилттай дууссан.");
+        this.startRatingPoll(order.id);
+        alert("Хүргэлт Захиалагч үнэлгээ өгсний дараа автоматаар дуусна дууссан.");
         return;
       }
 
@@ -135,12 +141,11 @@ class DelOrderProgress extends HTMLElement {
       }
 
       if (nextIdx === maxIndex) {
-        // ✅ энэ хүргэлтийн step localStorage-оос устгана
-        delete this.stepsState[order.id];
-        saveSteps(this.stepsState);
-
-        window.NumAppState?.resetToGuest("delivery_completed");
+        // ✅ Delivered болсон: устгахгүй, үнэлгээ иртэл хүлээнэ
+        localStorage.setItem("deliveryAwaitRating", "1");
+        this.startRatingPoll(order.id);
       }
+
 
 
       this.render();
@@ -166,6 +171,45 @@ class DelOrderProgress extends HTMLElement {
       console.warn("status update error", e);
     }
   }
+  startRatingPoll(orderId) {
+    if (this._ratingTimer) return;
+
+    this._ratingTimer = setInterval(async () => {
+      try {
+        // ✅ courier өөрийн id-г авна
+        const meRes = await fetch("/api/auth/me", { credentials: "include" });
+        if (!meRes.ok) return;
+        const me = await meRes.json();
+        const courierId = me?.user?.id;
+        if (!courierId) return;
+
+        // ✅ courier-д ирсэн ratings-аас энэ order үнэлэгдсэн эсэхийг шалгана
+        const rRes = await fetch(`/api/ratings/courier/${encodeURIComponent(courierId)}`, {
+          credentials: "include",
+        });
+        if (!rRes.ok) return;
+        const data = await rRes.json();
+        const items = data?.items || [];
+
+        const rated = items.some(r => String(r.order_id) === String(orderId));
+        if (!rated) return;
+
+        // ✅ үнэлгээ орсон байна → одоо л courier тал цэвэрлэнэ
+        clearInterval(this._ratingTimer);
+        this._ratingTimer = null;
+
+        // local steps цэвэрлээд дараа нь reset
+        delete this.stepsState[orderId];
+        saveSteps(this.stepsState);
+        localStorage.removeItem("deliveryAwaitRating");
+
+        window.NumAppState?.resetToGuest("rating_done");
+      } catch {
+        // ignore
+      }
+    }, 3000); // 3 секунд тутам
+  }
+
 }
 
 customElements.define("del-order-progress", DelOrderProgress);

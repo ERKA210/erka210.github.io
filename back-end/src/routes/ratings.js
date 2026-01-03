@@ -15,6 +15,7 @@ router.get("/ratings/me", requireAuth, async (req, res) => {
 
     const r = await pool.query(
       `SELECT r.id,
+              r.order_id,  
               r.stars,
               r.comment,
               r.created_at,
