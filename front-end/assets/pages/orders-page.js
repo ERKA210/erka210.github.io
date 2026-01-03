@@ -8,6 +8,7 @@ class OrdersPage extends HTMLElement {
     this.bindProgress();
     this.bindClicks();
     this.initOrderStream();
+    this.sendBtn();
     this.selectedOrder = null;
   }
 
@@ -75,7 +76,7 @@ class OrdersPage extends HTMLElement {
             </div>
           </div>
 
-          <button id="openModal">Бараа хүлээж авсан</button>
+          <button id="openModal" style="display: none;">Бараа хүлээж авсан</button>
 
           <div id="ratingModal" class="modal">
             <div class="modal-content">
@@ -422,6 +423,14 @@ class OrdersPage extends HTMLElement {
       }
     };
 
+    document.addEventListener('show-receive-button', () => {
+      const openBtn = this.querySelector("#openModal");
+      if (openBtn) {
+        openBtn.style.display = "block";
+      }
+    }
+    );
+    
     this.handleOrderUpdatedEvent = () => {
       this.loadOrders();
     };

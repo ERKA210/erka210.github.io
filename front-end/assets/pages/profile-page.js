@@ -212,13 +212,13 @@ class ProfilePage extends HTMLElement {
         </div>
       </div>
       <div class="history">
-        <section class="btn-order" data-modal-open="ordersModal" id="openOrderBtn">
+        <section class="btn-order" id="openOrderBtn">
           Миний захиалга
           <div class="history-inline" data-history="orders">
             ${this.buildHistoryMarkup(orderHistory, 'Захиалга байхгүй')}
           </div>
         </section>
-        <section class="btn-delivery" data-modal-open="deliveryModal" id="openDeliveryBtn">
+        <section class="btn-delivery" id="openDeliveryBtn">
           Миний хүргэлт
           <div class="history-inline" data-history="deliveries">
             ${this.buildHistoryMarkup(deliveryHistory, 'Хүргэлт байхгүй')}

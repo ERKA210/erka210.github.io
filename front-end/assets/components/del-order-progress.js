@@ -124,6 +124,7 @@ class DelOrderProgress extends HTMLElement {
       }
       // ✅ Сүүлийн алхам хүрвэл хүргэлт дууссан гэж үзээд guest рүү буцаана
       if (nextIdx === maxIndex) {
+        document.dispatchEvent(new CustomEvent('show-receive-button'));
         window.NumAppState?.resetToGuest("delivery_completed");
       }
       this.render();

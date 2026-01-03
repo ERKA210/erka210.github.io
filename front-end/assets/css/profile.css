@@ -612,7 +612,7 @@
 }
 .btn-order, .btn-delivery{
   background: var(--accent);
-  padding: 1rem;
+  padding: 2rem;
   color: var(--accent);
   border-radius: 10px;
   font-weight: 700;
@@ -623,6 +623,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  height: 20rem;
+  overflow-y: scroll;
+  scrollbar-width: none;
 }
 @media (max-width: 960px) {
   .profile-hero__content {
@@ -670,6 +673,7 @@
   .profile-card {
     border-color: var(--border);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    margin-bottom: 1rem;
   }
 
   .review {
