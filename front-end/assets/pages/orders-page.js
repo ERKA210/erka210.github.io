@@ -374,6 +374,22 @@ class OrdersPage extends HTMLElement {
   }
 
   initOrderStream() {
+    if (!window.EventSource) return; 
+
+    this.orderStream = new EventSource("/api/orders/stream");
+
+    this.orderStream.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      this.updateOrderStatus(data); // Захиалгын статусыг шинэчлэх
+    };
+  }
+
+  updateOrderStatus(order) {
+    const orderEl = document.querySelector(`[data-order-id="${order.order_id}"]`);
+    if (orderEl) {
+      const statusEl = orderEl.querySelector('.status');
+      statusEl.textContent = order.status;
+    }
     if (this.orderStream) return;
     const role = localStorage.getItem("authRole");
     if (role !== "customer") return;

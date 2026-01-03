@@ -97,6 +97,21 @@ class DeliveryPage extends HTMLElement {
     if (!listEl) return;
     this.fetchDeliveryItems(listEl);
   }
+   attachOrderSelection() {
+    const orderElements = this.querySelectorAll('d-orders');
+    orderElements.forEach(orderEl => {
+      orderEl.addEventListener('click', () => {
+        const orderId = orderEl.getAttribute('data-id');
+        this.selectOrder(orderId);
+      });
+    });
+  }
+
+  selectOrder(orderId) {
+    // Dispatch custom event to notify the order selection
+    const event = new CustomEvent('order-select', { detail: { id: orderId } });
+    document.dispatchEvent(event);
+  }
 
   escapeAttr(value) {
     return String(value || '')
