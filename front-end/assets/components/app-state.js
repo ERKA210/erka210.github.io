@@ -34,10 +34,10 @@ export async function resetToGuest(reason = "") {
     });
   } catch { }
 
-  // ✅ courier талын delivery steps устгах
+  //  courier талын delivery steps устгах
   localStorage.removeItem("deliverySteps");
 
-  // ✅ courier delivery cart DB-ээс цэвэрлэх
+  //  courier delivery cart DB-ээс цэвэрлэх
   try {
     await fetch("/api/delivery-cart", {
       method: "DELETE",
