@@ -343,6 +343,7 @@ order-progress {
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
     color: #ffffff;
+    border: none;
   }
   .modal {
   display: none; 
