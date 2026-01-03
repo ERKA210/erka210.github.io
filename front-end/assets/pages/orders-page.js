@@ -2,14 +2,29 @@ const API = "http://localhost:3000";
 
 class OrdersPage extends HTMLElement {
   connectedCallback() {
-    this.render();
-    this.loadOrders();
-    this.bindModal();
-    this.bindProgress();
-    this.bindClicks();
-    this.initOrderStream();
-    this.sendBtn();
     this.selectedOrder = null;
+    this._onDocClick = this._onDocClick?.bind(this) || ((e) => this.onDocClick(e));
+    this.render();
+    this.bindModal();
+    this.bindClicks();
+    this.bindProgress(); 
+    this.loadOrders();
+    this.initOrderStream();
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener("click", this._onDocClick);
+
+    if (this.orderStream) {
+      if (this.handleOrderStatusEvent) {
+        this.orderStream.removeEventListener("order-status", this.handleOrderStatusEvent);
+      }
+      if (this.handleOrderUpdatedEvent) {
+        this.orderStream.removeEventListener("order-updated", this.handleOrderUpdatedEvent);
+      }
+      this.orderStream.close();
+      this.orderStream = null;
+    }
   }
 
   renderCourier(courier) {
@@ -29,7 +44,7 @@ class OrdersPage extends HTMLElement {
 
   render() {
     this.innerHTML = `
-  <link rel="stylesheet" href="assets/css/order.css">
+      <link rel="stylesheet" href="assets/css/order.css">
       <main class="container">
         <section class="order-side">
           <section class="orders">
@@ -76,21 +91,35 @@ class OrdersPage extends HTMLElement {
             </div>
           </div>
 
-          <button id="openModal" style="display: none;">Бараа хүлээж авсан</button>
+          <button id="openModal" style="display:none;">Үнэлгээ өгөх</button>
 
-          <div id="ratingModal" class="modal">
+          <div id="ratingModal" class="modal" style="display:none;">
             <div class="modal-content">
-              <span class="close">&times;</span>
+              <span class="close" role="button" aria-label="Хаах">&times;</span>
               <h3>Сэтгэгдэл үлдээнэ үү...</h3>
               <rating-stars max="5" color="orange" size="28px"></rating-stars>
               <input type="text" id="comment" placeholder="Сэтгэгдэл үлдээнэ үү...">
               <button class="submit" id="sendBtn">Илгээх</button>
             </div>
           </div>
-
         </section>
       </main>
     `;
+  }
+
+  markOrderRated(orderId) {
+    const key = "ratedOrders";
+    let arr = [];
+    try { arr = JSON.parse(localStorage.getItem(key) || "[]"); } catch {}
+    const set = new Set(arr.map(String));
+    set.add(String(orderId));
+    localStorage.setItem(key, JSON.stringify([...set]));
+  }
+
+  isOrderRated(orderId) {
+    let arr = [];
+    try { arr = JSON.parse(localStorage.getItem("ratedOrders") || "[]"); } catch {}
+    return arr.map(String).includes(String(orderId));
   }
 
   async loadOrders() {
@@ -104,33 +133,34 @@ class OrdersPage extends HTMLElement {
         const data = await resUser.json();
         userId = data?.user?.id || "";
       }
-    } catch (e) {
+    } catch {
       userId = "";
     }
+
     if (!userId) {
       location.hash = "#login";
       return;
     }
-    const qs = userId ? `?customerId=${encodeURIComponent(userId)}` : "";
+
+    const qs = `?customerId=${encodeURIComponent(userId)}`;
 
     try {
       const res = await fetch(`${API}/api/orders${qs}`, { credentials: "include" });
-      const data = await res.json();
+      const data = await res.json().catch(() => ([]));
       if (!res.ok) throw new Error(data?.error || "Алдаа");
 
       const filtered = this.filterExpired(Array.isArray(data) ? data : []);
-      // ✅ Хэрвээ серверээс захиалга ирсэн ч бүгд expired бол guest рүү буцаана
+      const notRated = filtered.filter((o) => !this.isOrderRated(o.id));
+
       if (Array.isArray(data) && data.length > 0 && filtered.length === 0) {
         window.NumAppState?.resetToGuest("order_expired");
       }
 
-      this.renderOrders(filtered);
+      this.renderOrders(notRated);
     } catch (e) {
-      listEl.innerHTML = `<p class="muted">Захиалга уншихад алдаа: ${e.message}</p>`;
+      listEl.innerHTML = `<p class="muted">Захиалга уншихад алдаа: ${this.escapeHtml(e.message)}</p>`;
     }
   }
-
-
 
   renderOrders(orders) {
     const listEl = this.querySelector("#orderList");
@@ -138,6 +168,10 @@ class OrdersPage extends HTMLElement {
 
     if (!orders.length) {
       listEl.innerHTML = `<p class="muted">Захиалга алга.</p>`;
+      this.selectedOrder = null;
+      this.setProgressFromStatus(null);
+      this.syncRatingUI(null);
+      this.renderCourier(null);
       return;
     }
 
@@ -151,31 +185,29 @@ class OrdersPage extends HTMLElement {
       const iconSrc = this.getOfferThumb(o?.id) || this.getDeliveryIcon(totalQty);
 
       return `
-    <div class="order-card" data-order='${encodeURIComponent(JSON.stringify(o))}'>
-      <div class="order-info">
-        <h3 class="order-title">${o.from_name || ""} - ${o.to_name || ""}</h3>
-        <h4>${meta}</h4>
-        <p>${itemsTxt || "Бараа байхгүй"}</p>
-        <p class="order-total">Дүн: ${this.formatPrice(o.total_amount || 0)}</p>
-      </div>
-      <img src="${iconSrc}" alt="hemjee" width="57" height="57" decoding="async">
-    </div>
-  `;
+        <div class="order-card" data-order='${encodeURIComponent(JSON.stringify(o))}'>
+          <div class="order-info">
+            <h3 class="order-title">${this.escapeHtml(o.from_name || "")} - ${this.escapeHtml(o.to_name || "")}</h3>
+            <h4>${this.escapeHtml(meta)}</h4>
+            <p>${this.escapeHtml(itemsTxt || "Бараа байхгүй")}</p>
+            <p class="order-total">Дүн: ${this.formatPrice(o.total_amount || 0)}</p>
+          </div>
+          <img src="${iconSrc}" alt="hemjee" width="57" height="57" decoding="async">
+        </div>
+      `;
     }).join("");
 
     this.selectedOrder = orders[0] || null;
-    this.setProgressFromStatus(orders[0]?.status);
-    this.loadCourierForOrder(orders[0] || null);
-    // ✅ Delivered бол үнэлгээ нээнэ (resetToGuest хийхгүй)
-    const st = String(orders[0]?.status || "").toLowerCase();
+    this.setProgressFromStatus(this.selectedOrder?.status);
+    this.loadCourierForOrder(this.selectedOrder);
+
+    const st = String(this.selectedOrder?.status || "").toLowerCase();
     this.syncRatingUI(st);
 
     if (st === "delivered") {
-      localStorage.setItem("pendingRatingOrder", String(orders[0]?.id || ""));
+      localStorage.setItem("pendingRatingOrder", String(this.selectedOrder?.id || ""));
       this.openRatingModal();
     }
-
-
   }
 
   bindClicks() {
@@ -192,34 +224,233 @@ class OrdersPage extends HTMLElement {
       this.setProgressFromStatus(order.status);
       this.loadCourierForOrder(order);
 
+      const st = String(order.status || "").toLowerCase();
+      this.syncRatingUI(st);
     });
   }
 
-  readLocalOffers() {
-    try {
-      const raw = localStorage.getItem("offers");
-      const offers = raw ? JSON.parse(raw) : [];
-      return offers.map((o, idx) => {
-        const titleParts = (o.title || "").split(" - ");
-        return {
-          id: o.orderId || `local-${idx}`,
-          from_name: o.from || titleParts[0] || "",
-          to_name: o.to || titleParts[1] || "",
-          total_amount: o.total || this.parsePrice(o.price),
-          created_at: o.meta || new Date().toISOString(),
-          items: (o.sub || []).map((s) => {
-            if (typeof s === "string") return { name: s, qty: 1 };
-            return { name: s.name || "", qty: 1 };
-          }),
-        };
-      });
-    } catch {
-      return [];
+  mapStatusToStep(status) {
+    switch ((status || "").toLowerCase()) {
+      case "on_the_way":
+      case "on-the-way":
+        return 1;
+      case "delivered":
+        return 2;
+      default:
+        return 0;
     }
   }
 
-  parsePrice(v) {
-    return parseInt(String(v || "").replace(/[^\d]/g, ""), 10) || 0;
+  setProgressFromStatus(status) {
+    const stepIndex = this.mapStatusToStep(status);
+    localStorage.setItem("orderStep", String(stepIndex));
+    this.bindProgress();
+  }
+
+  bindProgress() {
+    const stepIndex = parseInt(localStorage.getItem("orderStep"), 10) || 0;
+    const steps = this.querySelectorAll(".step");
+    steps.forEach((step, idx) => {
+      step.classList.remove("active", "completed");
+      if (idx < stepIndex) step.classList.add("completed");
+      else if (idx === stepIndex) step.classList.add("active");
+    });
+  }
+
+  syncRatingUI(status) {
+    const openBtn = this.querySelector("#openModal");
+    if (!openBtn) return;
+
+    const st = String(status || "").toLowerCase();
+    const delivered = st === "delivered";
+
+    openBtn.style.display = delivered ? "block" : "none";
+
+    openBtn.disabled = !delivered;
+    openBtn.style.opacity = delivered ? "" : "0.5";
+    openBtn.title = delivered ? "" : "Хүргэлт дууссаны дараа үнэлгээ өгнө";
+    openBtn.textContent = "Үнэлгээ өгөх";
+  }
+
+  openRatingModal() {
+    const modal = this.querySelector("#ratingModal");
+    if (modal) modal.style.display = "block";
+  }
+
+  closeRatingModal() {
+    const modal = this.querySelector("#ratingModal");
+    if (modal) modal.style.display = "none";
+  }
+
+  onDocClick(e) {
+    const modal = this.querySelector("#ratingModal");
+    if (!modal) return;
+    if (modal.style.display !== "block") return;
+
+    const content = modal.querySelector(".modal-content");
+    if (!content) return;
+
+    if (e.target === modal) this.closeRatingModal();
+  }
+
+  bindModal() {
+    const modal = this.querySelector("#ratingModal");
+    const openBtn = this.querySelector("#openModal");
+    const closeBtn = this.querySelector(".close");
+    const sendBtn = this.querySelector("#sendBtn");
+    const ratingEl = this.querySelector("rating-stars");
+
+    document.removeEventListener("click", this._onDocClick);
+    document.addEventListener("click", this._onDocClick);
+
+    if (openBtn && modal) {
+      openBtn.onclick = () => {
+        if (!this.selectedOrder?.id) {
+          alert("Захиалга сонгоно уу.");
+          return;
+        }
+        const st = String(this.selectedOrder?.status || "").toLowerCase();
+        if (st !== "delivered") {
+          alert("Хүргэлт дууссаны дараа үнэлгээ өгнө.");
+          return;
+        }
+        this.openRatingModal();
+      };
+    }
+
+    if (closeBtn && modal) {
+      closeBtn.onclick = () => this.closeRatingModal();
+    }
+
+    if (sendBtn && modal) {
+      sendBtn.onclick = async () => {
+        const rating = Number(ratingEl?.getAttribute("value") || 0);
+        const comment = this.querySelector("#comment")?.value || "";
+        const orderId = this.selectedOrder?.id;
+
+        if (!orderId) {
+          alert("Захиалга сонгоно уу.");
+          return;
+        }
+
+        const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (!uuidRe.test(orderId)) {
+          alert("Энэ захиалгад сэтгэгдэл үлдээх боломжгүй.");
+          return;
+        }
+
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+          alert("Үнэлгээ сонгоно уу.");
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/ratings", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId, stars: rating, comment }),
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            alert(err.error || "Сэтгэгдэл хадгалахад алдаа гарлаа");
+            return;
+          }
+
+          this.markOrderRated(orderId);
+
+          this.closeRatingModal();
+          localStorage.removeItem("pendingRatingOrder");
+          window.dispatchEvent(new Event("reviews-updated"));
+
+          await window.NumAppState?.resetToGuest("rating_submitted");
+
+          this.loadOrders();
+        } catch {
+          alert("Сэтгэгдэл хадгалахад алдаа гарлаа");
+        }
+      };
+    }
+
+    if (ratingEl) {
+      ratingEl.addEventListener("rate", (e) => {
+        console.log("Үнэлгээ:", e.detail);
+      });
+    }
+  }
+
+  initOrderStream() {
+    const role = localStorage.getItem("authRole");
+    if (role !== "customer") return;
+    if (!window.EventSource) return;
+    if (this.orderStream) return;
+
+    this.orderStream = new EventSource(`${API}/api/orders/stream`);
+
+    this.handleOrderStatusEvent = (e) => {
+      try {
+        const data = JSON.parse(e.data || "{}");
+        if (!data.orderId || !data.status) return;
+
+        if (!this.selectedOrder || String(this.selectedOrder.id) === String(data.orderId)) {
+          if (this.selectedOrder) this.selectedOrder.status = data.status;
+
+          this.setProgressFromStatus(data.status);
+
+          const st = String(data.status).toLowerCase();
+          this.syncRatingUI(st);
+
+          if (st === "delivered") {
+            localStorage.setItem("pendingRatingOrder", String(data.orderId));
+            this.openRatingModal();
+          }
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    this.handleOrderUpdatedEvent = () => {
+      this.loadOrders();
+    };
+
+    this.orderStream.addEventListener("order-status", this.handleOrderStatusEvent);
+    this.orderStream.addEventListener("order-updated", this.handleOrderUpdatedEvent);
+  }
+
+  filterExpired(orders) {
+    return orders.filter((o) => {
+      const ts = this.getOrderTimestamp(o);
+      if (ts === null) return false;
+      return ts >= Date.now();
+    });
+  }
+
+  getOrderTimestamp(o) {
+    const raw =
+      o.scheduled_at ||
+      o.scheduledAt ||
+      o.created_at ||
+      o.createdAt ||
+      o.meta ||
+      null;
+    return this.parseDate(raw);
+  }
+
+  parseDate(val) {
+    if (!val) return null;
+    const parsed = Date.parse(val);
+    if (!Number.isNaN(parsed)) return parsed;
+
+    const m = String(val).match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4}).*?(\d{1,2}:\d{2}\s*[AP]M)/i);
+    if (m) {
+      const [_, mm, dd, yyRaw, time] = m;
+      const yy = yyRaw.length === 2 ? `20${yyRaw}` : yyRaw;
+      const d = new Date(`${yy}-${mm}-${dd} ${time}`);
+      if (!Number.isNaN(d.getTime())) return d.getTime();
+    }
+    return null;
   }
 
   formatPrice(v) {
@@ -247,258 +478,14 @@ class OrdersPage extends HTMLElement {
     return "assets/img/box.svg";
   }
 
-  mapStatusToStep(status) {
-    switch ((status || "").toLowerCase()) {
-      case "on_the_way":
-      case "on-the-way":
-        return 1;
-      case "delivered":
-        return 2;
-      default:
-        return 0;
-    }
-  }
-
-  setProgressFromStatus(status) {
-    const stepIndex = this.mapStatusToStep(status);
-    localStorage.setItem("orderStep", String(stepIndex));
-    this.bindProgress();
-  }
-
-  bindProgress() {
-    const stepIndex = parseInt(localStorage.getItem('orderStep')) || 0;
-    const steps = this.querySelectorAll('.step');
-    steps.forEach((step, idx) => {
-      step.classList.remove('active', 'completed');
-      if (idx < stepIndex) step.classList.add('completed');
-      else if (idx === stepIndex) step.classList.add('active');
-    });
-  }
-
-  syncRatingUI(status) {
-    const openBtn = this.querySelector("#openModal");
-    if (!openBtn) return;
-
-    const st = String(status || "").toLowerCase();
-    const delivered = st === "delivered";
-
-    openBtn.disabled = !delivered;
-    openBtn.style.opacity = delivered ? "" : "0.5";
-    openBtn.title = delivered ? "" : "Хүргэлт дууссаны дараа үнэлгээ өгнө";
-
-    openBtn.textContent = delivered ? "Үнэлгээ өгөх" : "Бараа хүлээж авсан";
-  }
-
-  openRatingModal() {
-    const modal = this.querySelector("#ratingModal");
-    if (modal) modal.style.display = "block";
-  }
-
-  closeRatingModal() {
-    const modal = this.querySelector("#ratingModal");
-    if (modal) modal.style.display = "none";
-  }
-
-
-  filterExpired(orders) {
-    return orders.filter((o) => {
-      const ts = this.getOrderTimestamp(o);
-      if (ts === null) return false;
-      return ts >= Date.now();
-    });
-  }
-
-  getOrderTimestamp(o) {
-    const raw =
-      o.scheduled_at ||
-      o.scheduledAt ||
-      o.created_at ||
-      o.createdAt ||
-      o.meta ||
-      null;
-    const t = this.parseDate(raw);
-    return t;
-  }
-
-  parseDate(val) {
-    if (!val) return null;
-    const parsed = Date.parse(val);
-    if (!Number.isNaN(parsed)) return parsed;
-
-    const m = String(val).match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4}).*?(\d{1,2}:\d{2}\s*[AP]M)/i);
-    if (m) {
-      const [_, mm, dd, yyRaw, time] = m;
-      const yy = yyRaw.length === 2 ? `20${yyRaw}` : yyRaw;
-      const d = new Date(`${yy}-${mm}-${dd} ${time}`);
-      if (!Number.isNaN(d.getTime())) return d.getTime();
-    }
-
-    return null;
-  }
-
-  bindModal() {
-    const modal = this.querySelector("#ratingModal");
-    const openBtn = this.querySelector("#openModal");
-    const closeBtn = this.querySelector(".close");
-    const sendBtn = this.querySelector("#sendBtn");
-    const ratingEl = this.querySelector("rating-stars");
-
-    if (openBtn && modal) {
-      openBtn.onclick = () => {
-        if (!this.selectedOrder?.id) {
-          alert("Захиалга сонгоно уу.");
-          return;
-        }
-
-        const st = String(this.selectedOrder?.status || "").toLowerCase();
-        if (st !== "delivered") {
-          alert("Хүргэлт дууссаны дараа үнэлгээ өгнө.");
-          return;
-        }
-
-        modal.style.display = "block";
-      };
-
-    }
-    if (closeBtn && modal) {
-      closeBtn.onclick = () => modal.style.display = "none";
-    }
-    window.onclick = (e) => {
-      if (e.target === modal) modal.style.display = "none";
-    };
-
-    if (sendBtn && modal) {
-      sendBtn.onclick = async () => {
-        const rating = Number(ratingEl?.getAttribute("value") || 0);
-        const comment = this.querySelector("#comment")?.value || "";
-        const orderId = this.selectedOrder?.id;
-        if (!orderId) {
-          alert("Захиалга сонгоно уу.");
-          return;
-        }
-        const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        if (!uuidRe.test(orderId)) {
-          alert("Энэ захиалгад сэтгэгдэл үлдээх боломжгүй.");
-          return;
-        }
-        if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-          alert("Үнэлгээ сонгоно уу.");
-          return;
-        }
-        try {
-          const res = await fetch("/api/ratings", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ orderId, stars: rating, comment }),
-          });
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            alert(err.error || "Сэтгэгдэл хадгалахад алдаа гарлаа");
-            return;
-          }
-          this.closeRatingModal();
-          localStorage.removeItem("pendingRatingOrder");
-          window.dispatchEvent(new Event("reviews-updated"));
-
-          await window.NumAppState?.resetToGuest("rating_submitted");
-
-          this.loadOrders();
-
-        } catch (e) {
-          alert("Сэтгэгдэл хадгалахад алдаа гарлаа");
-        }
-      };
-    }
-
-    if (ratingEl) {
-      ratingEl.addEventListener('rate', e => {
-        console.log('Үнэлгээ:', e.detail);
-      });
-    }
-  }
-
-  initOrderStream() {
-    if (!window.EventSource) return;
-
-    this.orderStream = new EventSource("/api/orders/stream");
-
-    this.orderStream.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      this.updateOrderStatus(data); // Захиалгын статусыг шинэчлэх
-    };
-  }
-
-  updateOrderStatus(order) {
-    const orderEl = document.querySelector(`[data-order-id="${order.order_id}"]`);
-    if (orderEl) {
-      const statusEl = orderEl.querySelector('.status');
-      statusEl.textContent = order.status;
-    }
-    if (this.orderStream) return;
-    const role = localStorage.getItem("authRole");
-    if (role !== "customer") return;
-    if (!window.EventSource) return;
-
-    try {
-      this.orderStream = new EventSource(`${API}/api/orders/stream`, { withCredentials: true });
-    } catch (e) {
-      try {
-        this.orderStream = new EventSource(`${API}/api/orders/stream`);
-      } catch (err) {
-        this.orderStream = null;
-        return;
-      }
-    }
-
-    this.handleOrderStatusEvent = (e) => {
-      try {
-        const data = JSON.parse(e.data || "{}");
-        if (!data.orderId || !data.status) return;
-        if (!this.selectedOrder || String(this.selectedOrder.id) === String(data.orderId)) {
-          if (this.selectedOrder) this.selectedOrder.status = data.status;
-          this.setProgressFromStatus(data.status);
-          const st = String(data.status).toLowerCase();
-          this.syncRatingUI(st);
-
-          if (st === "delivered") {
-            localStorage.setItem("pendingRatingOrder", String(data.orderId));
-            this.openRatingModal();
-          }
-
-        }
-      } catch (err) {
-        // ignore
-      }
-    };
-
-    document.addEventListener('show-receive-button', () => {
-      const openBtn = this.querySelector("#openModal");
-      if (openBtn) {
-        openBtn.style.display = "block";
-      }
-    }
-    );
-
-    this.handleOrderUpdatedEvent = () => {
-      this.loadOrders();
-    };
-
-    this.orderStream.addEventListener("order-status", this.handleOrderStatusEvent);
-    this.orderStream.addEventListener("order-updated", this.handleOrderUpdatedEvent);
-  }
-
-  disconnectedCallback() {
-    if (this.orderStream) {
-      if (this.handleOrderStatusEvent) {
-        this.orderStream.removeEventListener("order-status", this.handleOrderStatusEvent);
-      }
-      if (this.handleOrderUpdatedEvent) {
-        this.orderStream.removeEventListener("order-updated", this.handleOrderUpdatedEvent);
-      }
-      this.orderStream.close();
-      this.orderStream = null;
-    }
+  escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 }
 
-customElements.define('orders-page', OrdersPage);
+customElements.define("orders-page", OrdersPage);

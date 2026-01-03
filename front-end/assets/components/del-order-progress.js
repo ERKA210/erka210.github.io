@@ -31,7 +31,7 @@ class DelOrderProgress extends HTMLElement {
 
   async loadActiveOrder() {
     try {
-      const res = await fetch("/api/active-order");
+      const res = await fetch("/api/active-order", { credentials: "include" });
       if (!res.ok) return;
       const data = await res.json();
       const order = data?.order || null;
@@ -115,6 +115,9 @@ class DelOrderProgress extends HTMLElement {
 
       // ✅ Delivered дээр дахиж Next даруулахгүй
       if (current >= maxIndex) {
+        nextBtn.disabled = true;
+        nextBtn.textContent = "Дууссан";
+        nextBtn.style.opacity = "0.6";
         alert("Хүргэлт амжилттай дууссан.");
         return;
       }
@@ -146,9 +149,11 @@ class DelOrderProgress extends HTMLElement {
     try {
       const res = await fetch(`/api/orders/${encodeURIComponent(orderId)}/status`, {
         method: "PATCH",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
+
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         console.warn("status update failed", err?.error || res.status);
