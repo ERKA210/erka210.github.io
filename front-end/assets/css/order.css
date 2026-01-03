@@ -548,9 +548,10 @@ order-progress {
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      width: calc(100% - 2rem);
-      margin: 1rem;
+      width: 100%;
       gap: 1.25rem;
+      margin-top: -4rem;
+      padding: 0 10px;
     }
 
     .details {
@@ -588,5 +589,15 @@ order-progress {
       height: 7.3rem;
       margin-top: -3%;
       margin-left: -2%;
+    }
+  }
+  @media screen and (min-width: 42rem) {
+    .orders {
+      width: 100%;
+      padding: 5px;
+    }
+    .delivery-info{
+      display: flex;
+      flex-direction: column;
     }
   }
