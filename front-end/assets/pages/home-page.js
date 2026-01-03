@@ -200,16 +200,17 @@ class HomePage extends HTMLElement {
   async fetchCurrentUser() {
     if (this.currentUser) return this.currentUser;
     try {
-      const res = await fetch("/api/auth/me", {
-        credentials: "include",
-      });
+      const res = await fetch("/api/auth/me");
       if (!res.ok) return null;
       const data = await res.json();
+      console.log("herglegch", data);
       this.currentUser = data?.user || null;
       return this.currentUser;
     } catch (e) {
       return null;
+      
     }
+    
   }
 
   async syncCustomerInfo(userId) {
