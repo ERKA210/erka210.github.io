@@ -1,4 +1,18 @@
 login-page {
+    --login-card-border-color: var(--color-border);
+    --login-card-shadow: var(--shadow-light);
+    --login-subtitle-bg: rgba(17, 24, 39, 0.06);
+    --login-tabs-bg: #f3f4f6;
+    --login-tabs-border: rgba(148, 163, 184, 0.5);
+    --login-tabs-indicator-bg: #fff;
+    --login-tabs-indicator-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+    --login-tabs-courier-bg: #c90d30;
+    --login-tabs-courier-border: rgba(201, 13, 48, 0.6);
+    --login-tab-active-shadow: 0 6px 14px rgba(17, 24, 39, 0.08);
+    --login-payment-bg: rgba(201, 13, 48, 0.08);
+    --login-pay-btn-text: #fff;
+    --login-pay-btn-disabled-bg: #cbd5e1;
+    --login-pay-status-color: #16a34a;
     display: flex;
     justify-content: center;
     body {
@@ -14,10 +28,10 @@ login-page {
 
     .card {
         width: min(70rem, 90vw);
-        border: 1px solid gray;
+        border: 1px solid var(--login-card-border-color);
         background: var(--color-bg);
         border-radius: 18px;
-        box-shadow: var(--shadow-light);
+        box-shadow: var(--login-card-shadow);
         padding: 22px;
     }
 
@@ -34,10 +48,23 @@ login-page {
         font-weight: 600
     }
 
+    .login-tabs-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
     .subtitle {
         color: var(--color-muted);
         font-size: 13px;
-        margin-bottom: 18px
+        margin: 0;
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: var(--login-subtitle-bg);
     }
 
     .auth-tabs,
@@ -49,6 +76,57 @@ login-page {
         border-radius: 12px;
         padding: 6px;
         margin-bottom: 14px;
+    }
+
+    .login-tabs {
+        position: relative;
+        gap: 0;
+        padding: 2px;
+        height: 22px;
+        border-radius: 999px;
+        background: var(--login-tabs-bg);
+        border: 1px solid var(--login-tabs-border);
+        overflow: hidden;
+        margin-bottom: 0;
+        min-width: 58px;
+    }
+
+    .login-tabs::before {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: calc(50% - 2px);
+        height: calc(100% - 4px);
+        border-radius: 999px;
+        background: var(--login-tabs-indicator-bg);
+        box-shadow: var(--login-tabs-indicator-shadow);
+        transition: transform 0.25s ease;
+    }
+
+    .login-tabs[data-active-role="courier"]::before {
+        transform: translateX(100%);
+    }
+
+    .login-tabs[data-active-role="courier"] {
+        background: var(--login-tabs-courier-bg);
+        border-color: var(--login-tabs-courier-border);
+    }
+
+    .login-tabs .tab-btn {
+        position: relative;
+        z-index: 1;
+        font-size: 0;
+        padding: 0;
+        height: 100%;
+        border-radius: 999px;
+        color: transparent;
+    }
+
+    .login-tabs .tab-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
     }
 
     .tab-btn {
@@ -66,7 +144,13 @@ login-page {
     .tab-btn.is-active {
         background: var(--color-bg);
         color: var(--color-text);
-        box-shadow: 0 6px 14px rgba(17, 24, 39, 0.08);
+        box-shadow: var(--login-tab-active-shadow);
+    }
+
+    .login-tabs .tab-btn.is-active {
+        background: transparent;
+        box-shadow: none;
+        color: transparent;
     }
 
     .form-group {
@@ -162,7 +246,7 @@ login-page {
         padding: 16px;
         border-radius: 14px;
         border: 1px solid var(--color-border);
-        background: rgba(201, 13, 48, 0.08);
+        background: var(--login-payment-bg);
         min-width: 18rem;
     }
 
@@ -246,21 +330,21 @@ login-page {
         border-radius: 10px;
         border: none;
         background: var(--color-accent);
-        color: #fff;
+        color: var(--login-pay-btn-text);
         font-weight: 600;
         cursor: pointer;
         box-shadow: var(--shadow-light);
     }
 
     .pay-btn:disabled {
-        background: #cbd5e1;
+        background: var(--login-pay-btn-disabled-bg);
         cursor: not-allowed;
     }
 
     .pay-status {
         margin: 0;
         font-size: 12px;
-        color: #16a34a;
+        color: var(--login-pay-status-color);
         font-weight: 600;
     }
 

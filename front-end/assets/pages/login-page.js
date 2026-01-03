@@ -21,23 +21,23 @@ class LoginPage extends HTMLElement {
           </button>
         </div>
 
-        <div class="subtitle">
-          Нэр болон нууц үгээ ашиглан нэвтэрнэ.
+        <div class="login-tabs-row">
+          <div class="subtitle">
+            Нэр болон нууц үгээ ашиглан нэвтэрнэ.
+          </div>
+           <div class="login-tabs register-only" role="tablist" aria-label="Бүртгэлийн төрөл">
+            <button class="tab-btn is-active" type="button" data-role="customer" role="tab" aria-selected="true" aria-label="Хэрэглэгчээр">
+              Хэрэглэгчээр
+            </button>
+            <button class="tab-btn" type="button" data-role="courier" role="tab" aria-selected="false" aria-label="Хүргэгчээр">
+              Хүргэгчээр
+            </button>
+          </div>
         </div>
 
         <div class="auth-layout">
           <form>
-          <div class="register-only">
-            <div class="login-tabs" role="tablist" aria-label="Бүртгэлийн төрөл">
-              <button class="tab-btn is-active" type="button" data-role="customer" role="tab" aria-selected="true">
-                Хэрэглэгчээр
-              </button>
-              <button class="tab-btn" type="button" data-role="courier" role="tab" aria-selected="false">
-                Хүргэгчээр
-              </button>
-            </div>
-            <input type="hidden" name="role" value="customer">
-          </div>
+          <input class="register-only" type="hidden" name="role" value="customer">
           <div class="form-group register-only">
             <label for="name">Нэр</label>
             <input id="name" name="name" type="text" placeholder="Нэр">
@@ -135,6 +135,7 @@ class LoginPage extends HTMLElement {
     const roleInput = this.querySelector("input[name='role']");
     const modeTabs = this.querySelectorAll(".auth-tabs .tab-btn");
     const roleTabs = this.querySelectorAll(".login-tabs .tab-btn");
+    const loginTabs = this.querySelector(".login-tabs");
     const titleEl = this.querySelector("#login-title");
     const submitBtn = this.querySelector(".continue-btn");
     const subtitleEl = this.querySelector(".subtitle");
@@ -148,6 +149,7 @@ class LoginPage extends HTMLElement {
     const payStatus = this.querySelector(".pay-status");
     const isPaid = () =>
       localStorage.getItem("courierPaid") === "1";
+
 
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
@@ -200,6 +202,7 @@ class LoginPage extends HTMLElement {
       btn.addEventListener("click", () => {
         const role = btn.getAttribute("data-role") || "customer";
         this.currentRole = role;
+        if (loginTabs) loginTabs.dataset.activeRole = role;
         roleTabs.forEach((b) => {
           const isActive = b === btn;
           b.classList.toggle("is-active", isActive);
@@ -233,6 +236,7 @@ class LoginPage extends HTMLElement {
         el.style.display = this.currentMode === "register" ? "" : "none";
       });
     }
+    if (loginTabs) loginTabs.dataset.activeRole = this.currentRole;
     if (roleInput) roleInput.value = this.currentRole;
     if (titleEl) titleEl.textContent = this.currentMode === "register" ? "Бүртгүүлэх" : "Нэвтрэх";
     if (submitBtn) {
