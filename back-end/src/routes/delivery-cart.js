@@ -96,5 +96,21 @@ router.patch("/delivery-cart/:id", requireAuth, async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+router.delete("/delivery-cart", requireAuth, async (req, res) => {
+  try {
+    await ensureStorageTables();
+    const userId = req.user?.sub;
+
+    await pool.query(
+      `DELETE FROM delivery_cart_items WHERE user_id = $1`,
+      [userId]
+    );
+
+    res.json({ cleared: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 
 export default router;

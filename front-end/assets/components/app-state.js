@@ -32,7 +32,19 @@ export async function resetToGuest(reason = "") {
       credentials: "include",
       body: JSON.stringify({ order: null }),
     });
-  } catch {}
+  } catch { }
+
+  // ✅ courier талын delivery steps устгах
+  localStorage.removeItem("deliverySteps");
+
+  // ✅ courier delivery cart DB-ээс цэвэрлэх
+  try {
+    await fetch("/api/delivery-cart", {
+      method: "DELETE",
+      credentials: "include",
+    });
+  } catch { }
+
 
   // local step цэвэрлэх
   localStorage.removeItem("orderStep");

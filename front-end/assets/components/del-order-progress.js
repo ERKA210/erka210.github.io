@@ -134,10 +134,14 @@ class DelOrderProgress extends HTMLElement {
         this.updateOrderStatus(orderId, nextIdx);
       }
 
-      // ✅ Сүүлийн алхам хүрвэл хүргэлт дууссан гэж үзээд guest рүү буцаана
       if (nextIdx === maxIndex) {
+        // ✅ энэ хүргэлтийн step localStorage-оос устгана
+        delete this.stepsState[order.id];
+        saveSteps(this.stepsState);
+
         window.NumAppState?.resetToGuest("delivery_completed");
       }
+
 
       this.render();
     });
