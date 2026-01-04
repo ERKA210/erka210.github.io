@@ -130,7 +130,7 @@ class LoginPage extends HTMLElement {
         </div>
       </div>
   <div class="scene">
-    <div class="delivery">
+    <div class="delivery-man">
       <div class="head"></div>
       <div class="body"></div>
 

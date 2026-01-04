@@ -438,7 +438,7 @@ body {
 }
 
 /* Delivery person */
-.delivery {
+.delivery-man {
   position: absolute;
   left: -100px;
   animation: walk 8s linear infinite;
