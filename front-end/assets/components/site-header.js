@@ -131,7 +131,6 @@ class SiteHeader extends HTMLElement {
         } catch (e) {
           // ignore
         }
-        // 🔐 AUTH RESET (logout)
         localStorage.removeItem("auth_token");
 
         localStorage.removeItem("authLoggedIn");
@@ -143,7 +142,6 @@ class SiteHeader extends HTMLElement {
         localStorage.removeItem("appState");
         localStorage.removeItem("deliveryActive");
 
-        // ⚠️ courierPaid-г ЗААВАЛ reset
         localStorage.setItem("courierPaid", "0");
 
         this.currentUser = null;
