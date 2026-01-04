@@ -24,12 +24,10 @@ login-page {
         padding: 32px;
         color: var(--color-text);
         font-family: sans-serif;
-        background-color: black;
     }
 
     .card {
-          backdrop-filter: blur(6px);
-  background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(6px);
         z-index: 10;
         width: 50%;
         border: 1px solid var(--login-card-border-color);
