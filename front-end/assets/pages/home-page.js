@@ -1,143 +1,34 @@
+import { apiFetch } from "../api_client.js";
+
 class HomePage extends HTMLElement {
   connectedCallback() {
-    this.pendingOrder = null;
-    this.pendingOffer = null;
-    this.currentUser = null;
-
     this.render();
-    this.setupConfirmModal();
-    loadPlaces();
-    this.hydrateCustomerFromDb();
+    this.tohiruulahZahialgaBatalgaajilt();
+    loadGazruud();
+    this.loadHereglegchDb();
 
     const orderBtn = this.querySelector(".order-btn");
     if (orderBtn) {
-      orderBtn.addEventListener("click", () => this.prepareOrder());
+      orderBtn.addEventListener("click", () => this.beldehZahialga());
     }
   }
 
   render() {
     this.innerHTML = `
       <link rel="stylesheet" href="assets/css/index.css" />
-      <style>
-        .sr-only {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: -1px;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border: 0;
-        }
-        #confirm-modal {
-          position: fixed;
-          inset: 0;
-          display: none;
-          align-items: center;
-          justify-content: center;
-          background: rgba(0, 0, 0, 0.4);
-          backdrop-filter: blur(4px);
-          z-index: 10000;
-          padding: 1rem;
-        }
-        #confirm-modal.show { display: flex; }
-        #confirm-modal .modal-content {
-          background: #fff;
-          border-radius: 20px;
-          width: min(480px, 100%);
-          padding: 1.6rem 1.8rem;
-          box-shadow: 0 24px 70px rgba(0,0,0,0.2);
-          display: flex;
-          flex-direction: column;
-          gap: 0.9rem;
-          text-align: center;
-        }
-        #confirm-modal h3 {
-          margin: 0;
-          font-size: 1.3rem;
-          color: #111827;
-        }
-        #confirm-modal p {
-          margin: 0;
-          color: #374151;
-          line-height: 1.45;
-        }
-        #confirm-modal .modal-actions {
-          display: flex;
-          justify-content: space-between;
-          gap: 0.75rem;
-          margin-top: 0.75rem;
-        }
-        #confirm-modal .btn--gray {
-          background: #f9fafb;
-          color: #111827;
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          padding: 0.85rem 1.4rem;
-          font-weight: 700;
-        }
-        #confirm-modal .btn--accent {
-          background: var(--color-accent);
-          color: #fff;
-          border-radius: 12px;
-          padding: 0.85rem 1.4rem;
-          font-weight: 800;
-        }
-        #confirm-modal .detail-row {
-          text-align: left;
-          background: #f9fafb;
-          border-radius: 12px;
-          padding: 0.85rem 1rem;
-          border: 1px solid #eef2f7;
-          color: #1f2937;
-          line-height: 1.5;
-        }
-        #confirm-modal .detail-row strong {
-          display: inline-block;
-          min-width: 4.7rem;
-        }
-        @media (prefers-color-scheme: dark) {
-          #confirm-modal .modal-content {
-            background: #0f172a;
-            color: #e5e7eb;
-            border: 1px solid #243040;
-            box-shadow: 0 24px 70px rgba(0,0,0,0.45);
-          }
-          #confirm-modal h3 {
-            color: #f9fafb;
-          }
-          #confirm-modal p {
-            color: #9aa4b2;
-          }
-          #confirm-modal .btn--gray {
-            background: #111827;
-            color: #e5e7eb;
-            border-color: #243040;
-          }
-          #confirm-modal .detail-row {
-            background: #111827;
-            border-color: #243040;
-            color: #e5e7eb;
-          }
-        }
-      </style>
-
       <section class="filter-section">
         <div class="middle-row">
           <div class="ctrl">
-            <span><img src="assets/img/map_pin.svg" alt="icon" width="16" height="16" /></span>
-            <label class="sr-only" for="fromPlace">Хаанаас</label>
+            <span><img src="assets/img/map_pin.svg" alt="icon"/></span>
             <select id="fromPlace">
               <option value="" disabled selected hidden>Хаанаас</option>
             </select>
           </div>
 
-          <span class="arrow-icon"><img src="assets/img/arrow.svg" alt="icon" width="67" height="67" /></span>
+          <span><img src="assets/img/arrow.svg" alt="icon"/></span>
 
           <div class="ctrl">
-            <span><img src="assets/img/map_pin.svg" alt="icon" width="16" height="16" /></span>
-            <label class="sr-only" for="toPlace">Хаашаа</label>
+            <span><img src="assets/img/map_pin.svg" alt="icon"/></span>
             <select id="toPlace">
               <option value="" disabled selected hidden>Хаашаа</option>
             </select>
@@ -148,8 +39,7 @@ class HomePage extends HTMLElement {
 
         <div class="bottom-row">
           <div class="ctrl wide">
-            <span><img src="assets/img/fork.svg" alt="icon" width="40" height="38" /></span>
-            <label class="sr-only" for="what">Юуг</label>
+            <span><img src="assets/img/fork.svg" alt="icon" /></span>
             <select id="what">
               <option value="" disabled selected hidden>Юуг</option>
             </select>
@@ -159,7 +49,7 @@ class HomePage extends HTMLElement {
         <sh-cart class="cart"></sh-cart>
 
         <div class="top-row">
-          <button class="btn btn--accent order-btn" data-role="order-action">Захиалах</button>
+          <button class="btn btn--accent order-btn">Захиалах</button>
         </div>
       </section>
 
@@ -172,74 +62,38 @@ class HomePage extends HTMLElement {
         </aside>
       </div>
       <offer-modal></offer-modal>
-
-      <div id="confirm-modal" class="modal hidden">
-        <div class="modal-content">
-          <h3>Захиалга баталгаажуулах уу?</h3>
-          <p id="confirm-text"></p>
-          <div class="modal-actions">
-            <button id="cancel-order" class="btn btn--gray">Цуцлах</button>
-            <button id="confirm-order" class="btn btn--accent">Баталгаажуулах</button>
-          </div>
-        </div>
-      </div>
+      <order-confirm></order-confirm>
     `;
   }
 
-  async hydrateCustomerFromDb() {
-    const user = await this.fetchCurrentUser();
-    if (!user?.id) return;
+  async loadHereglegchDb() {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
 
     try {
-      await this.syncCustomerInfo(user.id);
+      await this.tentsvvlehHereglegchMedeelel(userId);
     } catch (e) {
       console.error("kkkkkk:", e);
     }
   }
 
-  async fetchCurrentUser() {
-    if (this.currentUser) return this.currentUser;
-    try {
-      const res = await fetch("/api/auth/me");
-      if (!res.ok) return null;
-      const data = await res.json();
-      console.log("herglegch", data);
-      this.currentUser = data?.user || null;
-      return this.currentUser;
-    } catch (e) {
-      return null;
-      
-    }
-    
-  }
-
-  async syncCustomerInfo(userId) {
+  async tentsvvlehHereglegchMedeelel(userId) {
     if (!userId) return;
-    const res = await fetch(`${API}/api/customers/${userId}`);
+    const res = await apiFetch(`/api/customers/${userId}`);
     if (!res.ok) return;
     const data = await res.json();
     if (data) {
+      if (data.name) localStorage.setItem("userName", data.name);
+      if (data.phone) localStorage.setItem("userPhone", data.phone);
+      localStorage.setItem("userId", data.id);
+      if (data.student_id) {
+        localStorage.setItem("userDisplayId", data.student_id);
+      }
       window.dispatchEvent(new Event("user-updated"));
     }
   }
 
-  formatPrice(n) {
-    return Number(n || 0).toLocaleString("mn-MN") + "₮";
-  }
-
-  formatMeta(ts) {
-    const d = new Date(ts);
-    if (isNaN(d.getTime())) return "";
-    const date = d.toLocaleDateString("en-US", {
-      month: "2-digit",
-      day: "2-digit",
-      year: "2-digit",
-    });
-    const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    return `${date} • ${time}`;
-  }
-
-  getScheduledAtISO() {
+  avahTovlogdsonISO() {
     const picker = this.querySelector("date-time-picker");
     const dateVal = picker?.shadowRoot?.querySelector(".date")?.value;
     const timeVal = picker?.shadowRoot?.querySelector(".time")?.value;
@@ -253,62 +107,11 @@ class HomePage extends HTMLElement {
     return now.toISOString();
   }
 
-  setupConfirmModal() {
-    this.confirmModal = this.querySelector("#confirm-modal");
-    this.confirmTextEl = this.querySelector("#confirm-text");
-    this.cancelBtn = this.querySelector("#cancel-order");
-    this.confirmBtn = this.querySelector("#confirm-order");
-
-    if (this.cancelBtn) {
-      this.cancelBtn.addEventListener("click", () => this.hideConfirmModal());
-    }
-    if (this.confirmBtn) {
-      this.confirmBtn.addEventListener("click", () => this.confirmOrder());
-    }
-    if (this.confirmModal) {
-      this.confirmModal.addEventListener("click", (e) => {
-        if (e.target === this.confirmModal) this.hideConfirmModal();
-      });
-    }
+  tohiruulahZahialgaBatalgaajilt() {
+    this.orderConfirm = this.querySelector("order-confirm");
   }
 
-  showConfirmModal(order, summary) {
-    if (!this.confirmModal || !this.confirmTextEl) return;
-
-    const items = summary.items?.length
-      ? summary.items.map((i) => `• ${i.name} — ${i.qty} ширхэг`).join("<br>")
-      : "Бараа сонгогдоогүй";
-
-    const d = new Date(order.createdAt);
-
-    this.confirmTextEl.innerHTML = `
-      <div class="detail-row">
-        <strong>Хаанаас:</strong> ${order.from}<br>
-        <strong>Хаашаа:</strong> ${order.to}<br>
-        <strong>Өдөр:</strong> ${order.createdAt.split("T")[0]}<br>
-        <strong>Цаг:</strong> ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-      </div>
-      <div class="detail-row">
-        <strong>Таны хоол:</strong><br>
-        ${items}
-      </div>
-      <div class="detail-row" style="text-align:center;">
-        <strong>Нийт үнэ:</strong> ${summary.total ? this.formatPrice(summary.total) : "0₮"}
-      </div>
-    `;
-
-    this.confirmModal.classList.remove("hidden");
-    this.confirmModal.classList.add("show");
-  }
-
-  hideConfirmModal() {
-    if (!this.confirmModal) return;
-    this.confirmModal.classList.remove("show");
-    this.pendingOrder = null;
-    this.pendingOffer = null;
-  }
-
-  prepareOrder() {
+  beldehZahialga() {
     const fromSel = this.querySelector("#fromPlace");
     const toSel = this.querySelector("#toPlace");
     const whatSel = this.querySelector("#what");
@@ -323,7 +126,7 @@ class HomePage extends HTMLElement {
     }
 
     const cartEl = this.querySelector("sh-cart");
-    const cartSummary = cartEl?.getSummary() || { totalQty: 0, items: [], total: 0, deliveryFee: 0 };
+    const cartSummary = cartEl?.avahTovch() || { totalQty: 0, items: [], total: 0, deliveryFee: 0 };
 
     const itemOpt = whatSel?.selectedOptions?.[0];
     if (cartSummary.totalQty === 0) {
@@ -337,24 +140,24 @@ class HomePage extends HTMLElement {
     const fromName = parts[0] || fromOptionText;
     const fromDetail = parts[1] || "";
 
-    const scheduledAt = this.getScheduledAtISO();
+    const scheduledAt = this.avahTovlogdsonISO();
 
     const items =
       cartSummary.totalQty > 0
         ? cartSummary.items.map((it) => ({
-          id: it.key || it.name,
-          name: it.name,
-          price: Number(it.unitPrice ?? it.price ?? 0),
-          qty: it.qty,
-        }))
+            id: it.key || it.name,
+            name: it.name,
+            price: Number(it.unitPrice ?? it.price ?? 0),
+            qty: it.qty,
+          }))
         : [{
-          id: itemOpt.value,
-          name: (itemOpt.textContent || "").split(" — ")[0],
-          price: Number(itemOpt.dataset.price || 0),
-          qty: 1,
-        }];
+            id: itemOpt.value,
+            name: (itemOpt.textContent || "").split(" — ")[0],
+            price: Number(itemOpt.dataset.price || 0),
+            qty: 1,
+          }];
 
-    this.pendingOrder = {
+    const pendingOrder = {
       fromId: fromSel.value,
       toId: toSel.value,
       from: fromName,
@@ -363,158 +166,23 @@ class HomePage extends HTMLElement {
       createdAt: scheduledAt,
     };
 
-    this.pendingOffer = {
+    const pendingOffer = {
       items,
       total: cartSummary.totalQty > 0 ? cartSummary.total : items.reduce((s, it) => s + (it.price * it.qty), 0),
       deliveryFee: cartSummary.totalQty > 0 ? cartSummary.deliveryFee : 500,
       thumb: cartSummary.deliveryIcon || "assets/img/box.svg"
     };
-
-    this.showConfirmModal(this.pendingOrder, this.pendingOffer);
-  }
-
-  async confirmOrder() {
-    if (!this.pendingOrder || !this.pendingOffer) {
-      this.hideConfirmModal();
+    if (this.orderConfirm && typeof this.orderConfirm.open === "function") {
+      this.orderConfirm.open(pendingOrder, pendingOffer);
       return;
     }
-
-    const user = await this.fetchCurrentUser();
-    if (!user?.id) {
-      localStorage.setItem("pendingOrderDraft", JSON.stringify(this.pendingOrder));
-      localStorage.setItem("pendingOfferDraft", JSON.stringify(this.pendingOffer));
-      this.hideConfirmModal();
-      location.hash = "#login";
-      return;
-    }
-
-    if (!this.pendingOrder.fromId || !this.pendingOrder.toId) {
-      alert("Хаанаас/Хаашаа сонгоно уу");
-      return;
-    }
-
-    if (!Array.isArray(this.pendingOffer.items) || this.pendingOffer.items.length === 0) {
-      alert("Сагс хоосон байна");
-      return;
-    }
-
-    const safeItems = this.pendingOffer.items
-      .map((i) => {
-        const unitPrice = Number(i.price);
-        const qty = Number(i.qty);
-        return {
-          menuItemKey: i.id,
-          name: i.name,
-          unitPrice: Number.isFinite(unitPrice) ? unitPrice : 0,
-          qty: Number.isFinite(qty) && qty > 0 ? qty : 1,
-          options: {},
-        };
-      })
-      .filter((i) => i.qty > 0);
-
-    const payload = {
-      customerId: user.id,
-      fromPlaceId: this.pendingOrder.fromId,
-      toPlaceId: this.pendingOrder.toId,
-      scheduledAt: this.pendingOrder.createdAt,
-      deliveryFee: Number.isFinite(this.pendingOffer.deliveryFee) ? this.pendingOffer.deliveryFee : 0,
-      items: safeItems,
-      customerName: user.name || "Зочин хэрэглэгч",
-      customerPhone: user.phone || "00000000",
-      customerStudentId: user.student_id || "",
-      note: this.pendingOrder.fromDetail ? `Pickup: ${this.pendingOrder.fromDetail}` : null,
-    };
-
-    try {
-      const resp = await fetch(`${API}/api/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
-
-      const data = await resp.json().catch(() => ({}));
-
-      if (!resp.ok) {
-        alert(data?.error || "Захиалга үүсгэхэд алдаа гарлаа");
-        return;
-      }
-
-      if (data?.customerId) {
-        this.syncCustomerInfo(data.customerId);
-      }
-
-      const activeOrder = {
-        ...this.pendingOrder,
-        customer: {
-          name: user.name || "Зочин хэрэглэгч",
-          phone: user.phone || "00000000",
-          studentId: user.student_id || "",
-        },
-      };
-      try {
-        await fetch("/api/active-order", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ order: activeOrder }),
-        });
-      } catch (e) {
-        // ignore
-      }
-      // ✅ appState: захиалга үүссэн тул customer болгоно
-      window.NumAppState?.setState("customer", "order_created");
-      window.dispatchEvent(new Event("order-updated"));
-
-      const existingOffers = JSON.parse(localStorage.getItem("offers") || "[]");
-      existingOffers.unshift({
-        ...this.pendingOffer,
-        orderId: data.orderId,
-        meta: this.formatMeta(this.pendingOrder.createdAt),
-        from: this.pendingOrder.from,
-        fromDetail: this.pendingOrder.fromDetail,
-        to: this.pendingOrder.to,
-        title: `${this.pendingOrder.from} - ${this.pendingOrder.to}`,
-        price: this.formatPrice((data?.total ?? this.pendingOffer.total) || 0),
-        thumb: this.pendingOffer.thumb || "assets/img/box.svg",
-        customer: {
-          name: user.name || "Зочин хэрэглэгч",
-          phone: user.phone || "00000000",
-          studentId: user.student_id || "",
-          avatar: user.avatar || "assets/img/profile.jpg",
-        },
-        sub: this.pendingOffer.items.map((it) => ({
-          name: `${it.name} x${it.qty}`,
-          price: this.formatPrice(it.price * it.qty)
-        }))
-      });
-      localStorage.setItem("offers", JSON.stringify(existingOffers));
-
-      const offersEl = this.querySelector("#offers");
-      if (offersEl && "items" in offersEl) {
-        offersEl.items = existingOffers;
-      }
-      window.dispatchEvent(new Event("offers-updated"));
-
-      this.hideConfirmModal();
-
-      const offersSection = document.querySelector("#offers");
-      if (offersSection && offersSection.scrollIntoView) {
-        setTimeout(() => {
-          offersSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 150);
-      }
-    } catch (e) {
-      alert("Сервертэй холбогдож чадсангүй");
-    }
+    alert("Order confirm component ачаалагдаагүй байна.");
   }
 }
 
-const API = "http://localhost:3000";
-
-async function loadPlaces() {
-  const from = await fetch(`${API}/api/from-places`).then((r) => r.json());
-  const to = await fetch(`${API}/api/to-places`).then((r) => r.json());
+async function loadGazruud() {
+  const from = await apiFetch(`/api/from-places`).then((r) => r.json());
+  const to = await apiFetch(`/api/to-places`).then((r) => r.json());
 
   const fromSel = document.querySelector("#fromPlace");
   const toSel = document.querySelector("#toPlace");
@@ -534,14 +202,14 @@ async function loadPlaces() {
     .join("");
 }
 
-loadPlaces();
+loadGazruud();
 
 document.addEventListener("change", async (e) => {
   if (e.target.id !== "fromPlace") return;
 
   const placeId = e.target.value;
 
-  const res = await fetch(`${API}/api/menus/${placeId}`).then((r) => r.json());
+  const res = await apiFetch(`/api/menus/${placeId}`).then((r) => r.json());
 
   const whatSel = document.querySelector("#what");
   if (!whatSel) return;
