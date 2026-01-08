@@ -426,7 +426,7 @@ class OfferModal extends HTMLElement {
     let orderDetail = null;
     const orderId = this.currentData?.orderId;
 
-    // ✅ ХҮРГЭХ товч дарсан үед offers жагсаалтаас устгах
+    //  ХҮРГЭХ товч дарсан үед offers жагсаалтаас устгах
     this.removeOfferFromList(this.currentData);
 
     if (orderId) {
