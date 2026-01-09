@@ -48,9 +48,9 @@
   function updateActiveLink() {
     const hash = location.hash || '#home';
 
-    document.querySelectorAll("nav a").forEach(k => {
-      const href = k.getAttribute('href');
-      k.classList.toggle('is-active', href === hash);
+    document.querySelectorAll('.top-menu a').forEach(a => {
+      const href = a.getAttribute('href');
+      a.classList.toggle('is-active', href === hash);
     });
 
     if (!location.hash) {

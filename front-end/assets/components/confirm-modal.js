@@ -6,8 +6,8 @@ class ConfirmModal extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    this.element_avh();
-    this.attach();
+    this.cacheEls();
+    this.bindEvents();
   }
 
   render() {
@@ -104,14 +104,14 @@ class ConfirmModal extends HTMLElement {
     `;
   }
 
-  element_avh() {
+  cacheEls() {
     this.modal = this.shadowRoot.querySelector(".modal");
     this.confirmTextEl = this.shadowRoot.querySelector("#confirm-text");
     this.cancelBtn = this.shadowRoot.querySelector("#cancel-order");
     this.confirmBtn = this.shadowRoot.querySelector("#confirm-order");
   }
 
-  attach() {
+  bindEvents() {
     if (this.cancelBtn) {
       this.cancelBtn.addEventListener("click", () => {
         this.close();
@@ -133,46 +133,41 @@ class ConfirmModal extends HTMLElement {
     }
   }
 
- buildBaraa(summary) {
-    const list = summary?.items || [];
-    if (!list.length) return "Бараа сонгогдоогүй";
-    return list.map((i) => `• ${i.name} — ${i.qty} ширхэг`).join("<br>");
-  }
-
-  buildBatalgaajiltHtml(order, summary) {
-    const d = new Date(order.createdAt);
-    const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    const day = order.createdAt.split("T")[0];
-    const total = summary?.total
-
-    return `
-      <div class="detail-row">
-        <strong>Хаанаас:</strong> ${order.from}<br>
-        <strong>Хаашаа:</strong> ${order.to}<br>
-        <strong>Өдөр:</strong> ${day}<br>
-        <strong>Цаг:</strong> ${time}
-      </div>
-      <div class="detail-row">
-        <strong>Таны хоол:</strong><br>
-        ${this.buildBaraa(summary)}
-      </div>
-      <div class="detail-row" style="text-align:center;">
-        <strong>Нийт үнэ:</strong> ${total}
-      </div>
-    `;
+  formatPrice(n) {
+    return Number(n || 0).toLocaleString("mn-MN") + "₮";
   }
 
   open(order, summary) {
-    const { modal, text } = this.els || {};
-    if (!modal || !text || !order) return;
-    text.innerHTML = this.buildBatalgaajiltHtml(order, summary || {});
-    modal.classList.add("open");
+    if (!this.modal || !this.confirmTextEl) return;
+
+    const items = summary?.items?.length
+      ? summary.items.map((i) => `• ${i.name} — ${i.qty} ширхэг`).join("<br>")
+      : "Бараа сонгогдоогүй";
+
+    const d = new Date(order.createdAt);
+
+    this.confirmTextEl.innerHTML = `
+      <div class="detail-row">
+        <strong>Хаанаас:</strong> ${order.from}<br>
+        <strong>Хаашаа:</strong> ${order.to}<br>
+        <strong>Өдөр:</strong> ${order.createdAt.split("T")[0]}<br>
+        <strong>Цаг:</strong> ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+      </div>
+      <div class="detail-row">
+        <strong>Таны хоол:</strong><br>
+        ${items}
+      </div>
+      <div class="detail-row" style="text-align:center;">
+        <strong>Нийт үнэ:</strong> ${summary?.total ? this.formatPrice(summary.total) : "0₮"}
+      </div>
+    `;
+
+    this.modal.classList.add("open");
   }
 
   close() {
-    const { modal } = this.els || {};
-    if (!modal) return;
-    modal.classList.remove("open");
+    if (!this.modal) return;
+    this.modal.classList.remove("open");
   }
 }
 

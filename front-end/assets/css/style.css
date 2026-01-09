@@ -106,20 +106,20 @@
   }
 
   .site-top,
-  nav {
+  .top-menu {
     background: var(--color-bg);
     border-color: var(--color-border);
   }
 
-  nav a {
+  .top-menu a {
     color: var(--color-muted);
   }
 
-  nav a.is-active {
+  .top-menu a.is-active {
     color: var(--color-accent);
   }
 
-  nav a.is-active::before {
+  .top-menu a.is-active::before {
     background: var(--color-bg);
     box-shadow: none;
   }
@@ -150,7 +150,7 @@
 }
 
 @media (prefers-color-scheme: dark) and (max-width: 54rem) {
-  nav a.is-active::before {
+  .top-menu a.is-active::before {
     background: var(--color-bg) !important;
   }
 }
@@ -185,13 +185,13 @@
   display: block;
 }
 
-nav {
+.top-menu {
   margin-left: auto;
   align-items: center;
   gap: 2.5rem;
 }
 
-nav a {
+.top-menu a {
   text-decoration: none;
   color: var(--color-text);
   font-weight: var(--font-weight-medium);
@@ -201,20 +201,31 @@ nav a {
   transition: var(--transition-fast);
 }
 
-nav a:hover {
+.top-menu a:hover {
   color: var(--color-accent);
 }
 
-nav a.is-active {
+.top-menu a.is-active {
   color: var(--color-accent);
 }
 
-nav svg {
+.top-menu svg {
   display: none;
 }
 
 main {
   padding-top: calc(var(--top-h) + var(--main-top-gap));
+}
+
+@keyframes routeFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 num-router {
@@ -229,6 +240,7 @@ num-router > [data-route] {
 }
 
 num-router > [data-route].is-active {
+  animation: routeFadeUp 260ms ease-out;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
@@ -237,6 +249,12 @@ num-router > [data-route].is-active {
 num-router > [data-route].is-leaving {
   opacity: 0;
   transform: translateY(-0.4rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  num-router > [data-route].is-active {
+    animation: none;
+  }
 }
 
 .header-actions {
@@ -366,14 +384,12 @@ num-router > [data-route].is-leaving {
     display: none;
   }
 
-  nav {
+  .top-menu {
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 1fr;
+    display: flex;
     justify-content: space-around;
     align-items: flex-end;
     padding: var(--mobile-nav-pad-top) var(--mobile-nav-pad-x)
@@ -383,17 +399,17 @@ num-router > [data-route].is-leaving {
     z-index: 900;
   }
 
-  nav a {
+  .top-menu a {
     position: relative;
-    display: grid;
-    grid-template-rows: auto auto;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     text-decoration: none;
     color: var(--color-muted);
     transition: all 0.25s ease;
   }
 
-  nav svg {
+  .top-menu svg {
     display: block;
     width: var(--icon-size);
     height: var(--icon-size);
@@ -401,22 +417,22 @@ num-router > [data-route].is-leaving {
     transition: all 0.25s ease;
   }
 
-  nav svg path {
+  .top-menu svg path {
     fill: var(--color-muted);
   }
 
-  nav a span {
+  .top-menu a span {
     display: none;
     font-size: var(--font-size-tab);
     margin-top: 0.25rem;
   }
 
-  nav a.is-active {
+  .top-menu a.is-active {
     color: var(--color-accent);
     transform: translateY(var(--mobile-nav-active-lift));
   }
 
-  nav a.is-active::before {
+  .top-menu a.is-active::before {
     content: "";
     position: absolute;
     bottom: var(--mobile-nav-bubble-bottom);
@@ -429,7 +445,7 @@ num-router > [data-route].is-leaving {
     z-index: 1;
   }
 
-  nav a.is-active svg {
+  .top-menu a.is-active svg {
     padding: var(--icon-pad);
     border-radius: 50%;
     background: var(--color-accent);
@@ -437,11 +453,11 @@ num-router > [data-route].is-leaving {
     transform: translateY(-0.2rem);
   }
 
-  nav a.is-active svg path {
+  .top-menu a.is-active svg path {
     fill: #fff;
   }
 
-  nav a.is-active span {
+  .top-menu a.is-active span {
     display: block;
     color: var(--color-accent);
     font-weight: var(--font-weight-700);
@@ -459,7 +475,7 @@ num-router > [data-route].is-leaving {
 }
 
 @media (min-width: 54.01rem) {
-  nav a[href="#profile"] {
+  .top-menu a[href="#profile"] {
     display: none;
   }
 
