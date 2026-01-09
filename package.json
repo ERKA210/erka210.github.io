@@ -15,8 +15,11 @@
   "type": "module",
   "main": "back-end/server.js",
   "scripts": {
-    "dev": "nodemon back-end/server.js",
-    "start": "node back-end/server.js"
+    "dev:server": "nodemon back-end/server.js",
+    "dev:client": "esbuild front-end/main.js --bundle --outfile=front-end/dist/app.js --sourcemap --watch --loader:.css=css",
+    "dev": "npm-run-all --parallel dev:server dev:client",
+    "start": "node back-end/server.js",
+    "build": "esbuild front-end/main.js --bundle --minify --outfile=front-end/dist/app.js --loader:.css=css"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -24,6 +27,8 @@
     "pg": "^8.16.3"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "esbuild": "^0.27.2",
+    "nodemon": "^3.1.11",
+    "npm-run-all": "^4.1.5"
   }
 }

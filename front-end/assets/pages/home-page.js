@@ -1,21 +1,27 @@
+import { apiFetch } from "../api_client.js";
+
 class HomePage extends HTMLElement {
   connectedCallback() {
+    this.currentUser = null;
     this.pendingOrder = null;
     this.pendingOffer = null;
-    this.currentUser = null;
 
     this.render();
+    this.cacheEls();
     this.bindConfirmModal();
-    loadPlaces();
-    this.hydrateCustomerFromDb();
+    this.bindEvents();
 
-    const orderBtn = this.querySelector(".order-btn");
-    if (orderBtn) {
-      orderBtn.addEventListener("click", () => this.prepareOrder());
-    }
+    this.loadPlaces();
+    this.hydrateCustomerFromDb();
   }
 
   disconnectedCallback() {
+    if (this.orderBtn && this.handleOrderClick) {
+      this.orderBtn.removeEventListener("click", this.handleOrderClick);
+    }
+    if (this.fromSel && this.handleFromChange) {
+      this.fromSel.removeEventListener("change", this.handleFromChange);
+    }
     if (this.confirmModal && this.handleConfirm) {
       this.confirmModal.removeEventListener("confirm", this.handleConfirm);
       this.confirmModal.removeEventListener("cancel", this.handleCancel);
@@ -92,6 +98,34 @@ class HomePage extends HTMLElement {
     `;
   }
 
+  cacheEls() {
+    this.fromSel = this.querySelector("#fromPlace");
+    this.toSel = this.querySelector("#toPlace");
+    this.whatSel = this.querySelector("#what");
+    this.orderBtn = this.querySelector(".order-btn");
+  }
+
+  bindEvents() {
+    this.handleOrderClick = () => this.prepareOrder();
+    this.handleFromChange = (e) => this.onFromPlaceChange(e);
+
+    if (this.orderBtn) {
+      this.orderBtn.addEventListener("click", this.handleOrderClick);
+    }
+    if (this.fromSel) {
+      this.fromSel.addEventListener("change", this.handleFromChange);
+    }
+  }
+
+  bindConfirmModal() {
+    this.confirmModal = this.querySelector("confirm-modal");
+    if (!this.confirmModal) return;
+    this.handleConfirm = () => this.confirmOrder();
+    this.handleCancel = () => this.hideConfirmModal();
+    this.confirmModal.addEventListener("confirm", this.handleConfirm);
+    this.confirmModal.addEventListener("cancel", this.handleCancel);
+  }
+
   async hydrateCustomerFromDb() {
     const user = await this.fetchCurrentUser();
     if (!user?.id) return;
@@ -99,34 +133,101 @@ class HomePage extends HTMLElement {
     try {
       await this.syncCustomerInfo(user.id);
     } catch (e) {
-      console.error("kkkkkk:", e);
+      console.error("Failed to sync customer info:", e);
     }
   }
 
   async fetchCurrentUser() {
     if (this.currentUser) return this.currentUser;
     try {
-      const res = await fetch("/api/auth/me");
+      const res = await apiFetch("/api/auth/me");
       if (!res.ok) return null;
       const data = await res.json();
-      console.log("herglegch", data);
       this.currentUser = data?.user || null;
       return this.currentUser;
-    } catch (e) {
+    } catch {
       return null;
-      
     }
-    
   }
 
   async syncCustomerInfo(userId) {
     if (!userId) return;
-    const res = await fetch(`${API}/api/customers/${userId}`);
+    const res = await apiFetch(`/api/customers/${userId}`);
     if (!res.ok) return;
     const data = await res.json();
     if (data) {
       window.dispatchEvent(new Event("user-updated"));
     }
+  }
+
+  async loadPlaces() {
+    try {
+      const [fromRes, toRes] = await Promise.all([
+        apiFetch("/api/from-places"),
+        apiFetch("/api/to-places"),
+      ]);
+      if (!fromRes.ok || !toRes.ok) return;
+
+      const [from, to] = await Promise.all([fromRes.json(), toRes.json()]);
+      this.fillPlaceSelect(this.fromSel, from, "Хаанаас", (p) =>
+        `${p.name}${p.detail ? " - " + p.detail : ""}`
+      );
+      this.fillPlaceSelect(this.toSel, to, "Хаашаа", (p) => p.name);
+    } catch (e) {
+      console.warn("Failed to load places:", e);
+    }
+  }
+
+  fillPlaceSelect(select, items, placeholder, labelFn) {
+    if (!select) return;
+    const list = Array.isArray(items) ? items : [];
+    select.innerHTML = `<option value="" disabled selected hidden>${placeholder}</option>`;
+    select.innerHTML += list
+      .map((p) => `<option value="${p.id}">${labelFn(p)}</option>`)
+      .join("");
+  }
+
+  async onFromPlaceChange(e) {
+    const placeId = e?.target?.value;
+    if (!placeId || !this.whatSel) return;
+
+    try {
+      const res = await apiFetch(`/api/menus/${placeId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const items = Array.isArray(data?.menu_json) ? data.menu_json : [];
+
+      this.populateMenuSelect(items);
+    } catch (err) {
+      console.warn("Failed to load menu:", err);
+    }
+  }
+
+  populateMenuSelect(items) {
+    if (!this.whatSel) return;
+    const foods = items.filter((i) => i.category === "food");
+    const drinks = items.filter((i) => i.category === "drink");
+    const others = items.filter((i) => !i.category);
+
+    this.whatSel.innerHTML = `<option value="" disabled selected hidden>Юуг</option>`;
+    this.appendMenuGroup("Идэх юм", foods);
+    this.appendMenuGroup("Уух юм", drinks);
+    this.appendMenuGroup("Бусад", others);
+  }
+
+  appendMenuGroup(label, items) {
+    if (!items.length || !this.whatSel) return;
+    const group = document.createElement("optgroup");
+    group.label = label;
+    items.forEach((item) => {
+      const opt = document.createElement("option");
+      opt.value = item.id;
+      opt.dataset.price = item.price;
+      opt.dataset.name = item.name;
+      opt.textContent = `${item.name} — ${item.price}₮`;
+      group.appendChild(opt);
+    });
+    this.whatSel.appendChild(group);
   }
 
   formatPrice(n) {
@@ -155,17 +256,7 @@ class HomePage extends HTMLElement {
       if (!isNaN(iso.getTime())) return iso.toISOString();
     }
 
-    const now = new Date();
-    return now.toISOString();
-  }
-
-  bindConfirmModal() {
-    this.confirmModal = this.querySelector("confirm-modal");
-    if (!this.confirmModal) return;
-    this.handleConfirm = () => this.confirmOrder();
-    this.handleCancel = () => this.hideConfirmModal();
-    this.confirmModal.addEventListener("confirm", this.handleConfirm);
-    this.confirmModal.addEventListener("cancel", this.handleCancel);
+    return new Date().toISOString();
   }
 
   hideConfirmModal() {
@@ -177,70 +268,85 @@ class HomePage extends HTMLElement {
   }
 
   prepareOrder() {
-    const fromSel = this.querySelector("#fromPlace");
-    const toSel = this.querySelector("#toPlace");
-    const whatSel = this.querySelector("#what");
+    if (!this.fromSel || !this.toSel || !this.whatSel) return;
 
-    if (!fromSel?.value) {
+    if (!this.fromSel.value) {
       alert("Хаанаасаа сонгоно уу");
       return;
     }
-    if (!toSel?.value) {
+    if (!this.toSel.value) {
       alert("Хаашаагаа сонгоно уу");
       return;
     }
 
-    const cartEl = this.querySelector("sh-cart");
-    const cartSummary = cartEl?.getSummary() || { totalQty: 0, items: [], total: 0, deliveryFee: 0 };
+    const cartSummary = this.getCartSummary();
+    const itemOpt = this.whatSel.selectedOptions?.[0];
 
-    const itemOpt = whatSel?.selectedOptions?.[0];
-    if (cartSummary.totalQty === 0) {
-      if (!itemOpt || !itemOpt.value) {
-        alert("Юуг (хоол/бараа) сонгоно уу");
-        return;
-      }
+    if (cartSummary.totalQty === 0 && (!itemOpt || !itemOpt.value)) {
+      alert("Юуг (хоол/бараа) сонгоно уу");
+      return;
     }
-    const fromOptionText = fromSel.selectedOptions[0].textContent || "";
-    const parts = fromOptionText.split(" - ");
-    const fromName = parts[0] || fromOptionText;
-    const fromDetail = parts[1] || "";
 
+    const { fromName, fromDetail } = this.parseFromPlace(this.fromSel);
     const scheduledAt = this.getScheduledAtISO();
-
-    const items =
-      cartSummary.totalQty > 0
-        ? cartSummary.items.map((it) => ({
-          id: it.key || it.name,
-          name: it.name,
-          price: Number(it.unitPrice ?? it.price ?? 0),
-          qty: it.qty,
-        }))
-        : [{
-          id: itemOpt.value,
-          name: (itemOpt.textContent || "").split(" — ")[0],
-          price: Number(itemOpt.dataset.price || 0),
-          qty: 1,
-        }];
+    const items = cartSummary.totalQty > 0
+      ? this.buildItemsFromCart(cartSummary)
+      : this.buildSingleItem(itemOpt);
 
     this.pendingOrder = {
-      fromId: fromSel.value,
-      toId: toSel.value,
+      fromId: this.fromSel.value,
+      toId: this.toSel.value,
       from: fromName,
       fromDetail,
-      to: toSel.selectedOptions[0].textContent,
+      to: this.toSel.selectedOptions[0].textContent,
       createdAt: scheduledAt,
     };
 
     this.pendingOffer = {
       items,
-      total: cartSummary.totalQty > 0 ? cartSummary.total : items.reduce((s, it) => s + (it.price * it.qty), 0),
+      total: cartSummary.totalQty > 0
+        ? cartSummary.total
+        : items.reduce((sum, it) => sum + (it.price * it.qty), 0),
       deliveryFee: cartSummary.totalQty > 0 ? cartSummary.deliveryFee : 500,
-      thumb: cartSummary.deliveryIcon || "assets/img/box.svg"
+      thumb: cartSummary.deliveryIcon || "assets/img/box.svg",
     };
 
     if (this.confirmModal && typeof this.confirmModal.open === "function") {
       this.confirmModal.open(this.pendingOrder, this.pendingOffer);
     }
+  }
+
+  getCartSummary() {
+    const cartEl = this.querySelector("sh-cart");
+    return cartEl?.getSummary() || { totalQty: 0, items: [], total: 0, deliveryFee: 0 };
+  }
+
+  parseFromPlace(select) {
+    const raw = select.selectedOptions[0].textContent || "";
+    const parts = raw.split(" - ");
+    return {
+      fromName: parts[0] || raw,
+      fromDetail: parts[1] || "",
+    };
+  }
+
+  buildItemsFromCart(cartSummary) {
+    return cartSummary.items.map((it) => ({
+      id: it.key || it.name,
+      name: it.name,
+      price: Number(it.unitPrice ?? it.price ?? 0),
+      qty: it.qty,
+    }));
+  }
+
+  buildSingleItem(itemOpt) {
+    if (!itemOpt) return [];
+    return [{
+      id: itemOpt.value,
+      name: (itemOpt.textContent || "").split(" — ")[0],
+      price: Number(itemOpt.dataset.price || 0),
+      qty: 1,
+    }];
   }
 
   async confirmOrder() {
@@ -296,15 +402,13 @@ class HomePage extends HTMLElement {
     };
 
     try {
-      const resp = await fetch(`${API}/api/orders`, {
+      const resp = await apiFetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify(payload),
       });
 
       const data = await resp.json().catch(() => ({}));
-
       if (!resp.ok) {
         alert(data?.error || "Захиалга үүсгэхэд алдаа гарлаа");
         return;
@@ -322,149 +426,67 @@ class HomePage extends HTMLElement {
           studentId: user.student_id || "",
         },
       };
+
       try {
-        await fetch("/api/active-order", {
+        await apiFetch("/api/active-order", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
           body: JSON.stringify({ order: activeOrder }),
         });
-      } catch (e) {
+      } catch {
         // ignore
       }
-      // ✅ appState: захиалга үүссэн тул customer болгоно
+
       window.NumAppState?.setState("customer", "order_created");
       window.dispatchEvent(new Event("order-updated"));
 
-      const existingOffers = JSON.parse(localStorage.getItem("offers") || "[]");
-      existingOffers.unshift({
-        ...this.pendingOffer,
-        orderId: data.orderId,
-        meta: this.formatMeta(this.pendingOrder.createdAt),
-        from: this.pendingOrder.from,
-        fromDetail: this.pendingOrder.fromDetail,
-        to: this.pendingOrder.to,
-        title: `${this.pendingOrder.from} - ${this.pendingOrder.to}`,
-        price: this.formatPrice((data?.total ?? this.pendingOffer.total) || 0),
-        thumb: this.pendingOffer.thumb || "assets/img/box.svg",
-        customer: {
-          name: user.name || "Зочин хэрэглэгч",
-          phone: user.phone || "00000000",
-          studentId: user.student_id || "",
-          avatar: user.avatar || "assets/img/profile.jpg",
-        },
-        sub: this.pendingOffer.items.map((it) => ({
-          name: `${it.name} x${it.qty}`,
-          price: this.formatPrice(it.price * it.qty)
-        }))
-      });
-      localStorage.setItem("offers", JSON.stringify(existingOffers));
-
-      const offersEl = this.querySelector("#offers");
-      if (offersEl && "items" in offersEl) {
-        offersEl.items = existingOffers;
-      }
-      window.dispatchEvent(new Event("offers-updated"));
-
+      this.addOfferToLocalList(user, data);
       this.hideConfirmModal();
-
-      const offersSection = document.querySelector("#offers");
-      if (offersSection && offersSection.scrollIntoView) {
-        setTimeout(() => {
-          offersSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 150);
-      }
-    } catch (e) {
+      this.scrollOffersIntoView();
+    } catch {
       alert("Сервертэй холбогдож чадсангүй");
     }
   }
+
+  addOfferToLocalList(user, data) {
+    const existingOffers = JSON.parse(localStorage.getItem("offers") || "[]");
+    existingOffers.unshift({
+      ...this.pendingOffer,
+      orderId: data.orderId,
+      meta: this.formatMeta(this.pendingOrder.createdAt),
+      from: this.pendingOrder.from,
+      fromDetail: this.pendingOrder.fromDetail,
+      to: this.pendingOrder.to,
+      title: `${this.pendingOrder.from} - ${this.pendingOrder.to}`,
+      price: this.formatPrice((data?.total ?? this.pendingOffer.total) || 0),
+      thumb: this.pendingOffer.thumb || "assets/img/box.svg",
+      customer: {
+        name: user.name || "Зочин хэрэглэгч",
+        phone: user.phone || "00000000",
+        studentId: user.student_id || "",
+        avatar: user.avatar || "assets/img/profile.jpg",
+      },
+      sub: this.pendingOffer.items.map((it) => ({
+        name: `${it.name} x${it.qty}`,
+        price: this.formatPrice(it.price * it.qty),
+      })),
+    });
+
+    localStorage.setItem("offers", JSON.stringify(existingOffers));
+    const offersEl = this.querySelector("#offers");
+    if (offersEl && "items" in offersEl) {
+      offersEl.items = existingOffers;
+    }
+    window.dispatchEvent(new Event("offers-updated"));
+  }
+
+  scrollOffersIntoView() {
+    const offersSection = document.querySelector("#offers");
+    if (!offersSection || !offersSection.scrollIntoView) return;
+    setTimeout(() => {
+      offersSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+  }
 }
-
-const API = "http://localhost:3000";
-
-async function loadPlaces() {
-  const from = await fetch(`${API}/api/from-places`).then((r) => r.json());
-  const to = await fetch(`${API}/api/to-places`).then((r) => r.json());
-
-  const fromSel = document.querySelector("#fromPlace");
-  const toSel = document.querySelector("#toPlace");
-
-  fromSel.innerHTML = `<option value="" disabled selected hidden>Хаанаас</option>`;
-  toSel.innerHTML = `<option value="" disabled selected hidden>Хаашаа</option>`;
-
-  fromSel.innerHTML += from
-    .map(
-      (p) =>
-        `<option value="${p.id}">${p.name}${p.detail ? " - " + p.detail : ""}</option>`
-    )
-    .join("");
-
-  toSel.innerHTML += to
-    .map((p) => `<option value="${p.id}">${p.name}</option>`)
-    .join("");
-}
-
-loadPlaces();
-
-document.addEventListener("change", async (e) => {
-  if (e.target.id !== "fromPlace") return;
-
-  const placeId = e.target.value;
-
-  const res = await fetch(`${API}/api/menus/${placeId}`).then((r) => r.json());
-
-  const whatSel = document.querySelector("#what");
-  if (!whatSel) return;
-
-  const items = Array.isArray(res.menu_json) ? res.menu_json : [];
-
-  const foods = items.filter((i) => i.category === "food");
-  const drinks = items.filter((i) => i.category === "drink");
-
-  whatSel.innerHTML = `<option value="" disabled selected hidden>Юуг</option>`;
-
-  if (foods.length) {
-    const og = document.createElement("optgroup");
-    og.label = "Идэх юм";
-    foods.forEach((item) => {
-      const opt = document.createElement("option");
-      opt.value = item.id;
-      opt.dataset.price = item.price;
-      opt.dataset.name = item.name;
-      opt.textContent = `${item.name} — ${item.price}₮`;
-      og.appendChild(opt);
-    });
-    whatSel.appendChild(og);
-  }
-
-  if (drinks.length) {
-    const og = document.createElement("optgroup");
-    og.label = "Уух юм";
-    drinks.forEach((item) => {
-      const opt = document.createElement("option");
-      opt.value = item.id;
-      opt.dataset.price = item.price;
-      opt.dataset.name = item.name;
-      opt.textContent = `${item.name} — ${item.price}₮`;
-      og.appendChild(opt);
-    });
-    whatSel.appendChild(og);
-  }
-
-  const others = items.filter((i) => !i.category);
-  if (others.length) {
-    const og = document.createElement("optgroup");
-    og.label = "Бусад";
-    others.forEach((item) => {
-      const opt = document.createElement("option");
-      opt.value = item.id;
-      opt.dataset.price = item.price;
-      opt.dataset.name = item.name;
-      opt.textContent = `${item.name} — ${item.price}₮`;
-      og.appendChild(opt);
-    });
-    whatSel.appendChild(og);
-  }
-});
 
 customElements.define("home-page", HomePage);
