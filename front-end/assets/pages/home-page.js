@@ -5,13 +5,20 @@ class HomePage extends HTMLElement {
     this.currentUser = null;
 
     this.render();
-    this.setupConfirmModal();
+    this.bindConfirmModal();
     loadPlaces();
     this.hydrateCustomerFromDb();
 
     const orderBtn = this.querySelector(".order-btn");
     if (orderBtn) {
       orderBtn.addEventListener("click", () => this.prepareOrder());
+    }
+  }
+
+  disconnectedCallback() {
+    if (this.confirmModal && this.handleConfirm) {
+      this.confirmModal.removeEventListener("confirm", this.handleConfirm);
+      this.confirmModal.removeEventListener("cancel", this.handleCancel);
     }
   }
 
@@ -29,97 +36,6 @@ class HomePage extends HTMLElement {
           clip: rect(0, 0, 0, 0);
           white-space: nowrap;
           border: 0;
-        }
-        #confirm-modal {
-          position: fixed;
-          inset: 0;
-          display: none;
-          align-items: center;
-          justify-content: center;
-          background: rgba(0, 0, 0, 0.4);
-          backdrop-filter: blur(4px);
-          z-index: 10000;
-          padding: 1rem;
-        }
-        #confirm-modal.show { display: flex; }
-        #confirm-modal .modal-content {
-          background: #fff;
-          border-radius: 20px;
-          width: min(480px, 100%);
-          padding: 1.6rem 1.8rem;
-          box-shadow: 0 24px 70px rgba(0,0,0,0.2);
-          display: flex;
-          flex-direction: column;
-          gap: 0.9rem;
-          text-align: center;
-        }
-        #confirm-modal h3 {
-          margin: 0;
-          font-size: 1.3rem;
-          color: #111827;
-        }
-        #confirm-modal p {
-          margin: 0;
-          color: #374151;
-          line-height: 1.45;
-        }
-        #confirm-modal .modal-actions {
-          display: flex;
-          justify-content: space-between;
-          gap: 0.75rem;
-          margin-top: 0.75rem;
-        }
-        #confirm-modal .btn--gray {
-          background: #f9fafb;
-          color: #111827;
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          padding: 0.85rem 1.4rem;
-          font-weight: 700;
-        }
-        #confirm-modal .btn--accent {
-          background: var(--color-accent);
-          color: #fff;
-          border-radius: 12px;
-          padding: 0.85rem 1.4rem;
-          font-weight: 800;
-        }
-        #confirm-modal .detail-row {
-          text-align: left;
-          background: #f9fafb;
-          border-radius: 12px;
-          padding: 0.85rem 1rem;
-          border: 1px solid #eef2f7;
-          color: #1f2937;
-          line-height: 1.5;
-        }
-        #confirm-modal .detail-row strong {
-          display: inline-block;
-          min-width: 4.7rem;
-        }
-        @media (prefers-color-scheme: dark) {
-          #confirm-modal .modal-content {
-            background: #0f172a;
-            color: #e5e7eb;
-            border: 1px solid #243040;
-            box-shadow: 0 24px 70px rgba(0,0,0,0.45);
-          }
-          #confirm-modal h3 {
-            color: #f9fafb;
-          }
-          #confirm-modal p {
-            color: #9aa4b2;
-          }
-          #confirm-modal .btn--gray {
-            background: #111827;
-            color: #e5e7eb;
-            border-color: #243040;
-          }
-          #confirm-modal .detail-row {
-            background: #111827;
-            border-color: #243040;
-            color: #e5e7eb;
-          }
         }
       </style>
 
@@ -172,17 +88,7 @@ class HomePage extends HTMLElement {
         </aside>
       </div>
       <offer-modal></offer-modal>
-
-      <div id="confirm-modal" class="modal hidden">
-        <div class="modal-content">
-          <h3>Захиалга баталгаажуулах уу?</h3>
-          <p id="confirm-text"></p>
-          <div class="modal-actions">
-            <button id="cancel-order" class="btn btn--gray">Цуцлах</button>
-            <button id="confirm-order" class="btn btn--accent">Баталгаажуулах</button>
-          </div>
-        </div>
-      </div>
+      <confirm-modal></confirm-modal>
     `;
   }
 
@@ -253,57 +159,19 @@ class HomePage extends HTMLElement {
     return now.toISOString();
   }
 
-  setupConfirmModal() {
-    this.confirmModal = this.querySelector("#confirm-modal");
-    this.confirmTextEl = this.querySelector("#confirm-text");
-    this.cancelBtn = this.querySelector("#cancel-order");
-    this.confirmBtn = this.querySelector("#confirm-order");
-
-    if (this.cancelBtn) {
-      this.cancelBtn.addEventListener("click", () => this.hideConfirmModal());
-    }
-    if (this.confirmBtn) {
-      this.confirmBtn.addEventListener("click", () => this.confirmOrder());
-    }
-    if (this.confirmModal) {
-      this.confirmModal.addEventListener("click", (e) => {
-        if (e.target === this.confirmModal) this.hideConfirmModal();
-      });
-    }
-  }
-
-  showConfirmModal(order, summary) {
-    if (!this.confirmModal || !this.confirmTextEl) return;
-
-    const items = summary.items?.length
-      ? summary.items.map((i) => `• ${i.name} — ${i.qty} ширхэг`).join("<br>")
-      : "Бараа сонгогдоогүй";
-
-    const d = new Date(order.createdAt);
-
-    this.confirmTextEl.innerHTML = `
-      <div class="detail-row">
-        <strong>Хаанаас:</strong> ${order.from}<br>
-        <strong>Хаашаа:</strong> ${order.to}<br>
-        <strong>Өдөр:</strong> ${order.createdAt.split("T")[0]}<br>
-        <strong>Цаг:</strong> ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-      </div>
-      <div class="detail-row">
-        <strong>Таны хоол:</strong><br>
-        ${items}
-      </div>
-      <div class="detail-row" style="text-align:center;">
-        <strong>Нийт үнэ:</strong> ${summary.total ? this.formatPrice(summary.total) : "0₮"}
-      </div>
-    `;
-
-    this.confirmModal.classList.remove("hidden");
-    this.confirmModal.classList.add("show");
+  bindConfirmModal() {
+    this.confirmModal = this.querySelector("confirm-modal");
+    if (!this.confirmModal) return;
+    this.handleConfirm = () => this.confirmOrder();
+    this.handleCancel = () => this.hideConfirmModal();
+    this.confirmModal.addEventListener("confirm", this.handleConfirm);
+    this.confirmModal.addEventListener("cancel", this.handleCancel);
   }
 
   hideConfirmModal() {
-    if (!this.confirmModal) return;
-    this.confirmModal.classList.remove("show");
+    if (this.confirmModal && typeof this.confirmModal.close === "function") {
+      this.confirmModal.close();
+    }
     this.pendingOrder = null;
     this.pendingOffer = null;
   }
@@ -370,7 +238,9 @@ class HomePage extends HTMLElement {
       thumb: cartSummary.deliveryIcon || "assets/img/box.svg"
     };
 
-    this.showConfirmModal(this.pendingOrder, this.pendingOffer);
+    if (this.confirmModal && typeof this.confirmModal.open === "function") {
+      this.confirmModal.open(this.pendingOrder, this.pendingOffer);
+    }
   }
 
   async confirmOrder() {

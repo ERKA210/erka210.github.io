@@ -369,11 +369,11 @@ router.patch("/orders/:id/status", requireAuth, async (req, res) => {
   }
 
   const status = String(req.body?.status || "").toLowerCase();
-  const allowed = new Set(["created", "on_the_way", "on-the-way", "delivered"]);
+  const allowed = new Set(["created", "preparing", "delivering", "delivered"]);
   if (!allowed.has(status)) {
     return res.status(400).json({ error: "Invalid status" });
   }
-  const normalizedStatus = status === "on-the-way" ? "on_the_way" : status;
+  const normalizedStatus = status;
 
   try {
     const meta = await pool.query(

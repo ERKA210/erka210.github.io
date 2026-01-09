@@ -1,82 +1,83 @@
-// class OfferCard extends HTMLElement {
-//   connectedCallback() {
-//     this.render();
-//     this.setup();
-//   }
+function parseJsonAttr(raw, fallback) {
+  if (!raw) return fallback;
+  try {
+    const decoded = decodeURIComponent(raw);
+    return JSON.parse(decoded);
+  } catch {
+    return fallback;
+  }
+}
 
-//   static get observedAttributes() {
-//     return ["thumb", "title", "meta", "price"];
-//   }
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
-//   attributeChangedCallback() {
-//     // attribute өөрчлөгдвөл дахин зурна
-//     if (this.isConnected) this.render();
-//   }
+class OfferCard extends HTMLElement {
+  static get observedAttributes() {
+    return ["thumb", "title", "meta", "price", "sub", "customer", "order-id"];
+  }
 
-//   render() {
-//     const thumb = this.getAttribute("thumb") || "assets/img/box.svg";
-//     const title = this.getAttribute("title") || "";
-//     const meta = this.getAttribute("meta") || "";
-//     const price = this.getAttribute("price") || "";
+  connectedCallback() {
+    if (this._ready) return;
+    this._ready = true;
+    this.render();
+    this.attach();
+  }
 
-//     this.innerHTML = `
-//       <article class="offer-card" role="button" tabindex="0">
-//         <div class="offer-thumb">
-//           <img src="${this.escapeAttr(thumb)}" alt="icon"/>
-//         </div>
+  attributeChangedCallback() {
+    if (this._ready) this.render();
+  }
 
-//         <div class="offer-info">
-//           <div class="offer-title">${this.escapeHtml(title)}</div>
-//           <div class="offer-meta">${this.escapeHtml(meta)}</div>
-//         </div>
+  get data() {
+    return {
+      thumb: this.getAttribute("thumb") || "assets/img/box.svg",
+      title: this.getAttribute("title") || "",
+      meta: this.getAttribute("meta") || "",
+      price: this.getAttribute("price") || "",
+      orderId: this.getAttribute("order-id") || "",
+      sub: parseJsonAttr(this.getAttribute("sub"), []),
+      customer: parseJsonAttr(this.getAttribute("customer"), {}),
+    };
+  }
 
-//         <div class="offer-price">${this.escapeHtml(price)}</div>
-//       </article>
-//     `;
-//   }
+  render() {
+    const { thumb, title, meta, price } = this.data;
+    this.innerHTML = `
+      <article class="offer-card" role="button" tabindex="0">
+        <div class="offer-thumb">
+          <img src="${escapeHtml(thumb)}" alt="icon" width="57" height="57" decoding="async"/>
+        </div>
+        <div class="offer-info">
+          <div class="offer-title">${escapeHtml(title)}</div>
+          <div class="offer-meta">${escapeHtml(meta)}</div>
+        </div>
+        <div class="offer-price">${escapeHtml(price)}</div>
+      </article>
+    `;
+  }
 
-//   setup() {
-//     const card = this.querySelector(".offer-card");
-//     if (!card) return;
+  attach() {
+    this.addEventListener("click", () => {
+      const detail = this.data;
+      this.dispatchEvent(new CustomEvent("offer-select", { bubbles: true, detail }));
+    });
 
-//     // click хийхэд offer-select event дэгдээнэ (OfferList/Modal чинь ашиглаж болно)
-//     card.addEventListener("click", () => {
-//       this.dispatchEvent(
-//         new CustomEvent("offer-select", {
-//           bubbles: true,
-//           detail: {
-//             thumb: this.getAttribute("thumb"),
-//             title: this.getAttribute("title"),
-//             meta: this.getAttribute("meta"),
-//             price: this.getAttribute("price"),
-//             // хүсвэл orderId гэх мэт data-* нэмээд дамжуулж болно
-//             orderId: this.getAttribute("orderid") || this.getAttribute("orderId"),
-//           },
-//         })
-//       );
-//     });
+    this.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        this.click();
+      }
+    });
+  }
+}
 
-//     // keyboard accessibility (Enter/Space)
-//     card.addEventListener("keydown", (e) => {
-//       if (e.key === "Enter" || e.key === " ") {
-//         e.preventDefault();
-//         card.click();
-//       }
-//     });
-//   }
+if (!customElements.get("offer-card")) {
+  customElements.define("offer-card", OfferCard);
+}
 
-//   escapeHtml(s) {
-//     return String(s ?? "")
-//       .replaceAll("&", "&amp;")
-//       .replaceAll("<", "&lt;")
-//       .replaceAll(">", "&gt;")
-//       .replaceAll('"', "&quot;")
-//       .replaceAll("'", "&#039;");
-//   }
-
-//   escapeAttr(s) {
-//     return this.escapeHtml(s);
-//   }
-// }
-
-// customElements.define("offer-card", OfferCard);
+export { OfferCard };

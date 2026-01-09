@@ -371,7 +371,14 @@ class LoginPage extends HTMLElement {
 
 
         } catch (err) {
-          alert(err.message || "Нэвтрэх үед алдаа гарлаа");
+          const msg = String(err?.message || "");
+          if (msg.includes("users_phone_key")) {
+            alert("Энэ утас бүртгэлтэй байна. Нэвтрэх горимоор орно уу.");
+            const loginTab = this.querySelector('.auth-tabs .tab-btn[data-mode="login"]');
+            if (loginTab) loginTab.click();
+            return;
+          }
+          alert(msg || "Нэвтрэх үед алдаа гарлаа");
         }
       });
     }

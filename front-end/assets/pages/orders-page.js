@@ -231,8 +231,7 @@ class OrdersPage extends HTMLElement {
 
   mapStatusToStep(status) {
     switch ((status || "").toLowerCase()) {
-      case "on_the_way":
-      case "on-the-way":
+      case "delivering":
         return 1;
       case "delivered":
         return 2;

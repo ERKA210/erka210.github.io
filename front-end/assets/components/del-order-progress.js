@@ -154,7 +154,11 @@ class DelOrderProgress extends HTMLElement {
   }
 
   async updateOrderStatus(orderId, stepIndex) {
-    const status = stepIndex === 2 ? "delivered" : stepIndex === 1 ? "on_the_way" : "created";
+    const statusMap = {
+      1: "delivering",
+      2: "delivered",
+    };
+    const status = statusMap[stepIndex] || "created";
     try {
       const res = await fetch(`/api/orders/${encodeURIComponent(orderId)}/status`, {
         method: "PATCH",

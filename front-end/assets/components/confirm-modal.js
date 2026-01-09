@@ -16,7 +16,18 @@ class ConfirmModal extends HTMLElement {
         :host {
           font-family: inherit;
         }
-        .modal {
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+        #confirm-modal {
           position: fixed;
           inset: 0;
           display: none;
@@ -27,8 +38,8 @@ class ConfirmModal extends HTMLElement {
           z-index: 10000;
           padding: 1rem;
         }
-        .modal.open { display: flex; }
-        .modal-content {
+        #confirm-modal.show { display: flex; }
+        #confirm-modal .modal-content {
           background: #fff;
           border-radius: 20px;
           width: min(480px, 100%);
@@ -39,29 +50,29 @@ class ConfirmModal extends HTMLElement {
           gap: 0.9rem;
           text-align: center;
         }
-        h3 {
+        #confirm-modal h3 {
           margin: 0;
           font-size: 1.3rem;
           color: #111827;
         }
-        p {
+        #confirm-modal p {
           margin: 0;
           color: #374151;
           line-height: 1.45;
         }
-        .modal-actions {
+        #confirm-modal .modal-actions {
           display: flex;
           justify-content: space-between;
           gap: 0.75rem;
           margin-top: 0.75rem;
         }
-        .btn {
+        #confirm-modal .btn {
           border: none;
           background: transparent;
           font: inherit;
           cursor: pointer;
         }
-        .btn--gray {
+        #confirm-modal .btn--gray {
           background: #f9fafb;
           color: #111827;
           border: 1px solid #e5e7eb;
@@ -69,14 +80,14 @@ class ConfirmModal extends HTMLElement {
           padding: 0.85rem 1.4rem;
           font-weight: 700;
         }
-        .btn--accent {
+        #confirm-modal .btn--accent {
           background: var(--color-accent);
           color: #fff;
           border-radius: 12px;
           padding: 0.85rem 1.4rem;
           font-weight: 800;
         }
-        .detail-row {
+        #confirm-modal .detail-row {
           text-align: left;
           background: #f9fafb;
           border-radius: 12px;
@@ -85,13 +96,37 @@ class ConfirmModal extends HTMLElement {
           color: #1f2937;
           line-height: 1.5;
         }
-        .detail-row strong {
+        #confirm-modal .detail-row strong {
           display: inline-block;
           min-width: 4.7rem;
         }
+        @media (prefers-color-scheme: dark) {
+          #confirm-modal .modal-content {
+            background: #0f172a;
+            color: #e5e7eb;
+            border: 1px solid #243040;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.45);
+          }
+          #confirm-modal h3 {
+            color: #f9fafb;
+          }
+          #confirm-modal p {
+            color: #9aa4b2;
+          }
+          #confirm-modal .btn--gray {
+            background: #111827;
+            color: #e5e7eb;
+            border-color: #243040;
+          }
+          #confirm-modal .detail-row {
+            background: #111827;
+            border-color: #243040;
+            color: #e5e7eb;
+          }
+        }
       </style>
 
-      <div class="modal" aria-hidden="true">
+      <div id="confirm-modal" aria-hidden="true">
         <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
           <h3 id="confirm-title">Захиалга баталгаажуулах уу?</h3>
           <p id="confirm-text"></p>
@@ -105,7 +140,7 @@ class ConfirmModal extends HTMLElement {
   }
 
   cacheEls() {
-    this.modal = this.shadowRoot.querySelector(".modal");
+    this.modal = this.shadowRoot.querySelector("#confirm-modal");
     this.confirmTextEl = this.shadowRoot.querySelector("#confirm-text");
     this.cancelBtn = this.shadowRoot.querySelector("#cancel-order");
     this.confirmBtn = this.shadowRoot.querySelector("#confirm-order");
@@ -146,6 +181,11 @@ class ConfirmModal extends HTMLElement {
 
     const d = new Date(order.createdAt);
 
+    const totalRaw = summary?.total;
+    const totalText = Number.isFinite(Number(totalRaw))
+      ? this.formatPrice(Number(totalRaw))
+      : (totalRaw || "0₮");
+
     this.confirmTextEl.innerHTML = `
       <div class="detail-row">
         <strong>Хаанаас:</strong> ${order.from}<br>
@@ -158,16 +198,19 @@ class ConfirmModal extends HTMLElement {
         ${items}
       </div>
       <div class="detail-row" style="text-align:center;">
-        <strong>Нийт үнэ:</strong> ${summary?.total ? this.formatPrice(summary.total) : "0₮"}
+        <strong>Нийт үнэ:</strong> ${totalText}
       </div>
     `;
 
-    this.modal.classList.add("open");
+    this.modal.setAttribute("aria-hidden", "false");
+    this.modal.classList.add("show");
+    if (this.confirmBtn) this.confirmBtn.focus();
   }
 
   close() {
     if (!this.modal) return;
-    this.modal.classList.remove("open");
+    this.modal.classList.remove("show");
+    this.modal.setAttribute("aria-hidden", "true");
   }
 }
 

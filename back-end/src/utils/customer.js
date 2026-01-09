@@ -11,7 +11,7 @@ export async function ensureCustomerUser(client, { id, name, phone, studentId })
   const studentValue = studentSafe ? studentSafe : null;
 
   const existing = await client.query(
-    `SELECT id FROM users WHERE phone = $1 AND role = 'customer' LIMIT 1`,
+    `SELECT id FROM users WHERE phone = $1 LIMIT 1`,
     [phoneSafe]
   );
   if (existing.rows.length) {

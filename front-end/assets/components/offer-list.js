@@ -1,136 +1,134 @@
-class OfferCard extends HTMLElement {
-  connectedCallback() {
-    this.innerHTML = `
-      <article class="offer-card">
-        <div class="offer-thumb">
-          <img src="${this.getAttribute('thumb') || 'assets/img/box.svg'}" alt="icon" width="57" height="57" decoding="async"/>
-        </div>
-        <div class="offer-info">
-          <div class="offer-title">${this.getAttribute('title') || ''}</div>
-          <div class="offer-meta">${this.getAttribute('meta') || ''}</div>
-        </div>
-        <div class="offer-price">${this.getAttribute('price') || ''}</div>
-      </article>
-    `;
-    this.addEventListener('click', () => {
-      const modal = document.querySelector('offer-modal');
-      const subRaw = this.getAttribute('sub');
-      const customerRaw = this.getAttribute('customer');
-      const orderId = this.getAttribute('order-id') || '';
-      let sub = [];
-      let customer = {};
-        try {
-          sub = JSON.parse(subRaw);  
-        } catch (e) {
-          sub = []; 
-        }
-        try {
-          const decoded = customerRaw ? decodeURIComponent(customerRaw) : "";
-          customer = decoded ? JSON.parse(decoded) : {};
-        } catch (e) {
-          customer = {};
-        }
-      modal.show({
-        thumb: this.getAttribute('thumb'),
-        title: this.getAttribute('title'),
-        meta: this.getAttribute('meta'),
-        sub,
-        price: this.getAttribute('price'),
-        orderId,
-        customer
-      });
-    });
-  }
-}
-
-customElements.define('offer-card', OfferCard);
+import { apiFetch } from "../api_client.js";
+import "./offer-card.js";
 
 class OffersList extends HTMLElement {
   connectedCallback() {
-    this.innerHTML = `
-      <section class="offers-container">
-        <div class="offers-row"></div>
-      </section>
-    `;
+    if (this._ready) return;
+    this._ready = true;
+    this.render();
+
     this.handleOffersUpdated = () => loadOffers();
-    loadOffers();
     window.addEventListener("offers-updated", this.handleOffersUpdated);
+    this.addEventListener("offer-select", this.handleOfferSelect);
+
+    loadOffers();
   }
 
   disconnectedCallback() {
     if (this.handleOffersUpdated) {
       window.removeEventListener("offers-updated", this.handleOffersUpdated);
     }
+    this.removeEventListener("offer-select", this.handleOfferSelect);
+  }
+
+  render() {
+    this.innerHTML = `
+      <section class="offers-container">
+        <div class="offers-row"></div>
+      </section>
+    `;
   }
 
   set items(list) {
-    const row = this.querySelector('.offers-row');
-    row.innerHTML = '';
-    
-    let content = '';
-    list.forEach(item => {
-      const thumb = item.thumb || 'assets/img/box.svg';
-      const title = item.title || '';
-      const meta = item.meta || '';
-      const price = item.price || '';
-      const orderId = item.orderId || item.id || '';
-      const customer = encodeURIComponent(JSON.stringify(item.customer || {}));
-      content += `<offer-card thumb="${thumb}" title="${title}" meta="${meta}" sub='${JSON.stringify(item.sub || [])}' price="${price}" order-id="${orderId}" customer="${customer}"></offer-card>`;
-    });
-    row.innerHTML = content;
+    this.renderItems(list);
+  }
+
+  renderItems(list) {
+    const row = this.querySelector(".offers-row");
+    if (!row) return;
+    const items = Array.isArray(list) ? list : [];
+    row.innerHTML = items.map(renderOfferCard).join("");
+  }
+
+  handleOfferSelect(event) {
+    const modal = document.querySelector("offer-modal");
+    if (!modal || typeof modal.show !== "function") return;
+    modal.show(event.detail);
   }
 }
-customElements.define('offers-list', OffersList);
 
-const API = "http://localhost:3000";
-const deliveryIcons = {
+if (!customElements.get("offers-list")) {
+  customElements.define("offers-list", OffersList);
+}
+
+const DELIVERY_ICONS = {
   single: "assets/img/document.svg",
   medium: "assets/img/tor.svg",
   large: "assets/img/box.svg",
 };
 
-const seedOffers = [
-  { 
-    thumb: 'assets/img/box.svg', 
-    title: 'GL burger - 7-р байр 207', 
-    meta: '11/21/25 • 14:00', 
-    price: '10,000₮', 
+const SEED_OFFERS = [
+  {
+    thumb: "assets/img/box.svg",
+    title: "GL burger - 7-р байр 207",
+    meta: "11/21/25 • 14:00",
+    price: "10,000₮",
     sub: [
       { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" }
-    ] 
+      { name: "Сүү", price: "2000₮" },
+    ],
   },
-  { 
-    thumb: 'assets/img/document.svg', 
-    title: 'GL burger - 7-р байр 207', 
-    meta: '11/21/25 • 14:00', 
-    price: '10,000₮', 
+  {
+    thumb: "assets/img/document.svg",
+    title: "GL burger - 7-р байр 207",
+    meta: "11/21/25 • 14:00",
+    price: "10,000₮",
     sub: [
       { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" }
-    ] 
+      { name: "Сүү", price: "2000₮" },
+    ],
   },
-  { 
-    thumb: 'assets/img/tor.svg', 
-    title: 'GL burger - 7-р байр 207', 
-    meta: '11/21/25 • 14:00', 
-    price: '10,000₮', 
+  {
+    thumb: "assets/img/tor.svg",
+    title: "GL burger - 7-р байр 207",
+    meta: "11/21/25 • 14:00",
+    price: "10,000₮",
     sub: [
       { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" }
-    ] 
+      { name: "Сүү", price: "2000₮" },
+    ],
   },
-  { 
-    thumb: 'assets/img/tor.svg', 
-    title: 'GL burger - 7-р байр 207', 
-    meta: '12/31/25 • 22:20', 
-    price: '10,000₮', 
+  {
+    thumb: "assets/img/tor.svg",
+    title: "GL burger - 7-р байр 207",
+    meta: "12/31/25 • 22:20",
+    price: "10,000₮",
     sub: [
       { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" }
-    ] 
+      { name: "Сүү", price: "2000₮" },
+    ],
   },
 ];
+
+function renderOfferCard(item) {
+  const thumb = escapeAttr(item.thumb || "assets/img/box.svg");
+  const title = escapeAttr(item.title || "");
+  const meta = escapeAttr(item.meta || "");
+  const price = escapeAttr(item.price || "");
+  const orderId = escapeAttr(item.orderId || item.id || "");
+  const sub = encodeURIComponent(JSON.stringify(item.sub || []));
+  const customer = encodeURIComponent(JSON.stringify(item.customer || {}));
+
+  return `
+    <offer-card
+      thumb="${thumb}"
+      title="${title}"
+      meta="${meta}"
+      sub="${sub}"
+      price="${price}"
+      order-id="${orderId}"
+      customer="${customer}">
+    </offer-card>
+  `;
+}
+
+function escapeAttr(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
 
 function formatMetaFromDate(ts) {
   const d = new Date(ts);
@@ -145,19 +143,18 @@ function formatMetaFromDate(ts) {
 
 function parseMetaDate(metaString) {
   try {
-    const parts = metaString.split('•');
+    const parts = metaString.split("•");
     if (parts.length < 2) return null;
-    
+
     const datePart = parts[0].trim();
     const timePart = parts[1].trim();
-    
-    const [month, day, year] = datePart.split('/');
-    const [hours, minutes] = timePart.split(':');
-    const fullYear = 2000 + parseInt(year, 10);
-    
+    const [month, day, year] = datePart.split("/");
+    const [hours, minutes] = timePart.split(":");
+    const fullYear = 2000 + Number.parseInt(year, 10);
+
     return new Date(fullYear, month - 1, day, hours, minutes);
   } catch (e) {
-    console.error('Error parsing date from meta:', e, metaString);
+    console.error("Error parsing date from meta:", e, metaString);
     return null;
   }
 }
@@ -191,10 +188,10 @@ function formatPrice(amount) {
 }
 
 function getDeliveryIcon(totalQty) {
-  if (totalQty > 10) return deliveryIcons.large;
-  if (totalQty >= 2) return deliveryIcons.medium;
-  if (totalQty === 1) return deliveryIcons.single;
-  return deliveryIcons.large;
+  if (totalQty > 10) return DELIVERY_ICONS.large;
+  if (totalQty >= 2) return DELIVERY_ICONS.medium;
+  if (totalQty === 1) return DELIVERY_ICONS.single;
+  return DELIVERY_ICONS.large;
 }
 
 function mapOrdersToOffers(orders) {
@@ -227,7 +224,7 @@ function mapOrdersToOffers(orders) {
 }
 
 async function fetchOffersFromApi() {
-  const res = await fetch(`${API}/api/orders`);
+  const res = await apiFetch("/api/orders");
   const data = await res.json().catch(() => []);
   if (!res.ok) {
     throw new Error(data?.error || "Failed to load orders");
@@ -237,11 +234,11 @@ async function fetchOffersFromApi() {
 }
 
 function readLocalOffers() {
-  const raw = localStorage.getItem('offers');
+  const raw = localStorage.getItem("offers");
   if (!raw) return [];
   try {
     return JSON.parse(raw) || [];
-  } catch (e) {
+  } catch {
     return [];
   }
 }
@@ -252,21 +249,21 @@ function getRemovedStorageKey(baseKey) {
 }
 
 function readRemovedOfferIds() {
-  const raw = localStorage.getItem(getRemovedStorageKey('removed_offer_ids'));
+  const raw = localStorage.getItem(getRemovedStorageKey("removed_offer_ids"));
   if (!raw) return [];
   try {
     return JSON.parse(raw) || [];
-  } catch (e) {
+  } catch {
     return [];
   }
 }
 
 function readRemovedOfferKeys() {
-  const raw = localStorage.getItem(getRemovedStorageKey('removed_offer_keys'));
+  const raw = localStorage.getItem(getRemovedStorageKey("removed_offer_keys"));
   if (!raw) return [];
   try {
     return JSON.parse(raw) || [];
-  } catch (e) {
+  } catch {
     return [];
   }
 }
@@ -278,9 +275,17 @@ function filterRemovedOffers(offers) {
   return offers.filter((offer) => {
     const offerId = offer?.orderId || offer?.id || null;
     if (offerId && removedIds.includes(String(offerId))) return false;
-    const key = `${offer?.title || ''}|${offer?.meta || ''}|${offer?.price || ''}`;
-    if (removedKeys.includes(key)) return false;
-    return true;
+    const key = `${offer?.title || ""}|${offer?.meta || ""}|${offer?.price || ""}`;
+    return !removedKeys.includes(key);
+  });
+}
+
+function filterExpiredOffers(offers) {
+  return offers.filter((offer) => {
+    if (!offer.meta) return true;
+    const parsed = parseMetaDate(offer.meta);
+    if (!parsed) return true;
+    return parsed.getTime() >= Date.now();
   });
 }
 
@@ -290,34 +295,24 @@ async function loadOffers() {
     offers = await fetchOffersFromApi();
     offers = filterRemovedOffers(offers);
     if (offers.length) {
-      localStorage.setItem('offers', JSON.stringify(offers));
+      localStorage.setItem("offers", JSON.stringify(offers));
     }
-  } catch (e) {
-    offers = readLocalOffers();
-    offers = filterRemovedOffers(offers);
+  } catch {
+    offers = filterRemovedOffers(readLocalOffers());
   }
 
-  if (!Array.isArray(offers) || offers.length === 0) {
-    offers = seedOffers;
-    localStorage.setItem('offers', JSON.stringify(offers));
+  if (!offers.length) {
+    offers = SEED_OFFERS;
   } else {
-    const nonExpiredOffers = offers.filter((offer) => {
-      if (!offer.meta) return true;
-      const parsed = parseMetaDate(offer.meta);
-      if (!parsed) return true;
-      return parsed.getTime() >= Date.now();
-    });
-    if (nonExpiredOffers.length !== offers.length) {
-      offers = nonExpiredOffers;
-      localStorage.setItem('offers', JSON.stringify(offers));
-    }
+    offers = filterExpiredOffers(offers);
   }
 
   offers = filterRemovedOffers(offers);
-  localStorage.setItem('offers', JSON.stringify(offers));
+  localStorage.setItem("offers", JSON.stringify(offers));
 
-  const lists = document.querySelectorAll("offers-list");
-  lists.forEach((list) => {
+  document.querySelectorAll("offers-list").forEach((list) => {
     list.items = offers;
   });
 }
+
+export { OffersList };

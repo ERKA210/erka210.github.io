@@ -86,6 +86,8 @@ class NumRouter extends HTMLElement {
         import('./offer-list.js'),
         import('./delivery-cart.js'),
         import('./offer-modal.js'),
+        import('./confirm-modal.js'),
+        import('./order-confirm.js'),
       ]),
       delivery: () => Promise.all([
         import('../pages/delivery-page.js'),
