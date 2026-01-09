@@ -9,7 +9,7 @@ class PayPage extends HTMLElement {
     window.removeEventListener("hashchange", this.handleRouteChange);
   }
 
-  handleRouteChange() {
+  async handleRouteChange() {
     if (location.hash !== "#pay") return;
 
     // 🔐 ROLE GUARD (only logged-in courier)
@@ -21,17 +21,28 @@ class PayPage extends HTMLElement {
       return;
     }
 
-    // ✅ identify user (login-page дээр authPhone/authStudentId set хийсэн байх ёстой)
-    const phone = (localStorage.getItem("authPhone") || "").trim();
-    const studentId = (localStorage.getItem("authStudentId") || "").trim(); // login дээр нэмээрэй
-    const paidKey = `courierPaid:${studentId || phone}`;
+    // ✅ identify user (fallback to API if localStorage missing)
+    let phone = (localStorage.getItem("authPhone") || "").trim();
+    let studentId = (localStorage.getItem("authStudentId") || "").trim();
+    let userId = (localStorage.getItem("authUserKey") || "").trim();
 
-    if (!studentId && !phone) {
-      alert("Хэрэглэгчийн мэдээлэл олдсонгүй. Дахин нэвтэрнэ үү.");
-      location.hash = "#login";
-      return;
+    if (!phone && !studentId) {
+      try {
+        const meRes = await fetch("/api/auth/me", { credentials: "include" });
+        if (meRes.ok) {
+          const data = await meRes.json();
+          const user = data?.user || {};
+          phone = String(user.phone || "").trim();
+          studentId = String(user.student_id || user.studentId || "").trim();
+          userId = String(user.id || userId || "").trim();
+        }
+      } catch {
+        // ignore
+      }
     }
 
+    const keySeed = studentId || phone || userId || "courier";
+    const paidKey = `courierPaid:${keySeed}`;
     const isPaid = () => localStorage.getItem(paidKey) === "1";
 
     this.innerHTML = `

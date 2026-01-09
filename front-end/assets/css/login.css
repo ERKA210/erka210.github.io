@@ -422,7 +422,7 @@ login-page {
     }
 }
 body {
-  background: #eaf6ff;
+  background: var(--color-bg);
   overflow: hidden;
 }
 

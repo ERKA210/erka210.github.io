@@ -4166,7 +4166,7 @@
         disconnectedCallback() {
           window.removeEventListener("hashchange", this.handleRouteChange);
         }
-        handleRouteChange() {
+        async handleRouteChange() {
           if (location.hash !== "#pay") return;
           const loggedIn = localStorage.getItem("authLoggedIn");
           const role = localStorage.getItem("authRole");
@@ -4174,14 +4174,24 @@
             location.hash = "#login";
             return;
           }
-          const phone = (localStorage.getItem("authPhone") || "").trim();
-          const studentId = (localStorage.getItem("authStudentId") || "").trim();
-          const paidKey = `courierPaid:${studentId || phone}`;
-          if (!studentId && !phone) {
-            alert("\u0425\u044D\u0440\u044D\u0433\u043B\u044D\u0433\u0447\u0438\u0439\u043D \u043C\u044D\u0434\u044D\u044D\u043B\u044D\u043B \u043E\u043B\u0434\u0441\u043E\u043D\u0433\u04AF\u0439. \u0414\u0430\u0445\u0438\u043D \u043D\u044D\u0432\u0442\u044D\u0440\u043D\u044D \u04AF\u04AF.");
-            location.hash = "#login";
-            return;
+          let phone = (localStorage.getItem("authPhone") || "").trim();
+          let studentId = (localStorage.getItem("authStudentId") || "").trim();
+          let userId = (localStorage.getItem("authUserKey") || "").trim();
+          if (!phone && !studentId) {
+            try {
+              const meRes = await fetch("/api/auth/me", { credentials: "include" });
+              if (meRes.ok) {
+                const data = await meRes.json();
+                const user = data?.user || {};
+                phone = String(user.phone || "").trim();
+                studentId = String(user.student_id || user.studentId || "").trim();
+                userId = String(user.id || userId || "").trim();
+              }
+            } catch {
+            }
           }
+          const keySeed = studentId || phone || userId || "courier";
+          const paidKey = `courierPaid:${keySeed}`;
           const isPaid = () => localStorage.getItem(paidKey) === "1";
           this.innerHTML = `
       <link rel="stylesheet" href="assets/css/pay.css">
@@ -4876,9 +4886,11 @@
         history.replaceState(null, "", "#home");
       }
       const current = location.hash || "#home";
-      const allowed = this.getNavLinks().map((link) => link.href);
+      const allowed = new Set(this.getNavLinks().map((link) => link.href));
+      allowed.add("#pay");
+      allowed.add("#login");
       if (!allowed.length) return;
-      if (!allowed.includes(current)) {
+      if (!allowed.has(current)) {
         location.hash = "#home";
         return;
       }

@@ -233,9 +233,12 @@ class SiteHeader extends HTMLElement {
     }
 
     const current = location.hash || '#home';
-    const allowed = this.getNavLinks().map((link) => link.href);
+    const allowed = new Set(this.getNavLinks().map((link) => link.href));
+    // allow system routes even if not in nav
+    allowed.add("#pay");
+    allowed.add("#login");
     if (!allowed.length) return;
-    if (!allowed.includes(current)) {
+    if (!allowed.has(current)) {
       location.hash = "#home";
       return;
     }
