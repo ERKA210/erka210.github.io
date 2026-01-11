@@ -5,7 +5,6 @@ function getState() {
 
 /**
  * Rule:
- * - courier -> block ordering UI
  * - customer -> block courier accept UI
  */
 export function applyStateUI(root = document) {
@@ -16,7 +15,7 @@ export function applyStateUI(root = document) {
   // 1) Order related (place order / checkout)
   // Add data-role="order-action" to buttons/sections you want blocked while courier
   root.querySelectorAll('[data-role="order-action"]').forEach((el) => {
-    const blocked = state === "courier" && deliveryActive;
+    const blocked = state === "courier" && deliveryActive && role !== "courier";
     if ("disabled" in el) el.disabled = blocked;
     el.style.pointerEvents = blocked ? "none" : "";
     el.style.opacity = blocked ? "0.5" : "";

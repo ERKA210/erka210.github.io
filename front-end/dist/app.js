@@ -3592,6 +3592,7 @@
           const reviewsModalMarkup = this.buildReviewsMarkup(reviews);
           const orderHistory = this.getOrderHistory();
           const deliveryHistory = this.getDeliveryHistory();
+          const isCourier = this.currentUser?.role === "courier";
           this.innerHTML = `
       <link rel="stylesheet" href="assets/css/profile.css" />
       <section class="profile-page">
@@ -3620,13 +3621,15 @@
                 <p>\u041D\u0438\u0439\u0442 \u0437\u0430\u0445\u0438\u0430\u043B\u0433\u0430</p>
                 <strong id="orderTotal">0</strong>
               </div>
-              <div class="stat-card">
-                <p>\u0414\u0443\u043D\u0434\u0430\u0436 \u04AF\u043D\u044D\u043B\u0433\u044D\u044D</p>
-                <div class="stars avg-stars" aria-label="0 \u043E\u0434">
-                  <span>\u2605</span><span>\u2605</span><span>\u2605</span><span>\u2605</span><span>\u2605</span>
+              ${isCourier ? `
+                <div class="stat-card">
+                  <p>\u0414\u0443\u043D\u0434\u0430\u0436 \u04AF\u043D\u044D\u043B\u0433\u044D\u044D</p>
+                  <div class="stars avg-stars" aria-label="0 \u043E\u0434">
+                    <span>\u2605</span><span>\u2605</span><span>\u2605</span><span>\u2605</span><span>\u2605</span>
+                  </div>
+                  <small class="avg-rating-text">0 / 5</small>
                 </div>
-                <small class="avg-rating-text">0 / 5</small>
-              </div>
+              ` : ""}
             </div>
           </div>
         </div>
@@ -3642,18 +3645,20 @@
           </button>
         </div>
 
-        <div class="profile-grid">
-          <article class="profile-card reviews">
-            <header>
-              <div>
-                <p class="eyebrow">\u0421\u044D\u0442\u0433\u044D\u0433\u0434\u044D\u043B</p>
-              </div>
-              <button class="ghost-btn small open-reviews">\u0411\u04AF\u0433\u0434\u0438\u0439\u0433 \u0445\u0430\u0440\u0430\u0445</button>
-            </header>
+        ${isCourier ? `
+          <div class="profile-grid">
+            <article class="profile-card reviews">
+              <header>
+                <div>
+                  <p class="eyebrow">\u0421\u044D\u0442\u0433\u044D\u0433\u0434\u044D\u043B</p>
+                </div>
+                <button class="ghost-btn small open-reviews">\u0411\u04AF\u0433\u0434\u0438\u0439\u0433 \u0445\u0430\u0440\u0430\u0445</button>
+              </header>
 
-            <div class="review-list">${reviewsMarkup}</div>
-          </article>
-        </div>
+              <div class="review-list">${reviewsMarkup}</div>
+            </article>
+          </div>
+        ` : ""}
       </section>
 
       <div class="modal-backdrop" data-modal="profileModal">
@@ -3694,19 +3699,21 @@
         </div>
       </div>
 
-      <div class="modal-backdrop" data-modal="reviewsModal">
-        <div class="modal-card">
-          <header class="modal-header">
-            <div>
-              <p class="eyebrow">\u0421\u044D\u0442\u0433\u044D\u0433\u0434\u043B\u04AF\u04AF\u0434</p>
+      ${isCourier ? `
+        <div class="modal-backdrop" data-modal="reviewsModal">
+          <div class="modal-card">
+            <header class="modal-header">
+              <div>
+                <p class="eyebrow">\u0421\u044D\u0442\u0433\u044D\u0433\u0434\u043B\u04AF\u04AF\u0434</p>
+              </div>
+              <button class="icon-btn close-modal" data-close="reviewsModal">\xD7</button>
+            </header>
+            <div class="modal-body review-list modal-scroll">
+              ${reviewsModalMarkup}
             </div>
-            <button class="icon-btn close-modal" data-close="reviewsModal">\xD7</button>
-          </header>
-          <div class="modal-body review-list modal-scroll">
-            ${reviewsModalMarkup}
           </div>
         </div>
-      </div>
+      ` : ""}
 
       <div class="modal-backdrop" data-modal="ordersModal">
         <div class="modal-card">
@@ -4030,28 +4037,20 @@
         }
         async loadReviews() {
           try {
-            if (this.currentUser?.role === "courier") {
-              const courierRes = await fetch(`/api/ratings/courier/${this.currentUser.id}`);
-              if (!courierRes.ok) return;
-              const courierData = await courierRes.json();
-              const items2 = Array.isArray(courierData?.items) ? courierData.items : [];
-              const reviews2 = items2.map((r) => ({
-                text: r.comment || "",
-                stars: r.stars
-              }));
-              this.updateReviewsUI(reviews2);
-              this.updateAverageRating(courierData?.courier?.rating_avg);
+            if (this.currentUser?.role !== "courier") {
+              this.updateReviewsUI([]);
               return;
             }
-            const res = await fetch("/api/ratings/me");
-            if (!res.ok) return;
-            const data = await res.json();
-            const items = Array.isArray(data?.items) ? data.items : [];
+            const courierRes = await fetch(`/api/ratings/courier/${this.currentUser.id}`);
+            if (!courierRes.ok) return;
+            const courierData = await courierRes.json();
+            const items = Array.isArray(courierData?.items) ? courierData.items : [];
             const reviews = items.map((r) => ({
               text: r.comment || "",
               stars: r.stars
             }));
             this.updateReviewsUI(reviews);
+            this.updateAverageRating(courierData?.courier?.rating_avg);
           } catch (e) {
             console.error("Load reviews error:", e);
           }
@@ -5019,7 +5018,7 @@
     const role = localStorage.getItem("authRole") || "";
     const deliveryActive = localStorage.getItem("deliveryActive") === "1";
     root.querySelectorAll('[data-role="order-action"]').forEach((el) => {
-      const blocked = state === "courier" && deliveryActive;
+      const blocked = state === "courier" && deliveryActive && role !== "courier";
       if ("disabled" in el) el.disabled = blocked;
       el.style.pointerEvents = blocked ? "none" : "";
       el.style.opacity = blocked ? "0.5" : "";

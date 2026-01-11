@@ -358,7 +358,7 @@ home-page {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
     padding: 1rem;
-    margin: 2rem;
+    margin: var(--offers-margin-y) var(--offers-margin-x);
 
   }
 

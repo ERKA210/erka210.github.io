@@ -68,6 +68,7 @@ class ProfilePage extends HTMLElement {
     const reviewsModalMarkup = this.buildReviewsMarkup(reviews);
     const orderHistory = this.getOrderHistory();
     const deliveryHistory = this.getDeliveryHistory();
+    const isCourier = this.currentUser?.role === "courier";
     this.innerHTML = `
       <link rel="stylesheet" href="assets/css/profile.css" />
       <section class="profile-page">
@@ -96,13 +97,15 @@ class ProfilePage extends HTMLElement {
                 <p>Нийт захиалга</p>
                 <strong id="orderTotal">0</strong>
               </div>
-              <div class="stat-card">
-                <p>Дундаж үнэлгээ</p>
-                <div class="stars avg-stars" aria-label="0 од">
-                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              ${isCourier ? `
+                <div class="stat-card">
+                  <p>Дундаж үнэлгээ</p>
+                  <div class="stars avg-stars" aria-label="0 од">
+                    <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                  </div>
+                  <small class="avg-rating-text">0 / 5</small>
                 </div>
-                <small class="avg-rating-text">0 / 5</small>
-              </div>
+              ` : ""}
             </div>
           </div>
         </div>
@@ -118,18 +121,20 @@ class ProfilePage extends HTMLElement {
           </button>
         </div>
 
-        <div class="profile-grid">
-          <article class="profile-card reviews">
-            <header>
-              <div>
-                <p class="eyebrow">Сэтгэгдэл</p>
-              </div>
-              <button class="ghost-btn small open-reviews">Бүгдийг харах</button>
-            </header>
+        ${isCourier ? `
+          <div class="profile-grid">
+            <article class="profile-card reviews">
+              <header>
+                <div>
+                  <p class="eyebrow">Сэтгэгдэл</p>
+                </div>
+                <button class="ghost-btn small open-reviews">Бүгдийг харах</button>
+              </header>
 
-            <div class="review-list">${reviewsMarkup}</div>
-          </article>
-        </div>
+              <div class="review-list">${reviewsMarkup}</div>
+            </article>
+          </div>
+        ` : ""}
       </section>
 
       <div class="modal-backdrop" data-modal="profileModal">
@@ -170,19 +175,21 @@ class ProfilePage extends HTMLElement {
         </div>
       </div>
 
-      <div class="modal-backdrop" data-modal="reviewsModal">
-        <div class="modal-card">
-          <header class="modal-header">
-            <div>
-              <p class="eyebrow">Сэтгэгдлүүд</p>
+      ${isCourier ? `
+        <div class="modal-backdrop" data-modal="reviewsModal">
+          <div class="modal-card">
+            <header class="modal-header">
+              <div>
+                <p class="eyebrow">Сэтгэгдлүүд</p>
+              </div>
+              <button class="icon-btn close-modal" data-close="reviewsModal">×</button>
+            </header>
+            <div class="modal-body review-list modal-scroll">
+              ${reviewsModalMarkup}
             </div>
-            <button class="icon-btn close-modal" data-close="reviewsModal">×</button>
-          </header>
-          <div class="modal-body review-list modal-scroll">
-            ${reviewsModalMarkup}
           </div>
         </div>
-      </div>
+      ` : ""}
 
       <div class="modal-backdrop" data-modal="ordersModal">
         <div class="modal-card">
@@ -548,29 +555,21 @@ class ProfilePage extends HTMLElement {
 
   async loadReviews() {
     try {
-      if (this.currentUser?.role === "courier") {
-        const courierRes = await fetch(`/api/ratings/courier/${this.currentUser.id}`);
-        if (!courierRes.ok) return;
-        const courierData = await courierRes.json();
-        const items = Array.isArray(courierData?.items) ? courierData.items : [];
-        const reviews = items.map((r) => ({
-          text: r.comment || "",
-          stars: r.stars,
-        }));
-        this.updateReviewsUI(reviews);
-        this.updateAverageRating(courierData?.courier?.rating_avg);
+      if (this.currentUser?.role !== "courier") {
+        this.updateReviewsUI([]);
         return;
       }
 
-      const res = await fetch("/api/ratings/me");
-      if (!res.ok) return;
-      const data = await res.json();
-      const items = Array.isArray(data?.items) ? data.items : [];
+      const courierRes = await fetch(`/api/ratings/courier/${this.currentUser.id}`);
+      if (!courierRes.ok) return;
+      const courierData = await courierRes.json();
+      const items = Array.isArray(courierData?.items) ? courierData.items : [];
       const reviews = items.map((r) => ({
         text: r.comment || "",
         stars: r.stars,
       }));
       this.updateReviewsUI(reviews);
+      this.updateAverageRating(courierData?.courier?.rating_avg);
     } catch (e) {
       console.error("Load reviews error:", e);
     }
