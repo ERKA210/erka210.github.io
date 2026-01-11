@@ -196,17 +196,19 @@ function buildOrderTitle(order) {
 }
 
 function mapOrdersToOffers(orders) {
-  const list = Array.isArray(orders) ? orders : [];
+  const list = orders;
+  // console.log(list, "ll")
 
   return list
     .filter((order) => {
-      const status = String(order?.status || "").toLowerCase();
+     const status = order?.status;
+    //  console.log(status, "ss")
       if (status === "delivered" || status === "cancelled" || status === "canceled") return false;
       if (order?.courier) return false;
       return !isOrderExpired(order);
     })
     .map((order) => {
-      const items = Array.isArray(order?.items) ? order.items : [];
+      const items = order?.items;
       const totalQty = items.reduce((sum, it) => sum + (Number(it?.qty) || 0), 0);
       const sub = items.map((it) => ({
         name: `${it?.name || ""} x${it?.qty || 1}`.trim(),

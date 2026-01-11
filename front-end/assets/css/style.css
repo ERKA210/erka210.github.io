@@ -181,7 +181,9 @@
 }
 
 .site-top .brand-logo {
-  height: var(--logo-h);
+  height: auto;
+  width: auto;
+  max-height: var(--logo-h);
   display: block;
 }
 
@@ -377,7 +379,7 @@ num-router > [data-route].is-leaving {
 
 @media (max-width: 54rem) {
   .site-top .brand-logo {
-    height: var(--logo-h-sm);
+    max-height: var(--logo-h-sm);
   }
 
   .header-actions .avatar-btn {

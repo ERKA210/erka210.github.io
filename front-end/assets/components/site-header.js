@@ -104,7 +104,7 @@ class SiteHeader extends HTMLElement {
         <div class="brand">
           <picture>
             <source srcset="${logoWebp}" type="image/webp" />
-            <img src="${logoPng}" alt="Logo" class="brand-logo" width="250" height="74" decoding="async" />
+            <img src="${logoPng}" alt="Logo" class="brand-logo" width="272" height="74" decoding="async" fetchpriority="high" />
           </picture>
         </div>
 

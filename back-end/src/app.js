@@ -21,7 +21,7 @@ app.use((req, res, next) => {
     "Content-Security-Policy",
     [
       "default-src 'self'",
-      `script-src 'self' 'nonce-${nonce}'`,
+      `script-src 'self' 'nonce-${nonce}' 'unsafe-inline'`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data:",
       "connect-src 'self' http://localhost:3000",
@@ -32,6 +32,11 @@ app.use((req, res, next) => {
     ].join("; ")
   );
   res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader(
+    "Strict-Transport-Security",
+    "max-age=63072000; includeSubDomains; preload"
+  );
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
   next();
 });
 app.use(express.json());

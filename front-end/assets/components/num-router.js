@@ -2,12 +2,11 @@ class NumRouter extends HTMLElement {
   connectedCallback() {
     this._views = Array.from(this.querySelectorAll('[data-route]'));
     this._current = null;
-    this._loadedRoutes = new Set();
     window.addEventListener('hashchange', () => this.applyRoute());
     this.applyRoute();
   }
 
-  async applyRoute() {
+  applyRoute() {
     const hash = (location.hash || '#home').replace('#', '') || 'home';
     const role = localStorage.getItem("authRole");
     const paid = localStorage.getItem("courierPaid");
@@ -44,8 +43,6 @@ class NumRouter extends HTMLElement {
       }
     }
 
-    await this.loadRoute(hash);
-
     const next = this._views.find((section) => section.dataset.route === hash);
     if (!next) {
       return;
@@ -74,45 +71,6 @@ class NumRouter extends HTMLElement {
 
     next.hidden = false;
     next.classList.add('is-active');
-  }
-
-  async loadRoute(route) {
-    if (this._loadedRoutes.has(route)) return;
-    const loaders = {
-      home: () => Promise.all([
-        import('../pages/home-page.js'),
-        import('./date-time-picker.js'),
-        import('./sh-cart.js'),
-        import('./offer-list.js'),
-        import('./delivery-cart.js'),
-        import('./offer-modal.js'),
-        import('./confirm-modal.js'),
-        import('./order-confirm.js'),
-      ]),
-      delivery: () => Promise.all([
-        import('../pages/delivery-page.js'),
-        import('./d-orders.js'),
-        import('./del-order-details.js'),
-        import('./del-order-progress.js'),
-        import('./person-detail.js'),
-      ]),
-      orders: () => Promise.all([
-        import('../pages/orders-page.js'),
-        import('./courier-card.js'),
-        import('./rating.js'),
-      ]),
-      profile: () => import('../pages/profile-page.js'),
-      pay: () => import('../pages/pay-page.js'),
-      login: () => import('../pages/login-page.js'),
-    };
-    const loader = loaders[route];
-    if (!loader) return;
-    try {
-      await loader();
-      this._loadedRoutes.add(route);
-    } catch (e) {
-      console.error("Route load failed:", route, e);
-    }
   }
 }
 
