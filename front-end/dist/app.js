@@ -702,32 +702,35 @@
         }
         addItemToCart(name, price, img = "") {
           if (!name) return;
-          const existing = [...this.cartItemsContainer.querySelectorAll(".item-box")].find(
-            (box) => box.querySelector("b") && box.querySelector("b").textContent.trim() === name
-          );
+          const boxes = [...this.cartItemsContainer.querySelectorAll(".item-box")];
+          const existing = boxes.find((box2) => {
+            const label = box2.querySelector("b");
+            return label && label.textContent.trim() === name;
+          });
           if (existing) {
-            const qty = parseInt(existing.dataset.qty || (existing.querySelector("p")?.textContent.match(/(\d+)/) || [0, 1])[1], 10) || 1;
+            const qty = parseInt(existing.dataset.qty || "1", 10) || 1;
             const newQty = qty + 1;
+            const basePrice = parseInt(existing.dataset.price || price, 10) || price;
             existing.dataset.qty = String(newQty);
+            existing.dataset.price = String(basePrice);
             existing.querySelector("p").innerHTML = `<b>${this.escapeHtml(name)}</b><br>${newQty} \u0448\u0438\u0440\u0445\u044D\u0433`;
-            const base = parseInt(existing.dataset.price || price, 10) || price;
-            existing.dataset.price = String(base);
-            existing.querySelector(".price").textContent = this.formatPrice(base * newQty);
-          } else {
-            const box = document.createElement("div");
-            box.className = "item-box";
-            box.dataset.qty = "1";
-            box.dataset.price = String(price);
-            const imgHtml = img ? `<img class="item-img" src="${this.escapeAttr(img)}" alt="${this.escapeAttr(name)}">` : "";
-            box.innerHTML = `
-                ${imgHtml}
-                <p><b>${this.escapeHtml(name)}</b><br>1 \u0448\u0438\u0440\u0445\u044D\u0433</p>
-                <p class="price">${this.formatPrice(price)}</p>
-                <svg class="del-btn" viewBox="0 0 20 20" width="18" height="18" role="button" aria-label="remove">
-                    <path d="M5.5415 15.75C5.10609 15.75 4.73334 15.6031 4.42327 15.3094C4.11321 15.0156 3.95817 14.6625 3.95817 14.25V4.5H3.1665V3H7.12484V2.25H11.8748V3H15.8332V4.5H15.0415V14.25C15.0415 14.6625 14.8865 15.0156 14.5764 15.3094C14.2663 15.6031 13.8936 15.75 13.4582 15.75H5.5415Z" fill="#C7C4CD"/>
-                </svg>`;
-            this.cartItemsContainer.appendChild(box);
+            existing.querySelector(".price").textContent = this.formatPrice(basePrice * newQty);
+            this.updateTotalsAndCount();
+            return;
           }
+          const box = document.createElement("div");
+          box.className = "item-box";
+          box.dataset.qty = "1";
+          box.dataset.price = String(price);
+          const imgHtml = img ? `<img class="item-img" src="${this.escapeAttr(img)}" alt="${this.escapeAttr(name)}">` : "";
+          box.innerHTML = `
+            ${imgHtml}
+            <p><b>${this.escapeHtml(name)}</b><br>1 \u0448\u0438\u0440\u0445\u044D\u0433</p>
+            <p class="price">${this.formatPrice(price)}</p>
+            <svg class="del-btn" viewBox="0 0 20 20" width="18" height="18" role="button" aria-label="remove">
+                <path d="M5.5415 15.75C5.10609 15.75 4.73334 15.6031 4.42327 15.3094C4.11321 15.0156 3.95817 14.6625 3.95817 14.25V4.5H3.1665V3H7.12484V2.25H11.8748V3H15.8332V4.5H15.0415V14.25C15.0415 14.6625 14.8865 15.0156 14.5764 15.3094C14.2663 15.6031 13.8936 15.75 13.4582 15.75H5.5415Z" fill="#C7C4CD"/>
+            </svg>`;
+          this.cartItemsContainer.appendChild(box);
           this.updateTotalsAndCount();
         }
         updateTotalsAndCount() {
@@ -807,9 +810,6 @@
       return fallback;
     }
   }
-  function escapeHtml(value) {
-    return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
-  }
   var OfferCard;
   var init_offer_card = __esm({
     "front-end/assets/components/offer-card.js"() {
@@ -842,13 +842,13 @@
           this.innerHTML = `
       <article class="offer-card" role="button" tabindex="0">
         <div class="offer-thumb">
-          <img src="${escapeHtml(thumb)}" alt="icon" width="57" height="57" decoding="async"/>
+          <img src="${thumb}" alt="icon" width="57" height="57" decoding="async"/>
         </div>
         <div class="offer-info">
-          <div class="offer-title">${escapeHtml(title)}</div>
-          <div class="offer-meta">${escapeHtml(meta)}</div>
+          <div class="offer-title">${title}</div>
+          <div class="offer-meta">${meta}</div>
         </div>
-        <div class="offer-price">${escapeHtml(price)}</div>
+        <div class="offer-price">${price}</div>
       </article>
     `;
         }
@@ -877,11 +877,11 @@
     OffersList: () => OffersList
   });
   function renderOfferCard(item) {
-    const thumb = escapeAttr(item.thumb || "assets/img/box.svg");
-    const title = escapeAttr(item.title || "");
-    const meta = escapeAttr(item.meta || "");
-    const price = escapeAttr(item.price || "");
-    const orderId = escapeAttr(item.orderId || item.id || "");
+    const thumb = item.thumb || "assets/img/box.svg";
+    const title = item.title || "";
+    const meta = item.meta || "";
+    const price = item.price || "";
+    const orderId = item.orderId || item.id || "";
     const sub = encodeURIComponent(JSON.stringify(item.sub || []));
     const customer = encodeURIComponent(JSON.stringify(item.customer || {}));
     return `
@@ -896,9 +896,6 @@
     </offer-card>
   `;
   }
-  function escapeAttr(value) {
-    return String(value ?? "").replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-  }
   function formatMetaFromDate(ts) {
     const d = new Date(ts);
     if (Number.isNaN(d.getTime())) return "";
@@ -911,14 +908,13 @@
   }
   function parseMetaDate(metaString) {
     try {
-      const parts = metaString.split("\u2022");
+      const parts = String(metaString || "").split("\u2022");
       if (parts.length < 2) return null;
-      const datePart = parts[0].trim();
-      const timePart = parts[1].trim();
+      const [datePart, timePart] = parts.map((p) => p.trim());
       const [month, day, year] = datePart.split("/");
       const [hours, minutes] = timePart.split(":");
       const fullYear = 2e3 + Number.parseInt(year, 10);
-      return new Date(fullYear, month - 1, day, hours, minutes);
+      return new Date(fullYear, Number(month) - 1, Number(day), Number(hours), Number(minutes));
     } catch (e) {
       console.error("Error parsing date from meta:", e, metaString);
       return null;
@@ -949,29 +945,34 @@
     if (totalQty === 1) return DELIVERY_ICONS.single;
     return DELIVERY_ICONS.large;
   }
+  function buildOrderTitle(order) {
+    const from = order?.from_name || "";
+    const to = order?.to_name || "";
+    return [from, to].filter(Boolean).join(" - ");
+  }
   function mapOrdersToOffers(orders) {
-    return orders.filter((order) => {
+    const list = Array.isArray(orders) ? orders : [];
+    return list.filter((order) => {
       const status = String(order?.status || "").toLowerCase();
       if (status === "delivered" || status === "cancelled" || status === "canceled") return false;
       if (order?.courier) return false;
       return !isOrderExpired(order);
     }).map((order) => {
-      const ts = parseOrderTimestamp(order);
-      const meta = ts ? formatMetaFromDate(ts) : "";
       const items = Array.isArray(order?.items) ? order.items : [];
       const totalQty = items.reduce((sum, it) => sum + (Number(it?.qty) || 0), 0);
-      const customer = order?.customer || {};
+      const sub = items.map((it) => ({
+        name: `${it?.name || ""} x${it?.qty || 1}`.trim(),
+        price: ""
+      }));
+      const ts = parseOrderTimestamp(order);
       return {
-        orderId: order.id,
-        title: `${order.from_name || ""} - ${order.to_name || ""}`.trim(),
-        meta,
-        price: formatPrice(order.total_amount || 0),
+        orderId: order?.id || "",
+        title: buildOrderTitle(order),
+        meta: ts ? formatMetaFromDate(ts) : "",
+        price: formatPrice(order?.total_amount || 0),
         thumb: getDeliveryIcon(totalQty),
-        customer,
-        sub: items.map((it) => ({
-          name: `${it.name || ""} x${it.qty || 1}`.trim(),
-          price: ""
-        }))
+        customer: order?.customer || {},
+        sub
       };
     });
   }
@@ -1028,7 +1029,7 @@
   }
   function filterExpiredOffers(offers) {
     return offers.filter((offer) => {
-      if (!offer.meta) return true;
+      if (!offer?.meta) return true;
       const parsed = parseMetaDate(offer.meta);
       if (!parsed) return true;
       return parsed.getTime() >= Date.now();
@@ -1038,18 +1039,11 @@
     let offers = [];
     try {
       offers = await fetchOffersFromApi();
-      offers = filterRemovedOffers(offers);
-      if (offers.length) {
-        localStorage.setItem("offers", JSON.stringify(offers));
-      }
     } catch {
-      offers = filterRemovedOffers(readLocalOffers());
+      offers = readLocalOffers();
     }
-    if (!offers.length) {
-      offers = SEED_OFFERS;
-    } else {
-      offers = filterExpiredOffers(offers);
-    }
+    if (!offers.length) offers = SEED_OFFERS;
+    offers = filterExpiredOffers(offers);
     offers = filterRemovedOffers(offers);
     localStorage.setItem("offers", JSON.stringify(offers));
     document.querySelectorAll("offers-list").forEach((list) => {

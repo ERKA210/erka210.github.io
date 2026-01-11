@@ -105,33 +105,39 @@ class ShCart extends HTMLElement {
 
     addItemToCart(name, price, img = '') {
         if (!name) return;
-        const existing = [...this.cartItemsContainer.querySelectorAll(".item-box")].find(
-            (box) => box.querySelector("b") && box.querySelector("b").textContent.trim() === name
-        );
+        const boxes = [...this.cartItemsContainer.querySelectorAll(".item-box")];
+        const existing = boxes.find((box) => {
+            const label = box.querySelector("b");
+            return label && label.textContent.trim() === name;
+        });
 
         if (existing) {
-            const qty = parseInt(existing.dataset.qty || (existing.querySelector("p")?.textContent.match(/(\d+)/)||[0,1])[1], 10) || 1;
+            const qty = parseInt(existing.dataset.qty || "1", 10) || 1;
             const newQty = qty + 1;
+            const basePrice = parseInt(existing.dataset.price || price, 10) || price;
+
             existing.dataset.qty = String(newQty);
+            existing.dataset.price = String(basePrice);
             existing.querySelector("p").innerHTML = `<b>${this.escapeHtml(name)}</b><br>${newQty} ширхэг`;
-            const base = parseInt(existing.dataset.price || price, 10) || price;
-            existing.dataset.price = String(base);
-            existing.querySelector(".price").textContent = this.formatPrice(base * newQty);
-        } else {
-            const box = document.createElement("div");
-            box.className = "item-box";
-            box.dataset.qty = "1";
-            box.dataset.price = String(price);
-            const imgHtml = img ? `<img class="item-img" src="${this.escapeAttr(img)}" alt="${this.escapeAttr(name)}">` : '';
-            box.innerHTML = `
-                ${imgHtml}
-                <p><b>${this.escapeHtml(name)}</b><br>1 ширхэг</p>
-                <p class="price">${this.formatPrice(price)}</p>
-                <svg class="del-btn" viewBox="0 0 20 20" width="18" height="18" role="button" aria-label="remove">
-                    <path d="M5.5415 15.75C5.10609 15.75 4.73334 15.6031 4.42327 15.3094C4.11321 15.0156 3.95817 14.6625 3.95817 14.25V4.5H3.1665V3H7.12484V2.25H11.8748V3H15.8332V4.5H15.0415V14.25C15.0415 14.6625 14.8865 15.0156 14.5764 15.3094C14.2663 15.6031 13.8936 15.75 13.4582 15.75H5.5415Z" fill="#C7C4CD"/>
-                </svg>`;
-            this.cartItemsContainer.appendChild(box);
+            existing.querySelector(".price").textContent = this.formatPrice(basePrice * newQty);
+
+            this.updateTotalsAndCount();
+            return;
         }
+
+        const box = document.createElement("div");
+        box.className = "item-box";
+        box.dataset.qty = "1";
+        box.dataset.price = String(price);
+        const imgHtml = img ? `<img class="item-img" src="${this.escapeAttr(img)}" alt="${this.escapeAttr(name)}">` : "";
+        box.innerHTML = `
+            ${imgHtml}
+            <p><b>${this.escapeHtml(name)}</b><br>1 ширхэг</p>
+            <p class="price">${this.formatPrice(price)}</p>
+            <svg class="del-btn" viewBox="0 0 20 20" width="18" height="18" role="button" aria-label="remove">
+                <path d="M5.5415 15.75C5.10609 15.75 4.73334 15.6031 4.42327 15.3094C4.11321 15.0156 3.95817 14.6625 3.95817 14.25V4.5H3.1665V3H7.12484V2.25H11.8748V3H15.8332V4.5H15.0415V14.25C15.0415 14.6625 14.8865 15.0156 14.5764 15.3094C14.2663 15.6031 13.8936 15.75 13.4582 15.75H5.5415Z" fill="#C7C4CD"/>
+            </svg>`;
+        this.cartItemsContainer.appendChild(box);
 
         this.updateTotalsAndCount();
     }

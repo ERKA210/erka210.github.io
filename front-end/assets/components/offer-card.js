@@ -8,15 +8,6 @@ function parseJsonAttr(raw, fallback) {
   }
 }
 
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
 class OfferCard extends HTMLElement {
   static get observedAttributes() {
     return ["thumb", "title", "meta", "price", "sub", "customer", "order-id"];
@@ -50,13 +41,13 @@ class OfferCard extends HTMLElement {
     this.innerHTML = `
       <article class="offer-card" role="button" tabindex="0">
         <div class="offer-thumb">
-          <img src="${escapeHtml(thumb)}" alt="icon" width="57" height="57" decoding="async"/>
+          <img src="${thumb}" alt="icon" width="57" height="57" decoding="async"/>
         </div>
         <div class="offer-info">
-          <div class="offer-title">${escapeHtml(title)}</div>
-          <div class="offer-meta">${escapeHtml(meta)}</div>
+          <div class="offer-title">${title}</div>
+          <div class="offer-meta">${meta}</div>
         </div>
-        <div class="offer-price">${escapeHtml(price)}</div>
+        <div class="offer-price">${price}</div>
       </article>
     `;
   }

@@ -101,11 +101,11 @@ const SEED_OFFERS = [
 ];
 
 function renderOfferCard(item) {
-  const thumb = escapeAttr(item.thumb || "assets/img/box.svg");
-  const title = escapeAttr(item.title || "");
-  const meta = escapeAttr(item.meta || "");
-  const price = escapeAttr(item.price || "");
-  const orderId = escapeAttr(item.orderId || item.id || "");
+  const thumb = item.thumb || "assets/img/box.svg";
+  const title = item.title || "";
+  const meta = item.meta || "";
+  const price = item.price || "";
+  const orderId = item.orderId || item.id || "";
   const sub = encodeURIComponent(JSON.stringify(item.sub || []));
   const customer = encodeURIComponent(JSON.stringify(item.customer || {}));
 
@@ -122,14 +122,6 @@ function renderOfferCard(item) {
   `;
 }
 
-function escapeAttr(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
-}
-
 function formatMetaFromDate(ts) {
   const d = new Date(ts);
   if (Number.isNaN(d.getTime())) return "";
@@ -143,16 +135,15 @@ function formatMetaFromDate(ts) {
 
 function parseMetaDate(metaString) {
   try {
-    const parts = metaString.split("•");
+    const parts = String(metaString || "").split("•");
     if (parts.length < 2) return null;
 
-    const datePart = parts[0].trim();
-    const timePart = parts[1].trim();
+    const [datePart, timePart] = parts.map((p) => p.trim());
     const [month, day, year] = datePart.split("/");
     const [hours, minutes] = timePart.split(":");
     const fullYear = 2000 + Number.parseInt(year, 10);
 
-    return new Date(fullYear, month - 1, day, hours, minutes);
+    return new Date(fullYear, Number(month) - 1, Number(day), Number(hours), Number(minutes));
   } catch (e) {
     console.error("Error parsing date from meta:", e, metaString);
     return null;
@@ -167,13 +158,17 @@ function parseOrderTimestamp(order) {
     order?.createdAt ||
     order?.meta ||
     null;
+
   if (!raw) return null;
+
   const parsed = Date.parse(raw);
   if (!Number.isNaN(parsed)) return parsed;
+
   if (typeof raw === "string") {
     const metaDate = parseMetaDate(raw);
     if (metaDate) return metaDate.getTime();
   }
+
   return null;
 }
 
@@ -194,8 +189,16 @@ function getDeliveryIcon(totalQty) {
   return DELIVERY_ICONS.large;
 }
 
+function buildOrderTitle(order) {
+  const from = order?.from_name || "";
+  const to = order?.to_name || "";
+  return [from, to].filter(Boolean).join(" - ");
+}
+
 function mapOrdersToOffers(orders) {
-  return orders
+  const list = Array.isArray(orders) ? orders : [];
+
+  return list
     .filter((order) => {
       const status = String(order?.status || "").toLowerCase();
       if (status === "delivered" || status === "cancelled" || status === "canceled") return false;
@@ -203,22 +206,22 @@ function mapOrdersToOffers(orders) {
       return !isOrderExpired(order);
     })
     .map((order) => {
-      const ts = parseOrderTimestamp(order);
-      const meta = ts ? formatMetaFromDate(ts) : "";
       const items = Array.isArray(order?.items) ? order.items : [];
       const totalQty = items.reduce((sum, it) => sum + (Number(it?.qty) || 0), 0);
-      const customer = order?.customer || {};
+      const sub = items.map((it) => ({
+        name: `${it?.name || ""} x${it?.qty || 1}`.trim(),
+        price: "",
+      }));
+      const ts = parseOrderTimestamp(order);
+
       return {
-        orderId: order.id,
-        title: `${order.from_name || ""} - ${order.to_name || ""}`.trim(),
-        meta,
-        price: formatPrice(order.total_amount || 0),
+        orderId: order?.id || "",
+        title: buildOrderTitle(order),
+        meta: ts ? formatMetaFromDate(ts) : "",
+        price: formatPrice(order?.total_amount || 0),
         thumb: getDeliveryIcon(totalQty),
-        customer,
-        sub: items.map((it) => ({
-          name: `${it.name || ""} x${it.qty || 1}`.trim(),
-          price: "",
-        })),
+        customer: order?.customer || {},
+        sub,
       };
     });
 }
@@ -282,7 +285,7 @@ function filterRemovedOffers(offers) {
 
 function filterExpiredOffers(offers) {
   return offers.filter((offer) => {
-    if (!offer.meta) return true;
+    if (!offer?.meta) return true;
     const parsed = parseMetaDate(offer.meta);
     if (!parsed) return true;
     return parsed.getTime() >= Date.now();
@@ -293,20 +296,13 @@ async function loadOffers() {
   let offers = [];
   try {
     offers = await fetchOffersFromApi();
-    offers = filterRemovedOffers(offers);
-    if (offers.length) {
-      localStorage.setItem("offers", JSON.stringify(offers));
-    }
   } catch {
-    offers = filterRemovedOffers(readLocalOffers());
+    offers = readLocalOffers();
   }
 
-  if (!offers.length) {
-    offers = SEED_OFFERS;
-  } else {
-    offers = filterExpiredOffers(offers);
-  }
+  if (!offers.length) offers = SEED_OFFERS;
 
+  offers = filterExpiredOffers(offers);
   offers = filterRemovedOffers(offers);
   localStorage.setItem("offers", JSON.stringify(offers));
 
