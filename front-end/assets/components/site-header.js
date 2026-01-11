@@ -237,7 +237,7 @@ class SiteHeader extends HTMLElement {
     // allow system routes even if not in nav
     allowed.add("#pay");
     allowed.add("#login");
-    if (!allowed.length) return;
+    if (!allowed.size) return;
     if (!allowed.has(current)) {
       location.hash = "#home";
       return;
