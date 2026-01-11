@@ -10,7 +10,7 @@ router.get("/delivery-cart", requireAuth, async (req, res) => {
     await ensureStorageTables();
     const userId = req.user?.sub;
     const r = await pool.query(
-      `SELECT id, title, meta, price, thumb, sub, qty
+      `SELECT id, order_id, title, meta, price, thumb, sub, qty
          FROM delivery_cart_items
         WHERE user_id = $1
         ORDER BY created_at DESC`,
@@ -26,7 +26,7 @@ router.post("/delivery-cart", requireAuth, async (req, res) => {
   try {
     await ensureStorageTables();
     const userId = req.user?.sub;
-    const { title, meta, price, thumb, sub } = req.body || {};
+    const { title, meta, price, thumb, sub, orderId } = req.body || {};
     if (!title || !price) {
       return res.status(400).json({ error: "title and price are required" });
     }
@@ -42,12 +42,12 @@ router.post("/delivery-cart", requireAuth, async (req, res) => {
     }
 
     const r = await pool.query(
-      `INSERT INTO delivery_cart_items (user_id, title, meta, price, thumb, sub, qty)
-       VALUES ($1,$2,$3,$4,$5,$6,1)
+      `INSERT INTO delivery_cart_items (user_id, order_id, title, meta, price, thumb, sub, qty)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,1)
        ON CONFLICT (user_id, title, meta, price)
        DO NOTHING
-       RETURNING id, title, meta, price, thumb, sub, qty`,
-      [userId, title, meta || "", price, thumb || "", JSON.stringify(sub || [])]
+       RETURNING id, order_id, title, meta, price, thumb, sub, qty`,
+      [userId, orderId || null, title, meta || "", price, thumb || "", JSON.stringify(sub || [])]
     );
 
     if (!r.rows.length) {
@@ -111,6 +111,7 @@ router.delete("/delivery-cart", requireAuth, async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+
 
 
 export default router;

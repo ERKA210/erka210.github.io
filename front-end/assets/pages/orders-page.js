@@ -363,7 +363,18 @@ class OrdersPage extends HTMLElement {
           localStorage.removeItem("pendingRatingOrder");
           window.dispatchEvent(new Event("reviews-updated"));
 
+          try {
+            await fetch("/api/delivery-cart", { method: "DELETE", credentials: "include" });
+          } catch {
+            // ignore
+          }
+
           await window.NumAppState?.resetToGuest("rating_submitted");
+          window.dispatchEvent(new Event("delivery-cart-updated"));
+          window.dispatchEvent(new Event("order-updated"));
+          if (localStorage.getItem("authLoggedIn") === "1") {
+            window.NumAppState?.setState("customer", "rating_submitted");
+          }
 
           this.loadOrders();
         } catch {

@@ -1835,6 +1835,7 @@
           const title = data.title || "";
           const meta = data.meta || "";
           const price = data.price || "";
+          const orderId = data.orderId || data.id || null;
           try {
             const res = await fetch(`${this.API}/api/delivery-cart`, {
               method: "POST",
@@ -1844,7 +1845,8 @@
                 meta,
                 price,
                 thumb: data.thumb || "assets/img/box.svg",
-                sub: Array.isArray(data.sub) ? data.sub : []
+                sub: Array.isArray(data.sub) ? data.sub : [],
+                orderId
               })
             });
             if (!res.ok) {
@@ -1856,6 +1858,7 @@
               alert(err.error || "\u0425\u04AF\u0440\u0433\u044D\u043B\u0442 \u043D\u044D\u043C\u044D\u0445\u044D\u0434 \u0430\u043B\u0434\u0430\u0430 \u0433\u0430\u0440\u043B\u0430\u0430");
               return false;
             }
+            await res.json().catch(() => ({}));
             return true;
           } catch (e) {
             alert("\u0425\u04AF\u0440\u0433\u044D\u043B\u0442 \u043D\u044D\u043C\u044D\u0445\u044D\u0434 \u0430\u043B\u0434\u0430\u0430 \u0433\u0430\u0440\u043B\u0430\u0430");
@@ -2462,17 +2465,38 @@
           if (!listEl) return;
           this.fetchDeliveryItems(listEl);
         }
-        attachOrderSelection() {
+        attachOrderSelection(items = []) {
           const orderElements = this.querySelectorAll("d-orders");
+          if (!orderElements.length) return;
+          const byId = new Map(
+            items.map((item) => [String(item.id || ""), item])
+          );
           orderElements.forEach((orderEl) => {
             orderEl.addEventListener("click", () => {
-              const orderId = orderEl.getAttribute("data-id");
-              this.selectOrder(orderId);
+              const itemId = orderEl.getAttribute("data-id");
+              const payload = byId.get(String(itemId)) || null;
+              this.selectOrder(payload, orderEl);
             });
           });
+          const first = orderElements[0];
+          const firstId = first?.getAttribute("data-id");
+          const firstPayload = byId.get(String(firstId)) || null;
+          if (firstPayload) {
+            this.selectOrder(firstPayload, first);
+          }
         }
-        selectOrder(orderId) {
-          const event = new CustomEvent("order-select", { detail: { id: orderId } });
+        selectOrder(payload, activeEl) {
+          if (!payload) return;
+          this.querySelectorAll("d-orders").forEach((el) => {
+            el.classList.toggle("is-active", el === activeEl);
+          });
+          const event = new CustomEvent("delivery-select", {
+            detail: {
+              ...payload,
+              id: payload.orderId || payload.id || null,
+              orderId: payload.orderId || null
+            }
+          });
           document.dispatchEvent(event);
         }
         escapeAttr(value) {
@@ -2501,17 +2525,38 @@
           const progress = this.querySelector("del-order-progress");
           if (details) details.removeAttribute("data-empty");
           if (progress) progress.removeAttribute("data-empty");
-          listEl.innerHTML = items.map((item) => {
+          const normalized = items.map((item) => {
             const qty = Number(item.qty || 1);
             const detailParts = [];
             if (item.meta) detailParts.push(item.meta);
             if (qty) detailParts.push(`x${qty}`);
             const detail = detailParts.join(" \u2022 ");
-            return `
-        <d-orders header="${this.escapeAttr(item.title || "")}"
-                  detail="${this.escapeAttr(detail)}"></d-orders>
-      `;
-          }).join("");
+            const title = String(item.title || "");
+            const parts = title.split(" - ");
+            const from = parts[0] || title;
+            const to = parts.slice(1).join(" - ");
+            const orderId = item.order_id || null;
+            return {
+              ...item,
+              detail,
+              from,
+              to,
+              createdAt: item.meta || "",
+              orderId
+            };
+          });
+          listEl.innerHTML = normalized.map((item) => `
+        <d-orders
+          data-id="${this.escapeAttr(item.id || "")}"
+          data-order-id="${this.escapeAttr(item.orderId || "")}"
+          data-from="${this.escapeAttr(item.from || "")}"
+          data-to="${this.escapeAttr(item.to || "")}"
+          data-created-at="${this.escapeAttr(item.createdAt || "")}"
+          header="${this.escapeAttr(item.title || "")}"
+          detail="${this.escapeAttr(item.detail || "")}">
+        </d-orders>
+      `).join("");
+          this.attachOrderSelection(normalized);
         }
       };
       customElements.define("delivery-page", DeliveryPage);
@@ -2582,6 +2627,20 @@
       DelOrderDetails = class extends HTMLElement {
         connectedCallback() {
           this.renderEmpty();
+          this.handleDeliverySelect = (e) => {
+            const data = e.detail || null;
+            if (!data) {
+              this.renderEmpty();
+              return;
+            }
+            this.hasSelection = true;
+            this.render({
+              from: data.from || "",
+              to: data.to || "",
+              createdAt: data.createdAt || ""
+            });
+          };
+          document.addEventListener("delivery-select", this.handleDeliverySelect);
           this.loadOrder();
         }
         renderEmpty() {
@@ -2608,6 +2667,7 @@
             this.renderEmpty();
             return;
           }
+          if (this.hasSelection) return;
           try {
             const res = await fetch("/api/active-order");
             if (!res.ok) {
@@ -2629,6 +2689,11 @@
             this.render({ from: order.from, to: order.to, createdAt: dateText });
           } catch (e) {
             this.renderEmpty();
+          }
+        }
+        disconnectedCallback() {
+          if (this.handleDeliverySelect) {
+            document.removeEventListener("delivery-select", this.handleDeliverySelect);
           }
         }
       };
@@ -2716,6 +2781,15 @@
           this.stepsState = loadSteps();
           this.currentId = ORDERS[0]?.id || null;
           this.activeOrder = null;
+          this.handleDeliverySelect = (e) => {
+            const data = e.detail || null;
+            const selectedId = data?.orderId || data?.id || null;
+            if (!selectedId) return;
+            this.userSelected = true;
+            this.activeOrder = { id: selectedId };
+            this.currentId = selectedId;
+            this.render();
+          };
           this.handleOrderSelect = (e) => {
             this.currentId = e.detail.id;
             this.render();
@@ -2724,10 +2798,12 @@
           this.render();
           this.loadActiveOrder();
           document.addEventListener("order-select", this.handleOrderSelect);
+          document.addEventListener("delivery-select", this.handleDeliverySelect);
           window.addEventListener("order-updated", this.handleOrderUpdated);
         }
         disconnectedCallback() {
           document.removeEventListener("order-select", this.handleOrderSelect);
+          document.removeEventListener("delivery-select", this.handleDeliverySelect);
           window.removeEventListener("order-updated", this.handleOrderUpdated);
           if (this._ratingTimer) {
             clearInterval(this._ratingTimer);
@@ -2740,6 +2816,7 @@
             if (!res.ok) return;
             const data = await res.json();
             const order = data?.order || null;
+            if (this.userSelected) return;
             this.activeOrder = order;
             const activeId = order?.orderId || order?.id || null;
             if (activeId) this.currentId = activeId;
@@ -3295,7 +3372,16 @@
                 this.closeRatingModal();
                 localStorage.removeItem("pendingRatingOrder");
                 window.dispatchEvent(new Event("reviews-updated"));
+                try {
+                  await fetch("/api/delivery-cart", { method: "DELETE", credentials: "include" });
+                } catch {
+                }
                 await window.NumAppState?.resetToGuest("rating_submitted");
+                window.dispatchEvent(new Event("delivery-cart-updated"));
+                window.dispatchEvent(new Event("order-updated"));
+                if (localStorage.getItem("authLoggedIn") === "1") {
+                  window.NumAppState?.setState("customer", "rating_submitted");
+                }
                 this.loadOrders();
               } catch {
                 alert("\u0421\u044D\u0442\u0433\u044D\u0433\u0434\u044D\u043B \u0445\u0430\u0434\u0433\u0430\u043B\u0430\u0445\u0430\u0434 \u0430\u043B\u0434\u0430\u0430 \u0433\u0430\u0440\u043B\u0430\u0430");
@@ -5044,6 +5130,7 @@
   window.addEventListener("DOMContentLoaded", () => applyStateUI(document));
 
   // front-end/assets/components/app-state.js
+  init_api_client();
   var KEY = "appState";
   var VALID = /* @__PURE__ */ new Set(["guest", "customer", "courier"]);
   function getState2() {
@@ -5065,19 +5152,17 @@
     setState("guest", reason);
     localStorage.setItem("deliveryActive", "0");
     try {
-      await fetch("/api/active-order", {
+      await apiFetch("/api/active-order", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ order: null })
       });
     } catch {
     }
     localStorage.removeItem("deliverySteps");
     try {
-      await fetch("/api/delivery-cart", {
-        method: "DELETE",
-        credentials: "include"
+      await apiFetch("/api/delivery-cart", {
+        method: "DELETE"
       });
     } catch {
     }

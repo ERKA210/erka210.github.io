@@ -1,4 +1,5 @@
 // assets/components/app-state.js
+import { apiFetch } from "../api_client.js";
 const KEY = "appState";
 const VALID = new Set(["guest", "customer", "courier"]);
 
@@ -26,10 +27,9 @@ export async function resetToGuest(reason = "") {
 
   // active-order цэвэрлэх
   try {
-    await fetch("/api/active-order", {
+    await apiFetch("/api/active-order", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify({ order: null }),
     });
   } catch { }
@@ -39,9 +39,8 @@ export async function resetToGuest(reason = "") {
 
   //  courier delivery cart DB-ээс цэвэрлэх
   try {
-    await fetch("/api/delivery-cart", {
+    await apiFetch("/api/delivery-cart", {
       method: "DELETE",
-      credentials: "include",
     });
   } catch { }
 

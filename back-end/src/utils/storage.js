@@ -8,6 +8,7 @@ export async function ensureStorageTables() {
     CREATE TABLE IF NOT EXISTS delivery_cart_items (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      order_id UUID,
       title TEXT,
       meta TEXT,
       price TEXT,
@@ -18,6 +19,10 @@ export async function ensureStorageTables() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       UNIQUE (user_id, title, meta, price)
     );
+  `);
+  await pool.query(`
+    ALTER TABLE delivery_cart_items
+    ADD COLUMN IF NOT EXISTS order_id UUID;
   `);
 
   await pool.query(`

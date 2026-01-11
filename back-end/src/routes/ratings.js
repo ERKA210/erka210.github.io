@@ -85,6 +85,14 @@ router.post("/ratings", requireAuth, async (req, res) => {
       [orderId, userId, courierId, starsNum, commentSafe]
     );
 
+    if (courierId) {
+      await pool.query(`DELETE FROM active_orders WHERE user_id = $1`, [courierId]);
+      await pool.query(
+        `DELETE FROM delivery_cart_items WHERE user_id = $1 AND order_id = $2`,
+        [courierId, orderId]
+      );
+    }
+
     res.json({ rating: history.rows[0] });
   } catch (e) {
     res.status(e.status || 500).json({ error: e.message });

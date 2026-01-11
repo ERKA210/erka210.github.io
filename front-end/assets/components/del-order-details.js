@@ -2,6 +2,20 @@ class DelOrderDetails extends HTMLElement {
   connectedCallback() {
     // ✅ эхлээд хоосон байдалтай
     this.renderEmpty();
+    this.handleDeliverySelect = (e) => {
+      const data = e.detail || null;
+      if (!data) {
+        this.renderEmpty();
+        return;
+      }
+      this.hasSelection = true;
+      this.render({
+        from: data.from || "",
+        to: data.to || "",
+        createdAt: data.createdAt || "",
+      });
+    };
+    document.addEventListener("delivery-select", this.handleDeliverySelect);
     this.loadOrder();
   }
 
@@ -36,6 +50,7 @@ class DelOrderDetails extends HTMLElement {
       this.renderEmpty();
       return;
     }
+    if (this.hasSelection) return;
 
     try {
       const res = await fetch("/api/active-order");
@@ -61,6 +76,12 @@ class DelOrderDetails extends HTMLElement {
       this.render({ from: order.from, to: order.to, createdAt: dateText });
     } catch (e) {
       this.renderEmpty();
+    }
+  }
+
+  disconnectedCallback() {
+    if (this.handleDeliverySelect) {
+      document.removeEventListener("delivery-select", this.handleDeliverySelect);
     }
   }
 }

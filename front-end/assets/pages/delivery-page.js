@@ -97,19 +97,43 @@ class DeliveryPage extends HTMLElement {
     if (!listEl) return;
     this.fetchDeliveryItems(listEl);
   }
-   attachOrderSelection() {
+
+  attachOrderSelection(items = []) {
     const orderElements = this.querySelectorAll('d-orders');
+    if (!orderElements.length) return;
+
+    const byId = new Map(
+      items.map((item) => [String(item.id || ""), item])
+    );
+
     orderElements.forEach(orderEl => {
       orderEl.addEventListener('click', () => {
-        const orderId = orderEl.getAttribute('data-id');
-        this.selectOrder(orderId);
+        const itemId = orderEl.getAttribute('data-id');
+        const payload = byId.get(String(itemId)) || null;
+        this.selectOrder(payload, orderEl);
       });
     });
+
+    const first = orderElements[0];
+    const firstId = first?.getAttribute('data-id');
+    const firstPayload = byId.get(String(firstId)) || null;
+    if (firstPayload) {
+      this.selectOrder(firstPayload, first);
+    }
   }
 
-  selectOrder(orderId) {
-    // Dispatch custom event to notify the order selection
-    const event = new CustomEvent('order-select', { detail: { id: orderId } });
+  selectOrder(payload, activeEl) {
+    if (!payload) return;
+    this.querySelectorAll('d-orders').forEach((el) => {
+      el.classList.toggle('is-active', el === activeEl);
+    });
+    const event = new CustomEvent('delivery-select', {
+      detail: {
+        ...payload,
+        id: payload.orderId || payload.id || null,
+        orderId: payload.orderId || null,
+      },
+    });
     document.dispatchEvent(event);
   }
 
@@ -152,17 +176,42 @@ class DeliveryPage extends HTMLElement {
     if (progress) progress.removeAttribute("data-empty");
 
 
-    listEl.innerHTML = items.map((item) => {
+    const normalized = items.map((item) => {
       const qty = Number(item.qty || 1);
       const detailParts = [];
       if (item.meta) detailParts.push(item.meta);
       if (qty) detailParts.push(`x${qty}`);
       const detail = detailParts.join(' • ');
-      return `
-        <d-orders header="${this.escapeAttr(item.title || '')}"
-                  detail="${this.escapeAttr(detail)}"></d-orders>
-      `;
-    }).join('');
+
+      const title = String(item.title || "");
+      const parts = title.split(" - ");
+      const from = parts[0] || title;
+      const to = parts.slice(1).join(" - ");
+      const orderId = item.order_id || null;
+
+      return {
+        ...item,
+        detail,
+        from,
+        to,
+        createdAt: item.meta || "",
+        orderId,
+      };
+    });
+
+    listEl.innerHTML = normalized.map((item) => `
+        <d-orders
+          data-id="${this.escapeAttr(item.id || '')}"
+          data-order-id="${this.escapeAttr(item.orderId || '')}"
+          data-from="${this.escapeAttr(item.from || '')}"
+          data-to="${this.escapeAttr(item.to || '')}"
+          data-created-at="${this.escapeAttr(item.createdAt || '')}"
+          header="${this.escapeAttr(item.title || '')}"
+          detail="${this.escapeAttr(item.detail || '')}">
+        </d-orders>
+      `).join('');
+
+    this.attachOrderSelection(normalized);
   }
 }
 

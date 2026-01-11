@@ -553,6 +553,7 @@ class OfferModal extends HTMLElement {
     const title = data.title || '';
     const meta = data.meta || '';
     const price = data.price || '';
+    const orderId = data.orderId || data.id || null;
     try {
       const res = await fetch(`${this.API}/api/delivery-cart`, {
         method: "POST",
@@ -563,6 +564,7 @@ class OfferModal extends HTMLElement {
           price,
           thumb: data.thumb || "assets/img/box.svg",
           sub: Array.isArray(data.sub) ? data.sub : [],
+          orderId,
         }),
       });
       if (!res.ok) {
@@ -574,6 +576,7 @@ class OfferModal extends HTMLElement {
         alert(err.error || "Хүргэлт нэмэхэд алдаа гарлаа");
         return false;
       }
+      await res.json().catch(() => ({}));
       return true;
     } catch (e) {
       alert("Хүргэлт нэмэхэд алдаа гарлаа");

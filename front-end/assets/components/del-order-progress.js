@@ -11,6 +11,15 @@ class DelOrderProgress extends HTMLElement {
     this.stepsState = loadSteps();
     this.currentId = ORDERS[0]?.id || null;
     this.activeOrder = null;
+    this.handleDeliverySelect = (e) => {
+      const data = e.detail || null;
+      const selectedId = data?.orderId || data?.id || null;
+      if (!selectedId) return;
+      this.userSelected = true;
+      this.activeOrder = { id: selectedId };
+      this.currentId = selectedId;
+      this.render();
+    };
     this.handleOrderSelect = (e) => {
       this.currentId = e.detail.id;
       this.render();
@@ -21,11 +30,13 @@ class DelOrderProgress extends HTMLElement {
     this.loadActiveOrder();
 
     document.addEventListener("order-select", this.handleOrderSelect);
+    document.addEventListener("delivery-select", this.handleDeliverySelect);
     window.addEventListener("order-updated", this.handleOrderUpdated);
   }
 
   disconnectedCallback() {
     document.removeEventListener("order-select", this.handleOrderSelect);
+    document.removeEventListener("delivery-select", this.handleDeliverySelect);
     window.removeEventListener("order-updated", this.handleOrderUpdated);
     if (this._ratingTimer) {
       clearInterval(this._ratingTimer);
@@ -40,6 +51,7 @@ class DelOrderProgress extends HTMLElement {
       if (!res.ok) return;
       const data = await res.json();
       const order = data?.order || null;
+      if (this.userSelected) return;
       this.activeOrder = order;
       const activeId = order?.orderId || order?.id || null;
       if (activeId) this.currentId = activeId;
