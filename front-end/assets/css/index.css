@@ -225,7 +225,7 @@ home-page {
     grid-template-columns: 1fr;
     gap: var(--offers-gap);
     margin: var(--offers-margin-y) var(--offers-margin-x);
-    align-items: start;
+
   }
 
   .offers-layout.has-cart {
@@ -358,7 +358,8 @@ home-page {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
     padding: 1rem;
-    margin-bottom: 2rem;
+    margin: 2rem;
+
   }
 
   .offers-row {
