@@ -423,7 +423,8 @@ login-page {
 }
 body {
   background: var(--color-bg);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .scene {

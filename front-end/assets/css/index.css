@@ -62,7 +62,7 @@ home-page {
     padding-top: var(--home-pad-top);
     padding-bottom: var(--home-pad-bottom);
     background: var(--color-bg);
-    min-height: 100vh;
+    min-height: calc(100vh - var(--home-pad-top) - var(--home-pad-bottom));
   }
 
   .filter-section {
@@ -81,6 +81,7 @@ home-page {
   .top-row {
     display: flex;
     justify-content: flex-end;
+    width: 100%;
   }
 
   .middle-row {
@@ -216,6 +217,9 @@ home-page {
   }
 
   .order-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     align-self: flex-end;
     margin-top: var(--order-btn-margin-top);
   }
