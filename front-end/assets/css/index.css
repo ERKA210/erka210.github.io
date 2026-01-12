@@ -232,10 +232,6 @@ home-page {
     grid-template-columns: minmax(0, 2fr) minmax(15rem, 1fr);
   }
 
-  .offers-panel .offers-container {
-    margin: 0;
-  }
-
   .delivery-cart {
     background: var(--color-bg);
     border-radius: var(--radius-lg);
@@ -353,12 +349,17 @@ home-page {
     background: #b0112f;
   }
 
+    .offers-panel .offers-container {
+    margin: 0;
+  }
+
   .offers-container {
     background: var(--color-bg);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
     padding: 1rem;
     margin: var(--offers-margin-y) var(--offers-margin-x);
+    gap: 1rem;
 
   }
 
@@ -682,8 +683,7 @@ home-page {
       scroll-snap-align: start;
     }
   }
-
-  @media (max-width: 30rem) {
+  @media (max-width: 54rem) {
     main {
       padding-top: var(--home-pad-top);
       padding-bottom: var(--home-pad-bottom);
