@@ -2881,8 +2881,7 @@
   function parseJsonAttr(raw, fallback) {
     if (!raw) return fallback;
     try {
-      const decoded = decodeURIComponent(raw);
-      return JSON.parse(decoded);
+      return JSON.parse(raw);
     } catch {
       return fallback;
     }
@@ -4136,7 +4135,7 @@
         }
       </style>
 
-      <div id="confirm-modal" aria-hidden="true">
+      <div id="confirm-modal" hidden>
         <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
           <h3 id="confirm-title">\u0417\u0430\u0445\u0438\u0430\u043B\u0433\u0430 \u0431\u0430\u0442\u0430\u043B\u0433\u0430\u0430\u0436\u0443\u0443\u043B\u0430\u0445 \u0443\u0443?</h3>
           <p id="confirm-text"></p>
@@ -4180,6 +4179,7 @@
     }
     open(order, summary) {
       if (!this.modal || !this.confirmTextEl) return;
+      this._lastFocus = document.activeElement;
       const items = summary?.items?.length ? summary.items.map((i) => `\u2022 ${i.name} \u2014 ${i.qty} \u0448\u0438\u0440\u0445\u044D\u0433`).join("<br>") : "\u0411\u0430\u0440\u0430\u0430 \u0441\u043E\u043D\u0433\u043E\u0433\u0434\u043E\u043E\u0433\u04AF\u0439";
       const d = new Date(order.createdAt);
       const totalRaw = summary?.total;
@@ -4199,14 +4199,17 @@
         <strong>\u041D\u0438\u0439\u0442 \u04AF\u043D\u044D:</strong> ${totalText}
       </div>
     `;
-      this.modal.setAttribute("aria-hidden", "false");
+      this.modal.removeAttribute("hidden");
       this.modal.classList.add("show");
       if (this.confirmBtn) this.confirmBtn.focus();
     }
     close() {
       if (!this.modal) return;
+      if (this._lastFocus && typeof this._lastFocus.focus === "function") {
+        this._lastFocus.focus();
+      }
       this.modal.classList.remove("show");
-      this.modal.setAttribute("aria-hidden", "true");
+      this.modal.setAttribute("hidden", "");
     }
   };
   customElements.define("confirm-modal", ConfirmModal);

@@ -1,8 +1,7 @@
 function parseJsonAttr(raw, fallback) {
   if (!raw) return fallback;
   try {
-    const decoded = decodeURIComponent(raw);
-    return JSON.parse(decoded);
+    return JSON.parse(raw);
   } catch {
     return fallback;
   }

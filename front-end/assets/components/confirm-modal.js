@@ -126,7 +126,7 @@ class ConfirmModal extends HTMLElement {
         }
       </style>
 
-      <div id="confirm-modal" aria-hidden="true">
+      <div id="confirm-modal" hidden>
         <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
           <h3 id="confirm-title">Захиалга баталгаажуулах уу?</h3>
           <p id="confirm-text"></p>
@@ -174,6 +174,7 @@ class ConfirmModal extends HTMLElement {
 
   open(order, summary) {
     if (!this.modal || !this.confirmTextEl) return;
+    this._lastFocus = document.activeElement;
 
     const items = summary?.items?.length
       ? summary.items.map((i) => `• ${i.name} — ${i.qty} ширхэг`).join("<br>")
@@ -202,15 +203,18 @@ class ConfirmModal extends HTMLElement {
       </div>
     `;
 
-    this.modal.setAttribute("aria-hidden", "false");
+    this.modal.removeAttribute("hidden");
     this.modal.classList.add("show");
     if (this.confirmBtn) this.confirmBtn.focus();
   }
 
   close() {
     if (!this.modal) return;
+    if (this._lastFocus && typeof this._lastFocus.focus === "function") {
+      this._lastFocus.focus();
+    }
     this.modal.classList.remove("show");
-    this.modal.setAttribute("aria-hidden", "true");
+    this.modal.setAttribute("hidden", "");
   }
 }
 
