@@ -122,13 +122,13 @@ const SEED_OFFERS = [
 ];
 
 function renderOfferCard(item) {
-  const thumb = item.thumb || "assets/img/box.svg";
-  const title = item.title || "";
-  const meta = item.meta || "";
-  const price = item.price || "";
-  const orderId = item.orderId || item.id || "";
-  const sub = encodeURIComponent(JSON.stringify(item.sub || []));
-  const customer = encodeURIComponent(JSON.stringify(item.customer || {}));
+  const thumb = escapeAttr(item.thumb || "assets/img/box.svg");
+  const title = escapeAttr(item.title || "");
+  const meta = escapeAttr(item.meta || "");
+  const price = escapeAttr(item.price || "");
+  const orderId = escapeAttr(item.orderId || item.id || "");
+  const sub = escapeAttr(JSON.stringify(item.sub || []));
+  const customer = escapeAttr(JSON.stringify(item.customer || {}));
 
   return `
     <offer-card
@@ -141,6 +141,14 @@ function renderOfferCard(item) {
       customer="${customer}">
     </offer-card>
   `;
+}
+
+function escapeAttr(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 function formatMetaFromDate(ts) {

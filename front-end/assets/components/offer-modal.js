@@ -431,7 +431,7 @@ class OfferModal extends HTMLElement {
 
     if (orderId) {
       try {
-        const assignRes = await fetch(`${this.API}/api/orders/${encodeURIComponent(orderId)}/assign-courier`, {
+        const assignRes = await fetch(`${this.API}/api/orders/${orderId}/assign-courier`, {
           method: "POST",
           credentials: "include",
         });
@@ -529,7 +529,7 @@ class OfferModal extends HTMLElement {
 
   async cancelOrderOnServer(orderId) {
     try {
-      const res = await fetch(`${this.API}/api/orders/${encodeURIComponent(orderId)}`, {
+      const res = await fetch(`${this.API}/api/orders/${orderId}`, {
         method: "DELETE",
         credentials: "include",
       });
