@@ -1,18 +1,3 @@
-function parseJsonAttr(raw, fallback) {
-  if (!raw) return fallback;
-  try {
-    let normalized = raw;
-    try {
-      normalized = decodeURIComponent(raw);
-    } catch {
-      normalized = raw;
-    }
-    return JSON.parse(normalized);
-  } catch {
-    return fallback;
-  }
-}
-
 class OfferCard extends HTMLElement {
   static get observedAttributes() {
     return ["thumb", "title", "meta", "price", "sub", "customer", "order-id"];
@@ -36,8 +21,8 @@ class OfferCard extends HTMLElement {
       meta: this.getAttribute("meta") || "",
       price: this.getAttribute("price") || "",
       orderId: this.getAttribute("order-id") || "",
-      sub: parseJsonAttr(this.getAttribute("sub"), []),
-      customer: parseJsonAttr(this.getAttribute("customer"), {}),
+      sub: JSON.parse(this.getAttribute("sub") || "[]"),
+      customer: JSON.parse(this.getAttribute("customer") || "{}"),
     };
   }
 

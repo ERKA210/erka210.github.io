@@ -1,14 +1,6 @@
 import { apiFetch } from "../api_client.js";
 import "./offer-card.js";
 
-function scheduleIdle(work) {
-  if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(() => work(), { timeout: 1200 });
-  } else {
-    setTimeout(work, 300);
-  }
-}
-
 class OffersList extends HTMLElement {
   connectedCallback() {
     if (this._ready) return;
@@ -64,7 +56,7 @@ class OffersList extends HTMLElement {
     this._loaded = true;
     const local = readLocalOffers();
     this.renderItems(local.length ? local : SEED_OFFERS);
-    scheduleIdle(() => loadOffers());
+    loadOffers();
   }
 }
 
