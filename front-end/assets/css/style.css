@@ -1,6 +1,5 @@
 :root {
   --color-accent: #c90d30;
-  --color-hover: #c90d30;
   --color-bg: #ffffff;
   --color-bg-light: #f9f9f9;
   --color-border: #e0e0e0;
@@ -219,7 +218,7 @@ main {
   padding-top: calc(var(--top-h) + var(--main-top-gap));
 }
 
-@keyframes routeFadeUp {
+@keyframes r {
   from {
     opacity: 0;
     transform: translateY(0.6rem);
@@ -242,7 +241,7 @@ num-router > [data-route] {
 }
 
 num-router > [data-route].is-active {
-  animation: routeFadeUp 260ms ease-out;
+  animation: r 260ms ease-out;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
@@ -251,12 +250,6 @@ num-router > [data-route].is-active {
 num-router > [data-route].is-leaving {
   opacity: 0;
   transform: translateY(-0.4rem);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  num-router > [data-route].is-active {
-    animation: none;
-  }
 }
 
 .header-actions {
@@ -339,7 +332,7 @@ num-router > [data-route].is-leaving {
 .header-actions .login-btn {
   padding: var(--padding-1);
   background: var(--color-accent);
-  color: #fff;
+  color: var(--color-surface);
   border: none;
   border-radius: var(--radius);
   font-size: var(--font-size-sm);
@@ -456,7 +449,7 @@ num-router > [data-route].is-leaving {
   }
 
   .top-menu a.is-active svg path {
-    fill: #fff;
+    fill: var(--color-surface);
   }
 
   .top-menu a.is-active span {

@@ -62,9 +62,8 @@ home-page {
     padding-top: var(--home-pad-top);
     padding-bottom: var(--home-pad-bottom);
     background: var(--color-bg);
-    min-height: calc(100vh - var(--home-pad-top) - var(--home-pad-bottom));
   }
-
+/*zahialga ugh heseg*/
   .filter-section {
     margin-left: var(--section-margin-x);
     margin-right: var(--section-margin-x);
@@ -77,13 +76,13 @@ home-page {
     flex-direction: column;
     gap: var(--row-gap-lg);
   }
-
+/*zahialga ugh tovch*/
   .top-row {
     display: flex;
     justify-content: flex-end;
     width: 100%;
   }
-/*Хаанаас-Хаашаа-Хэзээ-Юу хэсэг байна.*/
+/*deed murnii hesg*/
   .middle-row {
     display: flex;
     flex-wrap: wrap;
@@ -91,14 +90,14 @@ home-page {
     gap: var(--row-gap);
     justify-content: space-between;
   }
-
+/*dund murnii hesg*/
   .bottom-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
   }
-
+/*select design*/
   .ctrl {
     position: relative;
     display: flex;
@@ -223,17 +222,31 @@ home-page {
     align-self: flex-end;
     margin-top: var(--order-btn-margin-top);
   }
-
+/*offers buyu hurgeh zahialgatai heseg mun delivery cart gduurh div nii class*/
   .offers-layout {
     display: grid;
+    grid-template-areas:
+      "offers"
+      "cart";
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
     gap: var(--offers-gap);
     margin: var(--offers-margin-y) var(--offers-margin-x);
 
   }
 
+  .offers-panel {
+    grid-area: offers;
+  }
+
+  .delivery-cart-panel {
+    grid-area: cart;
+  }
+
   .offers-layout.has-cart {
+    grid-template-areas: "offers cart";
     grid-template-columns: minmax(0, 2fr) minmax(15rem, 1fr);
+    grid-template-rows: auto;
   }
 
   .delivery-cart {
@@ -277,7 +290,9 @@ home-page {
 
   .delivery-cart__item {
     display: grid;
+    grid-template-areas: "thumb info price";
     grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto;
     gap: 0.65rem;
     align-items: center;
     padding: 0.65rem;
@@ -285,6 +300,15 @@ home-page {
     border-radius: var(--radius);
     background: var(--color-bg-light);
   }
+
+  .delivery-cart__thumb {
+    grid-area: thumb;
+  }
+
+  .delivery-cart__info {
+    grid-area: info;
+  }
+
 
   .delivery-cart__thumb img {
     width: 2.75rem;
@@ -306,6 +330,7 @@ home-page {
   }
 
   .delivery-cart__price {
+    grid-area: price;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -443,7 +468,11 @@ home-page {
 
   @media (max-width: 56.25rem) {
     .offers-layout {
+      grid-template-areas:
+        "offers"
+        "cart";
       grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
       margin: 1.5rem 1rem;
     }
 
@@ -457,50 +486,7 @@ home-page {
     margin: 0.5rem 0;
   }
 
-  .swipe-bg {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 1rem;
-    overflow: hidden;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .swipe-bg.active {
-    opacity: 1;
-  }
-
-  .swipe-bg .bg-left,
-  .swipe-bg .bg-right {
-    flex: 1;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 1rem;
-    color: white;
-  }
-
-  .swipe-bg.confirm .bg-left {
-    background: #3cb371;
-  }
-
-  .swipe-bg.confirm .bg-right {
-    background: transparent;
-  }
-
-  .swipe-bg.delete .bg-right {
-    background: #d9534f;
-  }
-
-  .swipe-bg.delete .bg-left {
-    background: transparent;
-  }
-
+  
   .cart {
     width: 100%;
     margin: var(--cart-margin-y) auto;
@@ -517,6 +503,7 @@ home-page {
     max-height: 15rem;
     overflow-y: auto;
     padding-right: 0.4rem;
+    grid-area: items;
   }
 
   .cart-content>div:first-child::-webkit-scrollbar {
@@ -575,6 +562,9 @@ home-page {
     border-radius: 0.6rem;
     padding: 1rem;
     display: grid;
+    grid-template-areas:
+      "items delivery"
+      "items total";
     grid-template-columns: 65% 25%;
     grid-template-rows: auto auto;
     gap: 1.5rem;
@@ -587,19 +577,34 @@ home-page {
     padding: 1rem 1.2rem;
     background: var(--color-bg-light);
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-areas: "thumb info price remove";
+    grid-template-columns: auto 1fr auto auto;
+    grid-template-rows: auto;
     align-items: center;
     gap: 0.6rem;
     margin-top: 0.5rem;
   }
 
-  .item-box p {
-    margin: 0;
-    font-size: 1rem;
+  .item-box .item-img {
+    grid-area: thumb;
+  }
+
+  .item-box p:not(.price) {
+    grid-area: info;
   }
 
   .item-box .price {
+    grid-area: price;
     font-weight: 600;
+  }
+
+  .item-box svg.del-btn {
+    grid-area: remove;
+  }
+
+  .item-box p {
+    margin: 0;
+    font-size: 1rem;
   }
 
   .item-box svg {
@@ -608,6 +613,7 @@ home-page {
   }
 
   .delivery-box {
+     grid-area: delivery;
     border: 0.06rem solid #c90d30;
     border-radius: 0.8rem;
     text-align: center;
@@ -632,13 +638,11 @@ home-page {
   }
 
   .total-box {
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
+    grid-area: total;
+    position: static;
     display: flex;
-    align-items: flex-end;
+    justify-content: flex-end;
     gap: 0.3rem;
-    margin-top: 1rem;
   }
 
   .total-box p {
@@ -662,7 +666,7 @@ home-page {
     main {
       padding-top: var(--home-pad-top);
     }
-/*Үндсэн бараагаа сонгох хэсэг*/
+
     .filter-section {
       margin: var(--section-margin-x);
       padding: var(--section-padding-y) var(--section-padding-x);
@@ -672,7 +676,7 @@ home-page {
     .middle-row {
       gap: var(--row-gap);
     }
-    /*Нийт захиалгатай байгаа бараануудыг харуулах хэсэг*/
+
     .offers-container {
       margin: var(--offers-margin-y) var(--offers-margin-x);
       padding: var(--delivery-cart-padding);
@@ -801,14 +805,18 @@ home-page {
     }
 
     .cart-content {
+      grid-template-areas:
+        "items"
+        "delivery"
+        "total";
       grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
       gap: 1rem;
     }
 
     .total-box {
       position: static;
       justify-content: flex-end;
-      margin-top: 1rem;
     }
   }
 

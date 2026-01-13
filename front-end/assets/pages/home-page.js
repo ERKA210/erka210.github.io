@@ -1,13 +1,5 @@
 import { apiFetch } from "../api_client.js";
 
-function scheduleIdle(work) {
-  if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(() => work(), { timeout: 1200 });
-  } else {
-    setTimeout(work, 300);
-  }
-}
-
 class HomePage extends HTMLElement {
   connectedCallback() {
     this.currentUser = null;
@@ -42,33 +34,17 @@ class HomePage extends HTMLElement {
     if ((location.hash || "#home") !== "#home") return;
     if (this._loaded) return;
     this._loaded = true;
-    scheduleIdle(() => {
       this.loadPlaces();
       this.hydrateCustomerFromDb();
-    });
   }
 
   render() {
     this.innerHTML = `
-      <style>
-        .sr-only {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: -1px;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border: 0;
-        }
-      </style>
 
       <section class="filter-section">
         <div class="middle-row">
           <div class="ctrl">
             <span><img src="assets/img/map_pin.svg" alt="icon" width="16" height="16" /></span>
-            <label class="sr-only" for="fromPlace">Хаанаас</label>
             <select id="fromPlace">
               <option value="" disabled selected hidden>Хаанаас</option>
             </select>
@@ -78,7 +54,6 @@ class HomePage extends HTMLElement {
 
           <div class="ctrl">
             <span><img src="assets/img/map_pin.svg" alt="icon" width="16" height="16" /></span>
-            <label class="sr-only" for="toPlace">Хаашаа</label>
             <select id="toPlace">
               <option value="" disabled selected hidden>Хаашаа</option>
             </select>
@@ -90,7 +65,6 @@ class HomePage extends HTMLElement {
         <div class="bottom-row">
           <div class="ctrl wide">
             <span><img src="assets/img/fork.svg" alt="icon" width="40" height="38" /></span>
-            <label class="sr-only" for="what">Юуг</label>
             <select id="what">
               <option value="" disabled selected hidden>Юуг</option>
             </select>
