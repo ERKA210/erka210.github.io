@@ -69,7 +69,6 @@ class OrdersPage extends HTMLElement {
 
   render() {
     this.innerHTML = `
-      <link rel="stylesheet" href="assets/css/order.css">
       <main class="container">
         <section class="order-side">
           <section class="orders">

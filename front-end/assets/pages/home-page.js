@@ -50,7 +50,6 @@ class HomePage extends HTMLElement {
 
   render() {
     this.innerHTML = `
-      <link rel="stylesheet" href="assets/css/index.css" />
       <style>
         .sr-only {
           position: absolute;

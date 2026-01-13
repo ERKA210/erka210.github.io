@@ -18,8 +18,6 @@ class DateTimePicker extends HTMLElement {
   render() {
     this.shadowRoot.innerHTML = `
       <style>
-        @import url(/assets/css/style.css);
-
         :host {
           display: flex;
           gap: 0.5rem;

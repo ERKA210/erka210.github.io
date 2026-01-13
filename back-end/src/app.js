@@ -46,14 +46,14 @@ app.get("/", (req, res) => {
   const nonce = res.locals.cspNonce || "";
   const indexPath = path.join("front-end", "index.html");
   let html = fs.readFileSync(indexPath, "utf8");
-  html = html.replaceAll("nonce", nonce);
+  html = html.replaceAll("__CSP_NONCE__", nonce);
   res.type("html").send(html);
 });
 app.get("/index.html", (_req, res) => {
   const nonce = res.locals.cspNonce || "";
   const indexPath = path.join("front-end", "index.html");
   let html = fs.readFileSync(indexPath, "utf8");
-  html = html.replaceAll("nonce", nonce);
+  html = html.replaceAll("__CSP_NONCE__", nonce);
   res.type("html").send(html);
 });
 

@@ -4,7 +4,6 @@ class LoginPage extends HTMLElement {
     this.currentMode = "login";
     this.currentRole = "customer";
     this.innerHTML = `
-      <link rel="stylesheet" href="assets/css/login.css">
       <div class="card" role="dialog" aria-labelledby="login-title">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div style="width:18px"></div>

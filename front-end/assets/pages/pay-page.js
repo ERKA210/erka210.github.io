@@ -46,7 +46,6 @@ class PayPage extends HTMLElement {
     const isPaid = () => localStorage.getItem(paidKey) === "1";
 
     this.innerHTML = `
-      <link rel="stylesheet" href="assets/css/pay.css">
       <div class="pay-wrap">
         <div class="pay-card">
           <div class="pay-head">

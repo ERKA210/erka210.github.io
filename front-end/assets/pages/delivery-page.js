@@ -50,7 +50,6 @@ class DeliveryPage extends HTMLElement {
 
   render() {
     this.innerHTML = `
-    <link rel="stylesheet" href="assets/css/delivery.css">
       <div class="container">
         <section class="orders">
           <h2>Миний хүргэлт</h2>

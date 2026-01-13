@@ -13,7 +13,6 @@ class ProfilePage extends HTMLElement {
 
   renderAccessGate() {
     this.innerHTML = `
-      <link rel="stylesheet" href="assets/css/profile.css" />
       <section class="profile-page">
         <div class="profile-hero">
           <div class="profile-hero__content">
@@ -50,7 +49,6 @@ class ProfilePage extends HTMLElement {
 
   redirectToLogin() {
     this.innerHTML = `
-      <link rel="stylesheet" href="assets/css/profile.css" />
       <section class="profile-page">
         <div class="profile-hero">
           <div class="profile-hero__content">
@@ -77,7 +75,6 @@ class ProfilePage extends HTMLElement {
     const deliveryHistory = this.getDeliveryHistory();
     const isCourier = this.currentUser?.role === "courier";
     this.innerHTML = `
-      <link rel="stylesheet" href="assets/css/profile.css" />
       <section class="profile-page">
         <div class="profile-hero">
           <div class="profile-hero__content">
