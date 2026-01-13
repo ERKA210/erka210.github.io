@@ -1,5 +1,12 @@
 class ProfilePage extends HTMLElement {
   connectedCallback() {
+    this.handleRouteChange = this.handleRouteChange?.bind(this) || (() => this.onRouteChange());
+    window.addEventListener("hashchange", this.handleRouteChange);
+    this.handleRouteChange();
+  }
+
+  onRouteChange() {
+    if (location.hash !== "#profile") return;
     this.renderAccessGate();
     this.ensureAuthenticated();
   }
@@ -248,6 +255,7 @@ class ProfilePage extends HTMLElement {
   }
 
   disconnectedCallback() {
+    window.removeEventListener("hashchange", this.handleRouteChange);
     if (this.handleReviewsUpdated) {
       window.removeEventListener("reviews-updated", this.handleReviewsUpdated);
     }

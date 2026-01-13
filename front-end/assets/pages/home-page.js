@@ -1,21 +1,31 @@
 import { apiFetch } from "../api_client.js";
 
+function scheduleIdle(work) {
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(() => work(), { timeout: 1200 });
+  } else {
+    setTimeout(work, 300);
+  }
+}
+
 class HomePage extends HTMLElement {
   connectedCallback() {
     this.currentUser = null;
     this.pendingOrder = null;
     this.pendingOffer = null;
+    this._loaded = false;
+    this.handleRouteChange = this.handleRouteChange?.bind(this) || (() => this.onRouteChange());
+    window.addEventListener("hashchange", this.handleRouteChange);
 
     this.render();
     this.cacheEls();
     this.bindConfirmModal();
     this.bindEvents();
-
-    this.loadPlaces();
-    this.hydrateCustomerFromDb();
+    this.handleRouteChange();
   }
 
   disconnectedCallback() {
+    window.removeEventListener("hashchange", this.handleRouteChange);
     if (this.orderBtn && this.handleOrderClick) {
       this.orderBtn.removeEventListener("click", this.handleOrderClick);
     }
@@ -26,6 +36,16 @@ class HomePage extends HTMLElement {
       this.confirmModal.removeEventListener("confirm", this.handleConfirm);
       this.confirmModal.removeEventListener("cancel", this.handleCancel);
     }
+  }
+
+  onRouteChange() {
+    if ((location.hash || "#home") !== "#home") return;
+    if (this._loaded) return;
+    this._loaded = true;
+    scheduleIdle(() => {
+      this.loadPlaces();
+      this.hydrateCustomerFromDb();
+    });
   }
 
   render() {

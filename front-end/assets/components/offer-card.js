@@ -1,7 +1,13 @@
 function parseJsonAttr(raw, fallback) {
   if (!raw) return fallback;
   try {
-    return JSON.parse(raw);
+    let normalized = raw;
+    try {
+      normalized = decodeURIComponent(raw);
+    } catch {
+      normalized = raw;
+    }
+    return JSON.parse(normalized);
   } catch {
     return fallback;
   }

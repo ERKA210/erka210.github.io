@@ -1,24 +1,42 @@
 class DeliveryCart extends HTMLElement {
   connectedCallback() {
+    this.scheduleIdle = this.scheduleIdle?.bind(this) || ((work) => {
+      if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(() => work(), { timeout: 1200 });
+      } else {
+        setTimeout(work, 300);
+      }
+    });
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleViewportChange = this.handleViewportChange.bind(this);
+    this._loaded = false;
+    this.handleRouteChange = this.handleRouteChange?.bind(this) || (() => this.onRouteChange());
     this.render();
     this.cacheEls();
     this.addEventListener("click", this.handleClick);
     window.addEventListener("delivery-cart-updated", this.handleUpdate);
+    window.addEventListener("hashchange", this.handleRouteChange);
     this.mediaQuery = window.matchMedia("(max-width: 900px)");
     this.mediaQuery.addEventListener("change", this.handleViewportChange);
     this.handleViewportChange();
-    this.load();
+    this.handleRouteChange();
   }
 
   disconnectedCallback() {
     window.removeEventListener("delivery-cart-updated", this.handleUpdate);
+    window.removeEventListener("hashchange", this.handleRouteChange);
     this.removeEventListener("click", this.handleClick);
     if (this.mediaQuery) {
       this.mediaQuery.removeEventListener("change", this.handleViewportChange);
     }
+  }
+
+  onRouteChange() {
+    if ((location.hash || "#home") !== "#home") return;
+    if (this._loaded) return;
+    this._loaded = true;
+    this.scheduleIdle(() => this.load());
   }
 
   render() {

@@ -6,13 +6,20 @@ class SiteHeader extends HTMLElement {
     this.handleUserUpdated = this.handleUserUpdated.bind(this);
     this.handleAppStateChanged = this.handleAppStateChanged.bind(this);
     this.loadUser = this.loadUser.bind(this);
+    this.scheduleIdle = this.scheduleIdle?.bind(this) || ((work) => {
+      if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(() => work(), { timeout: 1200 });
+      } else {
+        setTimeout(work, 300);
+      }
+    });
 
     this.render();
 
     window.addEventListener('hashchange', this.updateActive);
     window.addEventListener('user-updated', this.handleUserUpdated);
     window.addEventListener('app-state-changed', this.handleAppStateChanged);
-    this.loadUser();
+    this.scheduleIdle(this.loadUser);
     this.updateActive();
   }
 

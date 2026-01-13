@@ -8,11 +8,26 @@ class Couriers extends HTMLElement {
 
   async loadCourier() {
     try {
-      const r = await fetch(`${API}/api/courier/me`);
-      if (!r.ok) throw new Error("courier not found");
-      const courier = await r.json();
-
-      if (courier) this.setData(courier);
+      const me = await fetch(`${API}/api/auth/me`);
+      if (me.ok) {
+        const payload = await me.json();
+        const user = payload?.user || null;
+        if (user?.role === "courier") {
+          const r = await fetch(`${API}/api/courier/me`);
+          if (r.ok) {
+            const courier = await r.json();
+            if (courier) {
+              this.setData(courier);
+              return;
+            }
+          }
+        }
+        if (user) {
+          this.setData(user);
+          return;
+        }
+      }
+      this.setEmpty();
     } catch {
       this.setEmpty();
     }
@@ -33,8 +48,8 @@ class Couriers extends HTMLElement {
     `;
   }
 
-  setData({ name, phone, courier_id}) {
-    
+  setData({ name, phone, courier_id, student_id, studentId, id }) {
+    const displayId = courier_id || student_id || studentId || id || "";
     this.innerHTML = `
       <article class="courier-card">
         <div class="delivery">
@@ -44,7 +59,7 @@ class Couriers extends HTMLElement {
           <div class="courier-info">
             <h3>Нэр : ${this.escape(name || "Хүргэгч")}</h3>
             <p>${phone ? `Утас: ${this.escape(phone || "Хүргэгч")}` : ""}</p>
-            <p>${courier_id ? `Хүргэгчийн ID: ${this.escape(courier_id || "Хүргэгч")}` : ""}</p>
+            <p>${displayId ? `ID: ${this.escape(displayId)}` : ""}</p>
           </div>
         </div>
       </article>

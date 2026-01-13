@@ -1,23 +1,35 @@
 import { apiFetch } from "../api_client.js";
 import "./offer-card.js";
 
+function scheduleIdle(work) {
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(() => work(), { timeout: 1200 });
+  } else {
+    setTimeout(work, 300);
+  }
+}
+
 class OffersList extends HTMLElement {
   connectedCallback() {
     if (this._ready) return;
     this._ready = true;
+    this._loaded = false;
+    this.handleRouteChange = this.handleRouteChange?.bind(this) || (() => this.onRouteChange());
     this.render();
 
     this.handleOffersUpdated = () => loadOffers();
     window.addEventListener("offers-updated", this.handleOffersUpdated);
+    window.addEventListener("hashchange", this.handleRouteChange);
     this.addEventListener("offer-select", this.handleOfferSelect);
 
-    loadOffers();
+    this.handleRouteChange();
   }
 
   disconnectedCallback() {
     if (this.handleOffersUpdated) {
       window.removeEventListener("offers-updated", this.handleOffersUpdated);
     }
+    window.removeEventListener("hashchange", this.handleRouteChange);
     this.removeEventListener("offer-select", this.handleOfferSelect);
   }
 
@@ -44,6 +56,15 @@ class OffersList extends HTMLElement {
     const modal = document.querySelector("offer-modal");
     if (!modal || typeof modal.show !== "function") return;
     modal.show(event.detail);
+  }
+
+  onRouteChange() {
+    if ((location.hash || "#home") !== "#home") return;
+    if (this._loaded) return;
+    this._loaded = true;
+    const local = readLocalOffers();
+    this.renderItems(local.length ? local : SEED_OFFERS);
+    scheduleIdle(() => loadOffers());
   }
 }
 

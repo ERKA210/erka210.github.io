@@ -2,17 +2,42 @@ const API = "http://localhost:3000";
 
 class OrdersPage extends HTMLElement {
   connectedCallback() {
+    this._initialized = false;
+    this.handleRouteChange = this.handleRouteChange?.bind(this) || (() => this.onRouteChange());
+    window.addEventListener("hashchange", this.handleRouteChange);
+    this.handleRouteChange();
+  }
+
+  onRouteChange() {
+    if (location.hash !== "#orders") {
+      if (this.orderStream) {
+        if (this.handleOrderStatusEvent) {
+          this.orderStream.removeEventListener("order-status", this.handleOrderStatusEvent);
+        }
+        if (this.handleOrderUpdatedEvent) {
+          this.orderStream.removeEventListener("order-updated", this.handleOrderUpdatedEvent);
+        }
+        this.orderStream.close();
+        this.orderStream = null;
+      }
+      return;
+    }
+
     this.selectedOrder = null;
     this._onDocClick = this._onDocClick?.bind(this) || ((e) => this.onDocClick(e));
-    this.render();
-    this.bindModal();
-    this.bindClicks();
-    this.bindProgress(); 
+    if (!this._initialized) {
+      this.render();
+      this.bindModal();
+      this.bindClicks();
+      this.bindProgress();
+      this._initialized = true;
+    }
     this.loadOrders();
     this.initOrderStream();
   }
 
   disconnectedCallback() {
+    window.removeEventListener("hashchange", this.handleRouteChange);
     document.removeEventListener("click", this._onDocClick);
 
     if (this.orderStream) {

@@ -197,6 +197,12 @@ class OrderConfirm extends HTMLElement {
       title: `${this.pendingOrder.from} - ${this.pendingOrder.to}`,
       price: this.formatUne((data?.total ?? this.pendingOffer.total) || 0),
       thumb: this.pendingOffer.thumb || "assets/img/box.svg",
+      customer: {
+        name: localStorage.getItem("userName") || "Тодорхойгүй",
+        phone: localStorage.getItem("userPhone") || "Утасгүй",
+        studentId: localStorage.getItem("userDisplayId") || "ID байхгүй",
+        avatar: localStorage.getItem("userAvatar") || "assets/img/profile.jpg",
+      },
       sub: this.pendingOffer.items.map((it) => ({
         name: `${it.name} x${it.qty}`,
         price: this.formatUne(it.price * it.qty)
