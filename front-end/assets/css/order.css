@@ -345,6 +345,7 @@ order-progress {
     color: #ffffff;
     border: none;
   }
+  /*Захиалгыг авсны дараах үнэлгээ өгөх modal хэсэг*/
   .modal {
   display: none; 
   position: fixed;
@@ -386,7 +387,7 @@ order-progress {
   height: 2rem;
   margin-left: 10%;
 }
-
+/*Захиалга хүлээж авсан хүргэгчийн мэдээллийн хэсэг*/
   .delivery {
     display: flex;
     align-items: center;
@@ -395,7 +396,7 @@ order-progress {
     border-radius: var(--radius);
     padding: 15px;
   }
-
+/*Тухайн захиалгын ямар үе шаттай байгааг мэдээллэх хэсэг*/
   .details {
     grid-column: 2;
     background: var(--color-bg);
@@ -569,6 +570,7 @@ order-progress {
     .order-side {
       gap: 1.5rem;
     }
+    /*Захиалгын жагсаалт харуулах хэсэг*/
     .orders{
       margin-top: 4rem;
       overflow-y: scroll;

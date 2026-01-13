@@ -68,7 +68,7 @@ login-page {
         border-radius: 999px;
         background: var(--login-subtitle-bg);
     }
-
+/*Нэвтрэх, Бүртгүүлэх хэсэг*/
     .auth-tabs,
     .login-tabs {
         display: grid;
@@ -436,7 +436,7 @@ body {
   pointer-events: none;
 }
 
-/* Delivery person */
+/* Ард талын animation хэсэг*/
 .delivery-man {
   position: absolute;
   left: -100px;

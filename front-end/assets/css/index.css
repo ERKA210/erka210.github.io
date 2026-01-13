@@ -83,7 +83,7 @@ home-page {
     justify-content: flex-end;
     width: 100%;
   }
-
+/*Хаанаас-Хаашаа-Хэзээ-Юу хэсэг байна.*/
   .middle-row {
     display: flex;
     flex-wrap: wrap;
@@ -662,7 +662,7 @@ home-page {
     main {
       padding-top: var(--home-pad-top);
     }
-
+/*Үндсэн бараагаа сонгох хэсэг*/
     .filter-section {
       margin: var(--section-margin-x);
       padding: var(--section-padding-y) var(--section-padding-x);
@@ -672,7 +672,7 @@ home-page {
     .middle-row {
       gap: var(--row-gap);
     }
-
+    /*Нийт захиалгатай байгаа бараануудыг харуулах хэсэг*/
     .offers-container {
       margin: var(--offers-margin-y) var(--offers-margin-x);
       padding: var(--delivery-cart-padding);
@@ -794,7 +794,7 @@ home-page {
       font-weight: 700;
       white-space: nowrap;
     }
-
+    /*Сагсны хэсэг байгаа*/
     .cart {
       width: 90%;
       padding: var(--cart-padding-compact);

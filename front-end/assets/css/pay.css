@@ -78,6 +78,7 @@
 }
 
 /* ===== Blocks ===== */
+/*Төлбөр төлөх хэсэг*/
 .block h4 {
   margin: 0 0 12px;
   font-size: 1rem;
@@ -85,6 +86,7 @@
 }
 
 /* ===== Plan cards ===== */
+/*Санал болгож буй хувилбарууд */
 .plan-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

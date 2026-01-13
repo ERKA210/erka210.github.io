@@ -21,7 +21,7 @@ delivery-page {
     justify-content: space-between;
     align-items: center;
   }
-
+/*Миний сонгосон захиалгын жагсаалт харуулах хэсэг*/
   .orders {
     grid-area: ord;
     flex: 1;
@@ -88,7 +88,7 @@ delivery-page {
   .view-btn:hover {
     background: --color-hover;
   }
-
+/*Миний сонгосон захиалгын захиалагчийн мэдээллийг харуулах хэсэг*/
   .details {
     grid-area: det;
     flex: 1.5;
@@ -98,7 +98,7 @@ delivery-page {
     padding: 30px;
     width: 100%;
   }
-
+/*Миний сонгосон захиалгын захиалагчид явцын харуулах хэсэг*/
   .order-step {
     grid-area: stp;
     flex: 0.8;
