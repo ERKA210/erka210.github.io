@@ -220,6 +220,7 @@ class ShCart extends HTMLElement {
     escapeHtml(s) {
         return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
+
 }
 
 window.customElements.define('sh-cart', ShCart);
