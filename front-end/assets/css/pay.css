@@ -1,15 +1,3 @@
-/* ===== Root vars (site theme) ===== */
-:root {
-  --pay-bg: var(--color-bg);
-  --pay-card-bg: var(--color-surface);
-  --pay-text: var(--color-text);
-  --pay-muted: var(--color-muted);
-  --pay-primary: var(--color-accent);
-  --pay-primary-hover: #a00a27;
-  --pay-border: var(--color-border);
-  --pay-radius: var(--radius-lg);
-  --pay-shadow: var(--shadow-card);
-}
 
 /* ===== Page ===== */
 .pay-wrap {
@@ -18,16 +6,16 @@
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  background: var(--pay-bg);
+  background: var(--color-bg);
 }
 
 /* ===== Card ===== */
 .pay-card {
   width: 100%;
   max-width: 57.5rem;
-  background: var(--pay-card-bg);
-  border-radius: var(--pay-radius);
-  box-shadow: var(--pay-shadow);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
   padding: 1.75rem;
 }
 
@@ -42,7 +30,7 @@
 .pay-head h2 {
   margin: 0;
   font-size: 1.4rem;
-  color: var(--pay-text);
+  color: var(--color-text);
 }
 
 .btn-close {
@@ -50,17 +38,17 @@
   background: transparent;
   font-size: 1.3rem;
   cursor: pointer;
-  color: var(--pay-muted);
+  color: var(--color-muted);
 }
 
 .btn-close:hover {
-  color: var(--pay-text);
+  color: var(--color-text);
 }
 
 /* ===== Note ===== */
 .pay-note {
   margin: 0 0 1.375rem;
-  color: var(--pay-muted);
+  color: var(--color-muted);
   font-size: 0.95rem;
 }
 
@@ -82,7 +70,7 @@
 .block h4 {
   margin: 0 0 0.75rem;
   font-size: 1rem;
-  color: var(--pay-text);
+  color: var(--color-text);
 }
 
 /* ===== Plan cards ===== */
@@ -100,7 +88,7 @@
 }
 
 .plan-card {
-  border: 0.0625rem solid var(--pay-border);
+  border: 0.0625rem solid var(--color-border);
   border-radius: 0.75rem;
   padding: 0.875rem;
   cursor: pointer;
@@ -111,16 +99,16 @@
 }
 
 .plan-card:hover {
-  border-color: var(--pay-primary);
+  border-color: var(--color-accent);
 }
 
 .plan-card input {
-  accent-color: var(--pay-primary);
+  accent-color: var(--color-accent);
 }
 
 .plan-card input:checked + span {
   font-weight: 600;
-  color: var(--pay-primary);
+  color: var(--color-accent);
 }
 
 /* ===== Payment method ===== */
@@ -132,7 +120,7 @@
 }
 
 .method-card {
-  border: 0.0625rem solid var(--pay-border);
+  border: 0.0625rem solid var(--color-border);
   border-radius: 0.75rem;
   padding: 0.75rem;
   cursor: pointer;
@@ -142,12 +130,12 @@
 }
 
 .method-card input {
-  accent-color: var(--pay-primary);
+  accent-color: var(--color-accent);
 }
 
 .method-card input:checked + span {
   font-weight: 600;
-  color: var(--pay-primary);
+  color: var(--color-accent);
 }
 
 /* ===== Form ===== */
@@ -160,21 +148,21 @@
 
 .form-group label {
   font-size: 0.85rem;
-  color: var(--pay-muted);
+  color: var(--color-muted);
 }
 
 .form-group input {
   padding: 0.625rem 0.75rem;
   border-radius: 0.625rem;
-  border: 0.0625rem solid var(--pay-border);
+  border: 0.0625rem solid var(--color-border);
   font-size: 0.95rem;
-  background: var(--pay-card-bg);
-  color: var(--pay-text);
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: var(--pay-primary);
+  border-color: var(--color-accent);
 }
 
 .form-row {
@@ -185,7 +173,7 @@
 
 /* ===== QPay ===== */
 .qpay-box {
-  border: 0.0625rem dashed var(--pay-border);
+  border: 0.0625rem dashed var(--color-border);
   border-radius: 0.75rem;
   padding: 1rem;
   display: flex;
@@ -202,7 +190,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  color: var(--pay-muted);
+  color: var(--color-muted);
 }
 
 /* ===== Actions ===== */
@@ -223,32 +211,32 @@
 }
 
 .btn-pay {
-  background: var(--pay-primary);
-  color: #fff;
+  background: var(--color-accent);
+  color: var(--color-surface);
 }
 
 .btn-pay:hover {
-  background: var(--pay-primary-hover);
+  background: var(--color-pay-primary-hover);
 }
 
 .btn-pay:disabled {
-  background: #9ca3af;
+  background: var(--color-100);
   cursor: not-allowed;
 }
 
 .btn-go {
-  background: #10b981;
-  color: #fff;
+  background: var(--color-pay-confirm);
+  color: var(--color-surface);
 }
 
 .btn-go:hover {
-  background: #059669;
+  background: var(--color-pay-confirm-hover);
 }
 
 /* ===== Status ===== */
 .status {
   font-size: 0.9rem;
-  color: #059669;
+  color: var(--color-pay-confirm-hover);
   font-weight: 600;
 }
 
@@ -259,20 +247,20 @@
   .form-group input,
   .qpay-box {
     background: var(--color-bg-light);
-    border-color: var(--pay-border);
-    color: var(--pay-text);
+    border-color: var(--color-border);
+    color: var(--color-text);
   }
 
   .form-group input::placeholder {
-    color: var(--pay-muted);
+    color: var(--color-muted);
   }
 
   .qpay-qr {
     background: var(--color-bg);
-    color: var(--pay-muted);
+    color: var(--color-muted);
   }
 
   .status {
-    color: #34d399;
+    color: var(--color-pay-status);
   }
 }

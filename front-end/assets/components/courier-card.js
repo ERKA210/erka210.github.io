@@ -1,4 +1,4 @@
-const API = "http://localhost:3000";
+import { apiFetch } from "../api_client.js";
 
 class Couriers extends HTMLElement {
   connectedCallback() {
@@ -8,12 +8,12 @@ class Couriers extends HTMLElement {
 
   async loadCourier() {
     try {
-      const me = await fetch(`${API}/api/auth/me`);
+      const me = await apiFetch("/api/auth/me");
       if (me.ok) {
         const payload = await me.json();
         const user = payload?.user || null;
         if (user?.role === "courier") {
-          const r = await fetch(`${API}/api/courier/me`);
+          const r = await apiFetch("/api/courier/me");
           if (r.ok) {
             const courier = await r.json();
             if (courier) {

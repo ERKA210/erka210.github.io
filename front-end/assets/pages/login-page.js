@@ -1,6 +1,7 @@
+import { apiFetch } from "../api_client.js";
+
 class LoginPage extends HTMLElement {
   connectedCallback() {
-    const API = "http://localhost:3000";
     this.currentMode = "login";
     this.currentRole = "customer";
     this.innerHTML = `
@@ -34,9 +35,7 @@ class LoginPage extends HTMLElement {
             </button>
           </div>
         </div>
-
-        <div class="auth-layout">
-          <form>
+        <form class="auth-layout">
           <input class="register-only" type="hidden" name="role" value="customer">
           <div class="form-group register-only">
             <label for="name">Нэр</label>
@@ -68,65 +67,6 @@ class LoginPage extends HTMLElement {
             </button>
           </div>
           </form>
-
-          <div class="payment-section" hidden>
-            <h4 class="section-title">Хүргэгчийн төлбөр</h4>
-            <p class="section-note">Төлбөрөө сонгоод дараа нь төлнө үү.</p>
-            <div class="plan-grid">
-              <label class="plan-card">
-                <input type="radio" name="paymentPlan" value="monthly" checked>
-                <span>Сард 3000₮</span>
-              </label>
-              <label class="plan-card">
-                <input type="radio" name="paymentPlan" value="two-months">
-                <span>2 сард 5000₮</span>
-              </label>
-              <label class="plan-card">
-                <input type="radio" name="paymentPlan" value="two-weeks">
-                <span>14 хоногт 2000₮</span>
-              </label>
-            </div>
-            <div class="method-grid">
-              <label class="method-card">
-                <input type="radio" name="paymentMethod" value="card" checked>
-                <span>Картаар төлөх</span>
-              </label>
-              <label class="method-card">
-                <input type="radio" name="paymentMethod" value="qpay">
-                <span>QPay-р төлөх</span>
-              </label>
-            </div>
-            <div class="payment-details payment-details--card">
-              <div class="form-group">
-                <label for="cardNumber">Картын дугаар</label>
-                <input id="cardNumber" type="text" inputmode="numeric" placeholder="0000 0000 0000 0000">
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="cardExp">Дуусах хугацаа</label>
-                  <input id="cardExp" type="text" placeholder="MM/YY">
-                </div>
-                <div class="form-group">
-                  <label for="cardCvv">CVV</label>
-                  <input id="cardCvv" type="password" inputmode="numeric" placeholder="***">
-                </div>
-              </div>
-            </div>
-            <div class="payment-details payment-details--qpay" hidden>
-              <div class="qpay-box">
-                <div class="qpay-qr">QR</div>
-                <div>
-                  <strong>QPay төлбөр</strong>
-                  <p>QR код уншуулж төлнө үү.</p>
-                </div>
-              </div>
-            </div>
-            <div class="payment-actions">
-              <button class="pay-btn" type="button">Төлбөр төлөх</button>
-              <p class="pay-status" hidden>Төлбөр төлөгдсөн.</p>
-            </div>
-          </div>
-        </div>
       </div>
   <div class="scene">
     <div class="delivery-man">
@@ -157,14 +97,7 @@ class LoginPage extends HTMLElement {
     const phoneInput = this.querySelector("#phone");
     const studentInput = this.querySelector("#studentId");
     const registerOnlyBlocks = this.querySelectorAll(".register-only");
-    const paymentSection = this.querySelector(".payment-section");
-    const paymentMethods = this.querySelectorAll('input[name="paymentMethod"]');
-    const payBtn = this.querySelector(".pay-btn");
-    const payStatus = this.querySelector(".pay-status");
-    const isPaid = () =>
-      localStorage.getItem("courierPaid") === "1";
-
-
+    
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
         location.hash = "#home";
@@ -188,10 +121,7 @@ class LoginPage extends HTMLElement {
         if (isRegister && roleInput) {
           roleInput.value = this.currentRole;
         }
-        this.classList.remove("show-payment");
-        if (paymentSection) paymentSection.hidden = true;
-        if (payStatus) payStatus.hidden = true;
-        if (payBtn) payBtn.disabled = false;
+      
         if (nameInput) nameInput.required = isRegister;
         if (studentInput) studentInput.required = false;
         if (phoneInput) phoneInput.required = true;
@@ -227,10 +157,6 @@ class LoginPage extends HTMLElement {
         if (submitBtn) {
           submitBtn.textContent = role === "courier" ? "Хүргэгчээр бүртгүүлэх" : "Хэрэглэгчээр бүртгүүлэх";
         }
-        this.classList.remove("show-payment");
-        if (paymentSection) paymentSection.hidden = true;
-        if (payStatus) payStatus.hidden = true;
-        if (payBtn) payBtn.disabled = false;
       });
     });
 
@@ -269,25 +195,6 @@ class LoginPage extends HTMLElement {
     }
     if (nameInput) nameInput.required = this.currentMode === "register";
 
-    if (payBtn) {
-      payBtn.addEventListener("click", () => {
-        localStorage.setItem("courierPaid", "1"); payBtn.disabled = true;
-        if (payStatus) payStatus.hidden = false;
-      });
-    }
-
-    if (paymentMethods.length && paymentSection) {
-      paymentMethods.forEach((input) => {
-        input.addEventListener("change", () => {
-          const method = this.querySelector('input[name="paymentMethod"]:checked')?.value || "card";
-          const card = this.querySelector(".payment-details--card");
-          const qpay = this.querySelector(".payment-details--qpay");
-          if (card) card.hidden = method !== "card";
-          if (qpay) qpay.hidden = method !== "qpay";
-        });
-      });
-    }
-
     if (form) {
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -302,10 +209,9 @@ class LoginPage extends HTMLElement {
         const fullName = name.trim() || "Зочин хэрэглэгч";
 
         try {
-          const res = await fetch(`${API}/api/auth/login`, {
+          const res = await apiFetch("/api/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            credentials: "include",
             body: JSON.stringify({
               name: fullName,
               phone,

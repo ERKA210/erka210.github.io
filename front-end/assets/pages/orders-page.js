@@ -1,4 +1,4 @@
-const API = "http://localhost:3000";
+import { apiFetch, API_BASE } from "../api_client.js";
 
 class OrdersPage extends HTMLElement {
   connectedCallback() {
@@ -152,7 +152,7 @@ class OrdersPage extends HTMLElement {
 
     let userId = "";
     try {
-      const resUser = await fetch("/api/auth/me", { credentials: "include" });
+      const resUser = await apiFetch("/api/auth/me");
       if (resUser.ok) {
         const data = await resUser.json();
         userId = data?.user?.id || "";
@@ -169,7 +169,7 @@ class OrdersPage extends HTMLElement {
     const qs = `?customerId=${encodeURIComponent(userId)}`;
 
     try {
-      const res = await fetch(`${API}/api/orders${qs}`, { credentials: "include" });
+      const res = await apiFetch(`/api/orders${qs}`);
       const data = await res.json().catch(() => ([]));
       if (!res.ok) throw new Error(data?.error || "Алдаа");
 
@@ -368,9 +368,8 @@ class OrdersPage extends HTMLElement {
         }
 
         try {
-          const res = await fetch("/api/ratings", {
+          const res = await apiFetch("/api/ratings", {
             method: "POST",
-            credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ orderId, stars: rating, comment }),
           });
@@ -388,7 +387,7 @@ class OrdersPage extends HTMLElement {
           window.dispatchEvent(new Event("reviews-updated"));
 
           try {
-            await fetch("/api/delivery-cart", { method: "DELETE", credentials: "include" });
+            await apiFetch("/api/delivery-cart", { method: "DELETE" });
           } catch {
             // ignore
           }
@@ -420,7 +419,7 @@ class OrdersPage extends HTMLElement {
     if (!window.EventSource) return;
     if (this.orderStream) return;
 
-    this.orderStream = new EventSource(`${API}/api/orders/stream`);
+    this.orderStream = new EventSource(`${API_BASE}/api/orders/stream`);
 
     this.handleOrderStatusEvent = (e) => {
       try {

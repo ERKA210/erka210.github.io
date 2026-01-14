@@ -5,6 +5,12 @@
   --color-border: #e0e0e0;
   --color-text: #333;
   --color-muted: #777;
+  --color-100: #9ca3af;
+  --color-pay-confirm: #10b981;
+  --color-pay-confirm-hover: #059669;
+  --color-pay-status: #34d399;
+  --color-pay-primary-hover: #a00a27;
+
 
   --color-surface: #fff;        
   --color-surface-hover: #f5f5f5;
@@ -14,20 +20,20 @@
   --color-shadow-accent-2: rgba(201, 13, 48, 0.25);
 
   --font-family: "Roboto", "Poppins", sans-serif;
-  --font-size-base: 14px;
+  --font-size-base: 1rem;
   --font-size-sm: 0.875rem;
   --font-size-action: 0.9rem;
   --font-size-tab: 0.75rem;
 
-  --font-weight-medium: 500;
-  --font-weight-bold: 600;
+  --font-weight-500: 500;
+  --font-weight-600: 600;
   --font-weight-700: 700;
 
-  --radius: 8px;
-  --radius-lg: 14px;
+  --radius: 0.5rem;
+  --radius-lg: 0.875rem;
   --radius-dropdown: 0.75rem;
   --radius-action: 0.5rem;
-  --radius-round: 999px;
+  --radius-round: 62.4rem;
 
   --shadow-light: 0 2px 5px rgba(0, 0, 0, 0.05);
   --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.08);
@@ -38,30 +44,12 @@
   --transition-fast: 0.2s ease;
   --transition-route: 0.45s ease;
 
-  --top-h: 4rem;
-  --container-pad-x: 1.25rem;
-  --gap-top: 1rem;
-  --main-top-gap: 0.75rem;
-
-  --border-w: 0.0625rem; 
-  --border-w-active: 0.125rem; 
-
-  --pad-link-y: 0.375rem;
   --pad-link-x: 0.8rem;
-
-  --pad-btn-y: 0.625rem;
-  --pad-btn-x: 1.25rem;
-
-  --pad-dropdown: 0.5rem;
-  --pad-action-y: 0.5rem;
-  --pad-action-x: 0.75rem;
 
   --avatar-size: 2.5rem;
   --logo-h: 4rem;
   --logo-h-sm: 3rem;
 
-  --mobile-nav-pad-top: 0.75rem;
-  --mobile-nav-pad-x: 1rem;
   --mobile-nav-active-lift: -1.2rem;
   --mobile-nav-bubble: 5rem;
   --mobile-nav-bubble-bottom: -0.4rem;
@@ -73,6 +61,26 @@
   --padding-1: 0.625rem 1.25rem;
 
   --bp-md: 54rem;
+
+  --default-rem--2: 5rem;
+  --default-rem--3: 4.75rem;
+  --default-rem--4: 4.5rem;
+  --default-rem--5: 4.25rem;
+  --default-rem--1: 4rem;
+  --default-rem-0: 3rem;
+  --default-rem: 2rem;
+  --default-rem-1: 1.75rem;
+  --default-rem-2: 1.5rem;
+  --default-rem-3: 1.25rem;
+  --default-rem-4: 1rem;
+  --default-rem-5: 0.875rem;
+  --default-rem-6: 0.75rem;
+  --default-rem-7: 0.625rem;
+  --default-rem-8: 0.5rem;
+  --default-rem-9: 0.375rem;
+  --default-rem-10: 0.25rem;
+  --default-rem-11: 0.125rem;
+  --default-rem-12: 0.0625rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -164,14 +172,14 @@
   top: 0;
   left: 0;
   right: 0;
-  height: var(--top-h);
+  height: var(--default-rem--1);
   background: var(--color-bg);
-  border-bottom: var(--border-w) solid var(--color-border);
+  border-bottom: var(--default-rem-12) solid var(--color-border);
   z-index: 1000;
   display: flex;
   align-items: center;
-  padding: 0 var(--container-pad-x);
-  gap: var(--gap-top);
+  padding: 0 var(--default-rem-3);
+  gap: var(--default-rem-4);
 }
 
 .site-top .brand {
@@ -195,10 +203,10 @@
 .top-menu a {
   text-decoration: none;
   color: var(--color-text);
-  font-weight: var(--font-weight-medium);
-  padding: var(--pad-link-y) var(--pad-link-x);
+  font-weight: var(--font-weight-500);
+  padding: var(--default-rem-9) var(--pad-link-x);
   line-height: 1;
-  border-bottom: var(--border-w-active) solid transparent;
+  border-bottom: var(--default-rem-11) solid transparent;
   transition: var(--transition-fast);
 }
 
@@ -215,7 +223,7 @@
 }
 
 main {
-  padding-top: calc(var(--top-h) + var(--main-top-gap));
+  padding-top: 4.75rem;
 }
 
 @keyframes r {
@@ -270,7 +278,7 @@ num-router > [data-route].is-leaving {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-dropdown);
   box-shadow: var(--shadow-card);
-  padding: var(--pad-dropdown);
+  padding: var(--default-rem-8);
   opacity: 0;
   transform: translateY(-0.4rem);
   pointer-events: none;
@@ -281,13 +289,13 @@ num-router > [data-route].is-leaving {
 .header-actions .avatar-action {
   width: 100%;
   text-align: left;
-  padding: var(--pad-action-y) var(--pad-action-x);
+  padding: var(--default-rem-8) var(--default-rem-6);
   background: transparent;
   border: none;
   border-radius: var(--radius-action);
   color: var(--color-text);
   font-size: var(--font-size-action);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-500);
   cursor: pointer;
 }
 
@@ -304,13 +312,13 @@ num-router > [data-route].is-leaving {
 }
 
 .header-actions .logout-btn {
-  padding: var(--pad-btn-y) var(--pad-btn-x);
+  padding: var(--default-rem-7) var(--default-rem-3);
   background: var(--color-surface);
   color: var(--color-text);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-500);
   cursor: pointer;
   transition: var(--transition-fast);
   white-space: nowrap;
@@ -336,7 +344,7 @@ num-router > [data-route].is-leaving {
   border: none;
   border-radius: var(--radius);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-500);
   cursor: pointer;
   transition: var(--transition-fast);
   white-space: nowrap;
@@ -387,10 +395,10 @@ num-router > [data-route].is-leaving {
     display: flex;
     justify-content: space-around;
     align-items: flex-end;
-    padding: var(--mobile-nav-pad-top) var(--mobile-nav-pad-x)
-      calc(var(--mobile-nav-pad-top) + env(safe-area-inset-bottom));
+    padding: var(--default-rem-6) var(--default-rem-4)
+      calc(var(--default-rem-6) + env(safe-area-inset-bottom));
     background: var(--color-bg);
-    border-top: var(--border-w) solid var(--color-border);
+    border-top: var(--default-rem-12) solid var(--color-border);
     z-index: 900;
   }
 

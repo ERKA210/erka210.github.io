@@ -1,3 +1,5 @@
+import { apiFetch } from "../api_client.js";
+
 class OfferModal extends HTMLElement {
   constructor() {
     super();
@@ -6,16 +8,15 @@ class OfferModal extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    this.cacheEls();
-    this.bindEvents();
+    this.elements();
+    this.attachEvents();
   }
 
   render() {
-    this.API = "http://localhost:3000";
     this.shadowRoot.innerHTML = `
       <style>
         :host {
-          --accent: var(--color-accent, #c90d30);
+          --accent: #c90d30;
           --radius: 14px;
           --text: #1f2937;
           --muted: #6b7280;
@@ -277,7 +278,7 @@ class OfferModal extends HTMLElement {
     `;
   }
 
-  cacheEls() {
+  elements() {
     this.modal = this.shadowRoot.querySelector('.modal');
     this.card = this.shadowRoot.querySelector('.card');
     this.titleEl = this.shadowRoot.getElementById('title');
@@ -295,7 +296,7 @@ class OfferModal extends HTMLElement {
     this.confirmBtn = this.shadowRoot.querySelector('.confirm');
   }
 
-  bindEvents() {
+  attachEvents() {
     this.closeBtn.addEventListener('click', () => this.close());
     this.modal.addEventListener('click', (e) => {
       if (e.target === this.modal) this.close();
@@ -431,7 +432,7 @@ class OfferModal extends HTMLElement {
 
     if (orderId) {
       try {
-        const assignRes = await fetch(`${this.API}/api/orders/${orderId}/assign-courier`, {
+        const assignRes = await apiFetch(`/api/orders/${orderId}/assign-courier`, {
           method: "POST",
           credentials: "include",
         });
@@ -463,7 +464,7 @@ class OfferModal extends HTMLElement {
     this.removeOfferFromList(this.currentData);
 
     try {
-      const res = await fetch(`${this.API}/api/courier/me`, {
+      const res = await apiFetch("/api/courier/me", {
         credentials: "include",
       });
 
@@ -529,7 +530,7 @@ class OfferModal extends HTMLElement {
 
   async cancelOrderOnServer(orderId) {
     try {
-      const res = await fetch(`${this.API}/api/orders/${orderId}`, {
+      const res = await apiFetch(`/api/orders/${orderId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -555,7 +556,7 @@ class OfferModal extends HTMLElement {
     const price = data.price || '';
     const orderId = data.orderId || data.id || null;
     try {
-      const res = await fetch(`${this.API}/api/delivery-cart`, {
+      const res = await apiFetch("/api/delivery-cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -586,7 +587,7 @@ class OfferModal extends HTMLElement {
 
   async saveActiveOrder(order) {
     try {
-      await fetch(`${this.API}/api/active-order`, {
+      await apiFetch("/api/active-order", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ order }),
@@ -599,7 +600,7 @@ class OfferModal extends HTMLElement {
   async fetchCurrentUser() {
     if (this.currentUser) return this.currentUser;
     try {
-      const res = await fetch(`${this.API}/api/auth/me`, {
+      const res = await apiFetch("/api/auth/me", {
         credentials: "include",
       });
       if (!res.ok) {
