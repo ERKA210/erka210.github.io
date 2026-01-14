@@ -340,7 +340,7 @@ num-router > [data-route].is-leaving {
 .header-actions .login-btn {
   padding: var(--padding-1);
   background: var(--color-accent);
-  color: var(--color-surface);
+  color: #fff;
   border: none;
   border-radius: var(--radius);
   font-size: var(--font-size-sm);

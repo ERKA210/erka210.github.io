@@ -226,7 +226,7 @@ orders-page {
     margin-top: 30px;
     padding: 12px 40px;
     background: var(--color-primary);
-    color: var(--color-bg);
+    color: #fff;
     border: none;
     border-radius: 25px;
     cursor: pointer;

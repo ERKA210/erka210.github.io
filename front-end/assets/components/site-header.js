@@ -241,7 +241,6 @@ class SiteHeader extends HTMLElement {
 
     const current = location.hash || '#home';
     const allowed = new Set(this.getNavLinks().map((link) => link.href));
-    // allow system routes even if not in nav
     allowed.add("#pay");
     allowed.add("#login");
     if (!allowed.size) return;
@@ -254,6 +253,11 @@ class SiteHeader extends HTMLElement {
       const href = a.getAttribute('href');
       a.classList.toggle('is-active', href === current);
     });
+
+    const loginBtn = this.querySelector(".login-btn");
+    if (loginBtn) {
+      loginBtn.style.display = current === "#login" ? "none" : "";
+    }
 
   }
 }

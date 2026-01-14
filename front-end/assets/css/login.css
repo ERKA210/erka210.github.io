@@ -1,14 +1,10 @@
 login-page {
-    --login-card-border-color: var(--color-border);
-    --login-card-shadow: var(--shadow-light);
     --login-subtitle-bg: rgba(17, 24, 39, 0.06);
     --login-tabs-bg: #f3f4f6;
     --login-tabs-border: rgba(148, 163, 184, 0.5);
-    --login-tabs-indicator-bg: #fff;
-    --login-tabs-indicator-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
-    --login-tabs-courier-bg: #c90d30;
+    --login-tabs-indicator-shadow: 0 0.125rem 0.375rem rgba(15, 23, 42, 0.2);
     --login-tabs-courier-border: rgba(201, 13, 48, 0.6);
-    --login-tab-active-shadow: 0 6px 14px rgba(17, 24, 39, 0.08);
+    --login-tab-active-shadow: 0 0.375rem 0.875rem rgba(17, 24, 39, 0.08);
     display: flex;
     justify-content: center;
     body {
@@ -17,32 +13,32 @@ login-page {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 32px;
+        padding: 2rem;
         color: var(--color-text);
         font-family: sans-serif;
     }
 
     .card {
-        backdrop-filter: blur(6px);
+        backdrop-filter: blur(0.375rem);
         z-index: 10;
         width: 50%;
-        border: 1px solid var(--login-card-border-color);
+        border: 0.0625rem solid var(--color-border);
         background: var(--color-bg);
-        border-radius: 18px;
-        box-shadow: var(--login-card-shadow);
-        padding: 22px;
+        border-radius: 1.125rem;
+        box-shadow: var(--shadow-light);
+        padding: 1.375rem;
     }
 
     .close {
-        font-size: 18px;
+        font-size: 1.125rem;
         float: right;
         color: var(--color-muted);
         cursor: pointer;
     }
 
     h1 {
-        font-size: 18px;
-        margin: 0 0 14px 0;
+        font-size: 1.125rem;
+        margin: 0 0 0.875rem 0;
         font-weight: 600
     }
 
@@ -50,18 +46,18 @@ login-page {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
+        gap: 0.625rem;
         flex-wrap: wrap;
-        margin-bottom: 18px;
+        margin-bottom: 1.125rem;
     }
 
     .subtitle {
         color: var(--color-muted);
-        font-size: 13px;
+        font-size: 0.8125rem;
         margin: 0;
         display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
+        padding: 0.25rem 0.625rem;
+        border-radius: 62.4375rem;
         background: var(--login-subtitle-bg);
     }
 /*Нэвтрэх, Бүртгүүлэх хэсэг*/
@@ -69,35 +65,35 @@ login-page {
     .login-tabs {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 6px;
+        gap: 0.375rem;
         background: var(--color-bg-light);
-        border-radius: 12px;
-        padding: 6px;
-        margin-bottom: 14px;
+        border-radius: 0.75rem;
+        padding: 0.375rem;
+        margin-bottom: 0.875rem;
     }
 
     .login-tabs {
         position: relative;
         gap: 0;
-        padding: 2px;
-        height: 22px;
-        border-radius: 999px;
+        padding: 0.125rem;
+        height: 1.375rem;
+        border-radius: 62.4375rem;
         background: var(--login-tabs-bg);
-        border: 1px solid var(--login-tabs-border);
+        border: 0.0625rem solid var(--login-tabs-border);
         overflow: hidden;
         margin-bottom: 0;
-        min-width: 58px;
+        min-width: 3.625rem;
     }
 
     .login-tabs::before {
         content: "";
         position: absolute;
-        top: 2px;
-        left: 2px;
-        width: calc(50% - 2px);
-        height: calc(100% - 4px);
-        border-radius: 999px;
-        background: var(--login-tabs-indicator-bg);
+        top: 0.125rem;
+        left: 0.125rem;
+        width: calc(50% - 0.125rem);
+        height: calc(100% - 0.25rem);
+        border-radius: 62.4375rem;
+        background: var(--color-surface);
         box-shadow: var(--login-tabs-indicator-shadow);
         transition: transform 0.25s ease;
     }
@@ -107,7 +103,7 @@ login-page {
     }
 
     .login-tabs[data-active-role="courier"] {
-        background: var(--login-tabs-courier-bg);
+        background: var(--color-accent);
         border-color: var(--login-tabs-courier-border);
     }
 
@@ -117,7 +113,7 @@ login-page {
         font-size: 0;
         padding: 0;
         height: 100%;
-        border-radius: 999px;
+        border-radius: 62.4375rem;
         color: transparent;
     }
 
@@ -130,10 +126,10 @@ login-page {
     .tab-btn {
         border: 0;
         background: transparent;
-        padding: 10px 12px;
-        border-radius: 10px;
+        padding: 0.625rem 0.75rem;
+        border-radius: 0.625rem;
         font-weight: 700;
-        font-size: 13px;
+        font-size: 0.8125rem;
         cursor: pointer;
         color: var(--color-muted);
         transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
@@ -152,7 +148,7 @@ login-page {
     }
 
     .form-group {
-        margin-bottom: 14px;
+        margin-bottom: 0.5rem;
         display: flex;
         flex-direction: column;
     }
@@ -160,44 +156,44 @@ login-page {
     .auth-layout {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 18px;
+        gap: 0.625rem;
         align-items: start;
     }
 
     .form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: 0.5rem;
     }
 
     label {
-        margin-bottom: 5px;
-        font-size: 13px;
+        margin-bottom: 0.1875rem;
+        font-size: 0.8125rem;
         color: var(--color-muted);
     }
 
     input {
-        padding: 10px 12px;
-        border: 1px solid var(--color-border);
+        padding: 0.625rem 0.75rem;
+        border: 0.0625rem solid var(--color-border);
         background: var(--color-bg);
         color: var(--color-text);
-        border-radius: 10px;
-        font-size: 14px;
+        border-radius: 0.625rem;
+        font-size: 0.875rem;
         outline: none;
     }
 
     .phone-wrap {
         display: flex;
-        gap: 10px;
+        gap: 0.5rem;
     }
 
     .country {
-        flex: 0 0 130px;
+        flex: 0 0 8.125rem;
         display: flex;
         align-items: center;
-        border: 1px solid var(--color-muted);
-        padding: 8px 10px;
-        border-radius: 10px;
+        border: 0.0625rem solid var(--color-muted);
+        padding: 0.5rem 0.625rem;
+        border-radius: 0.625rem;
         background: var(--color-bg-light);
     }
 
@@ -206,88 +202,94 @@ login-page {
         border: 0;
         background: transparent;
         outline: none;
-        font-size: 14px;
+        font-size: 0.875rem;
     }
 
     .phone {
         flex: 1;
-        padding: 10px;
-        border-radius: 10px;
-        border: 1px solid var(--color-border);
+        padding: 0.625rem;
+        border-radius: 0.625rem;
+        border: 0.0625rem solid var(--color-border);
     }
 
     .continue-btn {
         width: 100%;
-        margin-top: 12px;
-        padding: 12px 14px;
+        margin-top: 0.5rem;
+        padding: 0.75rem 0.875rem;
         background: var(--color-accent);
         color: white;
         border: 0;
-        border-radius: 10px;
+        border-radius: 0.625rem;
         font-weight: 600;
         cursor: pointer;
         box-shadow: var(--shadow-card);
     }
 
-    @media (max-width: 720px) {
+    @media (max-width: 54rem) {
         .auth-layout {
             grid-template-columns: 1fr;
+        }
+        login-page.show-payment .auth-layout {
+            grid-template-columns: 1fr;
+        }
+        login-page.show-payment form {
+            transform: none;
         }
     }
 
     .or {
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin: 18px 0;
+        gap: 0.625rem;
+        margin: 1.125rem 0;
         color: var(--color-muted);
-        font-size: 13px
+        font-size: 0.8125rem
     }
 
     .or::before,
     .or::after {
         content: "";
         flex: 1;
-        height: 1px;
+        height: 0.0625rem;
         background: var(--color-border)
     }
 
     .social {
         display: grid;
-        gap: 10px;
+        gap: 0.625rem;
     }
 
     .btn-social {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 10px 12px;
-        border-radius: 10px;
-        border: 1px solid var(--color-border);
+        gap: 0.75rem;
+        padding: 0.625rem 0.75rem;
+        border-radius: 0.625rem;
+        border: 0.0625rem solid var(--color-border);
         background: var(--color-bg);
         cursor: pointer;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 0.875rem;
     }
 
     .btn-social img {
-        width: 30px;
-        height: 30px;
+        width: 1.875rem;
+        height: 1.875rem;
     }
 
     .privacy {
-        font-size: 11px;
+        font-size: 0.6875rem;
         color: var(--color-muted);
-        margin-top: 10px;
+        margin-top: 0.625rem;
     }
 
-    @media (max-width:420px) {
+    @media (max-width: 54rem ) {
         .card {
             width: 92vw
         }
 
         .country {
-            flex-basis: 110px
+            flex-basis: 6.875rem
         }
     }
 }
@@ -301,22 +303,22 @@ body {
   z-index: 1;
   position: fixed;
   width: 100%;
-  height: 300px;
-  margin-top: 100px;
+  height: 18.75rem;
+  margin-top: 6.25rem;
   pointer-events: none;
 }
 
 /* Ард талын animation хэсэг*/
 .delivery-man {
   position: absolute;
-  left: -100px;
+  left: -6.25rem;
   animation: walk 8s linear infinite;
 }
 
 /* Head */
 .head {
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   background: #f1c27d;
   border-radius: 50%;
   margin: 0 auto;
@@ -324,59 +326,59 @@ body {
 
 /* Body */
 .body {
-  width: 50px;
-  height: 70px;
+  width: 3.125rem;
+  height: 4.375rem;
   background: #2f80ed;
   margin: 0 auto;
-  border-radius: 10px;
+  border-radius: 0.625rem;
 }
 
 /* Arms */
 .arm {
-  width: 12px;
-  height: 50px;
+  width: 0.75rem;
+  height: 3.125rem;
   background: #f1c27d;
   position: absolute;
-  top: 50px;
+  top: 3.125rem;
   transform-origin: top;
 }
 
 .arm.left {
-  left: -10px;
+  left: -0.625rem;
   animation: armMove 0.8s infinite alternate;
 }
 
 .arm.right {
-  right: -10px;
+  right: -0.625rem;
   animation: armMove 0.8s infinite alternate-reverse;
 }
 
 /* Legs */
 .leg {
-  width: 14px;
-  height: 60px;
+  width: 0.875rem;
+  height: 3.75rem;
   background: #333;
   position: absolute;
-  top: 110px;
+  top: 6.875rem;
   transform-origin: top;
 }
 
 .leg.left {
-  left: 5px;
+  left: 0.3125rem;
   animation: legMove 0.8s infinite alternate;
 }
 
 .leg.right {
-  right: 5px;
+  right: 0.3125rem;
   animation: legMove 0.8s infinite alternate-reverse;
 }
 
 /* Box */
 .box {
   position: absolute;
-  right: -40px;
-  top: 70px;
-  font-size: 30px;
+  right: -2.5rem;
+  top: 4.375rem;
+  font-size: 1.875rem;
 }
 
 /* Animations */
@@ -400,7 +402,7 @@ body {
 
 @keyframes walk {
   from {
-    left: -100px;
+    left: -6.25rem;
   }
   to {
     left: 100%;
