@@ -193,14 +193,14 @@ class HomePage extends HTMLElement {
 
   async onFromPlaceChange(e) {
     const placeId = e?.target?.value;
-    console.log(placeId, "pp");
+    // console.log(placeId, "pp");
     if (!placeId || !this.whatSel) return;
 
     try {
       const res = await apiFetch(`/api/menus/${placeId}`);
       if (!res.ok) return;
       const data = await res.json();
-      const items = Array.isArray(data?.menu_json) ? data.menu_json : [];
+      const items = data.menu_json || [];
 
       this.fromMenuSelect(items);
     } catch (err) {
