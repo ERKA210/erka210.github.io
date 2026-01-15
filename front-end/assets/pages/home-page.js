@@ -2,17 +2,22 @@ import { apiFetch } from "../api_client.js";
 
 class HomePage extends HTMLElement {
   connectedCallback() {
+    /* nevtersn herglgch */
     this.currentUser = null;
+    /* batalgaajuulhaas umnh zahialgiin medeellig hdglna */
     this.pendingOrder = null;
+    /* batalgaajuulh modald hrgdh offer iin delgerngui*/
     this.pendingOffer = null;
+    /* home ru orsn data neg udaa acaalna */
     this._loaded = false;
-    this.handleRouteChange = this.handleRouteChange?.bind(this) || (() => this.onRouteChange());
+
+    this.handleRouteChange = () => this.onRouteChange();
     window.addEventListener("hashchange", this.handleRouteChange);
 
     this.render();
-    this.cacheEls();
-    this.bindConfirmModal();
-    this.bindEvents();
+    this.Element_qs();
+    this.confirmModal_events();
+    this.events();
     this.handleRouteChange();
   }
 
@@ -31,11 +36,13 @@ class HomePage extends HTMLElement {
   }
 
   onRouteChange() {
-    if ((location.hash || "#home") !== "#home") return;
-    if (this._loaded) return;
+    if (location.hash !== "#home" && location.hash !== "") return;
+    if (this._loaded === true) return;
+    // console.log(this._loaded);
     this._loaded = true;
-      this.loadPlaces();
-      this.hydrateCustomerFromDb();
+    // console.log(this._loaded);
+      this.load_places();
+      this.check_customer();
   }
 
   render() {
@@ -91,14 +98,14 @@ class HomePage extends HTMLElement {
     `;
   }
 
-  cacheEls() {
+  Element_qs() {
     this.fromSel = this.querySelector("#fromPlace");
     this.toSel = this.querySelector("#toPlace");
     this.whatSel = this.querySelector("#what");
     this.orderBtn = this.querySelector(".order-btn");
   }
 
-  bindEvents() {
+  events() {
     this.handleOrderClick = () => this.prepareOrder();
     this.handleFromChange = (e) => this.onFromPlaceChange(e);
 
@@ -110,7 +117,7 @@ class HomePage extends HTMLElement {
     }
   }
 
-  bindConfirmModal() {
+  confirmModal_events() {
     this.confirmModal = this.querySelector("confirm-modal");
     if (!this.confirmModal) return;
     this.handleConfirm = () => this.confirmOrder();
@@ -119,23 +126,27 @@ class HomePage extends HTMLElement {
     this.confirmModal.addEventListener("cancel", this.handleCancel);
   }
 
-  async hydrateCustomerFromDb() {
+  async check_customer() {
     const user = await this.fetchCurrentUser();
     if (!user?.id) return;
 
     try {
       await this.syncCustomerInfo(user.id);
+      // console.log(user.id);
     } catch (e) {
-      console.error("Failed to sync customer info:", e);
+      console.error("herglegch shlghd aldaa grla", e);
     }
   }
 
   async fetchCurrentUser() {
-    if (this.currentUser) return this.currentUser;
+    if (this.currentUser !== null) return this.currentUser;
+    // console.log(this.currentUser);
     try {
       const res = await apiFetch("/api/auth/me");
       if (!res.ok) return null;
+      // console.log(res);
       const data = await res.json();
+      // console.log(data);
       this.currentUser = data?.user || null;
       return this.currentUser;
     } catch {
@@ -148,12 +159,13 @@ class HomePage extends HTMLElement {
     const res = await apiFetch(`/api/customers/${userId}`);
     if (!res.ok) return;
     const data = await res.json();
+    
     if (data) {
       window.dispatchEvent(new Event("user-updated"));
     }
   }
 
-  async loadPlaces() {
+  async load_places() {
     try {
       const [fromRes, toRes] = await Promise.all([
         apiFetch("/api/from-places"),
@@ -162,18 +174,17 @@ class HomePage extends HTMLElement {
       if (!fromRes.ok || !toRes.ok) return;
 
       const [from, to] = await Promise.all([fromRes.json(), toRes.json()]);
-      this.fillPlaceSelect(this.fromSel, from, "Хаанаас", (p) =>
-        `${p.name}${p.detail ? " - " + p.detail : ""}`
-      );
+      this.fillPlaceSelect(this.fromSel, from, "Хаанаас", (p) => p.name);
       this.fillPlaceSelect(this.toSel, to, "Хаашаа", (p) => p.name);
     } catch (e) {
-      console.warn("Failed to load places:", e);
+      console.warn("gzr acaalh aldaa:", e);
     }
   }
 
   fillPlaceSelect(select, items, placeholder, labelFn) {
     if (!select) return;
-    const list = Array.isArray(items) ? items : [];
+    const list = items || [];
+    // console.log(list, "ll");
     select.innerHTML = `<option value="" disabled selected hidden>${placeholder}</option>`;
     select.innerHTML += list
       .map((p) => `<option value="${p.id}">${labelFn(p)}</option>`)
@@ -182,6 +193,7 @@ class HomePage extends HTMLElement {
 
   async onFromPlaceChange(e) {
     const placeId = e?.target?.value;
+    console.log(placeId, "pp");
     if (!placeId || !this.whatSel) return;
 
     try {
@@ -190,13 +202,13 @@ class HomePage extends HTMLElement {
       const data = await res.json();
       const items = Array.isArray(data?.menu_json) ? data.menu_json : [];
 
-      this.populateMenuSelect(items);
+      this.fromMenuSelect(items);
     } catch (err) {
-      console.warn("Failed to load menu:", err);
+      console.warn("menu acaalh aldaa:", err);
     }
   }
 
-  populateMenuSelect(items) {
+  fromMenuSelect(items) {
     if (!this.whatSel) return;
     const foods = items.filter((i) => i.category === "food");
     const drinks = items.filter((i) => i.category === "drink");

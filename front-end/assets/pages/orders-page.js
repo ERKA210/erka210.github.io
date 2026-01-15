@@ -1,4 +1,4 @@
-import { apiFetch, API_BASE } from "../api_client.js";
+import { apiFetch, API } from "../api_client.js";
 
 class OrdersPage extends HTMLElement {
   connectedCallback() {
@@ -419,7 +419,7 @@ class OrdersPage extends HTMLElement {
     if (!window.EventSource) return;
     if (this.orderStream) return;
 
-    this.orderStream = new EventSource(`${API_BASE}/api/orders/stream`);
+    this.orderStream = new EventSource(`${API}/api/orders/stream`);
 
     this.handleOrderStatusEvent = (e) => {
       try {
