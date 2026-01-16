@@ -1,5 +1,7 @@
 import { apiFetch } from "../api_client.js";
 import "./offer-card.js";
+import { formatPrice, formatMetaFromDate } from "./format-d-ts-p.js";
+import { escapeAttr } from "./escape-attr.js";
 
 class OffersList extends HTMLElement {
   connectedCallback() {
@@ -33,29 +35,29 @@ class OffersList extends HTMLElement {
     `;
   }
 
-  set items(list) {
-    this.renderItems(list);
+  set items(items) {
+    this.renderItems(items);
   }
 
-  renderItems(list) {
+  renderItems(items) {
     const row = this.querySelector(".offers-row");
-    if (!row) return;
-    const items = Array.isArray(list) ? list : [];
     row.innerHTML = items.map(renderOfferCard).join("");
   }
 
   handleOfferSelect(event) {
     const modal = document.querySelector("offer-modal");
-    if (!modal || typeof modal.show !== "function") return;
+    if (!modal) return;
     modal.show(event.detail);
   }
 
   onRouteChange() {
-    if ((location.hash || "#home") !== "#home") return;
-    if (this._loaded) return;
+    if (location.hash !== "#home" && location.hash !== "") return;
+    if (this._loaded === true) return;
     this._loaded = true;
+    //localstorage dahi offer local object n
     const local = readLocalOffers();
-    this.renderItems(local.length ? local : SEED_OFFERS);
+    // console.log("local offers", local);
+    this.renderItems(local);
     loadOffers();
   }
 }
@@ -114,13 +116,14 @@ const SEED_OFFERS = [
 ];
 
 function renderOfferCard(item) {
-  const thumb = escapeAttr(item.thumb || "assets/img/box.svg");
-  const title = escapeAttr(item.title || "");
-  const meta = escapeAttr(item.meta || "");
-  const price = escapeAttr(item.price || "");
-  const orderId = escapeAttr(item.orderId || item.id || "");
+  const thumb = item.thumb || "assets/img/document.svg";
+  const title = item.title || "";
+  const meta = item.meta || "";
+  const price = item.price || "";
+  const orderId = item.orderId || item.id || "";
   const sub = escapeAttr(JSON.stringify(item.sub || []));
   const customer = escapeAttr(JSON.stringify(item.customer || {}));
+  // console.log("rendering offer card", item);
 
   return `
     <offer-card
@@ -135,60 +138,34 @@ function renderOfferCard(item) {
   `;
 }
 
-function escapeAttr(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function formatMetaFromDate(ts) {
-  const d = new Date(ts);
-  if (Number.isNaN(d.getTime())) return "";
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const yy = String(d.getFullYear()).slice(-2);
-  const hh = String(d.getHours()).padStart(2, "0");
-  const min = String(d.getMinutes()).padStart(2, "0");
-  return `${mm}/${dd}/${yy}  •${hh}:${min}`;
-}
 
 function parseMetaDate(metaString) {
   try {
-    const parts = String(metaString || "").split("•");
-    if (parts.length < 2) return null;
+    const parts = String(metaString).split("•");
 
-    const [datePart, timePart] = parts.map((p) => p.trim());
+    // console.log("parsing meta date", metaString, parts);
+
+    const [datePart, timePart] = parts;
     const [month, day, year] = datePart.split("/");
     const [hours, minutes] = timePart.split(":");
     const fullYear = 2000 + Number.parseInt(year, 10);
 
+
     return new Date(fullYear, Number(month) - 1, Number(day), Number(hours), Number(minutes));
   } catch (e) {
-    console.error("Error parsing date from meta:", e, metaString);
-    return null;
+    console.error("date error shu:", e, metaString);
   }
 }
 
 function parseOrderTimestamp(order) {
-  const raw =
-    order?.scheduled_at ||
-    order?.scheduledAt ||
-    order?.created_at ||
-    order?.createdAt ||
-    order?.meta ||
-    null;
-
+  const raw =order?.scheduled_at;
   if (!raw) return null;
 
   const parsed = Date.parse(raw);
-  if (!Number.isNaN(parsed)) return parsed;
+  if (!isNaN(parsed)) return parsed;
 
-  if (typeof raw === "string") {
-    const metaDate = parseMetaDate(raw);
-    if (metaDate) return metaDate.getTime();
-  }
+  const metaDate = parseMetaDate(raw);
+  if (metaDate) return metaDate.getTime();
 
   return null;
 }
@@ -199,12 +176,8 @@ function isOrderExpired(order) {
   return ts < Date.now();
 }
 
-function formatPrice(amount) {
-  return Number(amount || 0).toLocaleString("mn-MN") + "₮";
-}
-
 function getDeliveryIcon(totalQty) {
-  if (totalQty > 10) return DELIVERY_ICONS.large;
+  if (totalQty > 5) return DELIVERY_ICONS.large;
   if (totalQty >= 2) return DELIVERY_ICONS.medium;
   if (totalQty === 1) return DELIVERY_ICONS.single;
   return DELIVERY_ICONS.large;
@@ -213,7 +186,7 @@ function getDeliveryIcon(totalQty) {
 function buildOrderTitle(order) {
   const from = order?.from_name || "";
   const to = order?.to_name || "";
-  return [from, to].filter(Boolean).join(" - ");
+  return [from, to].filter(v => v !== "").join(" - ");
 }
 
 function mapOrdersToOffers(orders) {
@@ -223,27 +196,29 @@ function mapOrdersToOffers(orders) {
   return list
     .filter((order) => {
      const status = order?.status;
-    //  console.log(status, "ss")
-      if (status === "delivered" || status === "cancelled" || status === "canceled") return false;
+    // console.log(status, "ss")
+      if (status === "delivered" || status === "cancelled") return false;
       if (order?.courier) return false;
       return !isOrderExpired(order);
     })
     .map((order) => {
+      
       const items = order?.items;
-      const totalQty = items.reduce((sum, it) => sum + (Number(it?.qty) || 0), 0);
+      const totalQty = items.reduce((sum, it) => sum + (it?.qty??0), 0);
+      // console.log("qty too bnu", totalQty); 
       const sub = items.map((it) => ({
-        name: `${it?.name || ""} x${it?.qty || 1}`.trim(),
-        price: "",
+        name: `${it?.name} x${it?.qty}`,
       }));
-      const ts = parseOrderTimestamp(order);
 
+      const ts = parseOrderTimestamp(order);
+  
       return {
         orderId: order?.id || "",
         title: buildOrderTitle(order),
-        meta: ts ? formatMetaFromDate(ts) : "",
-        price: formatPrice(order?.total_amount || 0),
+        meta: formatMetaFromDate(ts),
+        price: formatPrice(order?.total_amount),
         thumb: getDeliveryIcon(totalQty),
-        customer: order?.customer || {},
+        customer: order?.customer,
         sub,
       };
     });
@@ -251,11 +226,8 @@ function mapOrdersToOffers(orders) {
 
 async function fetchOffersFromApi() {
   const res = await apiFetch("/api/orders");
-  const data = await res.json().catch(() => []);
-  if (!res.ok) {
-    throw new Error(data?.error || "Failed to load orders");
-  }
-  if (!Array.isArray(data)) return [];
+  if (!res.ok) return [];
+  const data = await res.json();
   return mapOrdersToOffers(data);
 }
 

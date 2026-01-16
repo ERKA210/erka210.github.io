@@ -1,4 +1,5 @@
 import { apiFetch } from "../api_client.js";
+import { formatMeta, formatPrice } from "../components/format-d-ts-p.js";
 
 class HomePage extends HTMLElement {
   connectedCallback() {
@@ -236,22 +237,6 @@ class HomePage extends HTMLElement {
     this.whatSel.appendChild(group);
   }
 
-  formatPrice(n) {
-    return Number(n || 0).toLocaleString("mn-MN") + "₮";
-  }
-
-  formatMeta(ts) {
-    const d = new Date(ts);
-    if (isNaN(d.getTime())) return "";
-    const date = d.toLocaleDateString("en-US", {
-      month: "2-digit",
-      day: "2-digit",
-      year: "2-digit",
-    });
-    const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    return `${date} • ${time}`;
-  }
-
   getScheduledAtISO() {
     const picker = this.querySelector("date-time-picker");
     const dateVal = picker?.shadowRoot?.querySelector(".date")?.value;
@@ -430,11 +415,11 @@ class HomePage extends HTMLElement {
     existingOffers.unshift({
       ...this.pendingOffer,
       orderId: data.orderId,
-      meta: this.formatMeta(this.pendingOrder.createdAt),
+      meta: formatMeta(this.pendingOrder.createdAt),
       from: this.pendingOrder.from,
       to: this.pendingOrder.to,
       title: `${this.pendingOrder.from} - ${this.pendingOrder.to}`,
-      price: this.formatPrice((data?.total ?? this.pendingOffer.total) || 0),
+      price: formatPrice((data?.total ?? this.pendingOffer.total) || 0),
       thumb: this.pendingOffer.thumb || "assets/img/box.svg",
       customer: {
         name: user.name,
@@ -444,7 +429,7 @@ class HomePage extends HTMLElement {
       },
       sub: this.pendingOffer.items.map((it) => ({
         name: `${it.name} x${it.qty}`,
-        price: this.formatPrice(it.price * it.qty),
+        price: formatPrice(it.price * it.qty),
       })),
     });
 
