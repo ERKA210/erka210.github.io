@@ -6,7 +6,7 @@ class HomePage extends HTMLElement {
     this.currentUser = null;
     /* batalgaajuulhaas umnh zahialgiin medeellig hdglna */
     this.pendingOrder = null;
-    /* batalgaajuulh modald hrgdh offer iin delgerngui*/
+    /* batalgaajuulh modald hrgdh sags iin delgerngui*/
     this.pendingOffer = null;
     /* home ru orsn data neg udaa acaalna */
     this._loaded = false;
@@ -87,7 +87,7 @@ class HomePage extends HTMLElement {
 
       <div class="offers-layout">
         <div class="offers-panel">
-          <offers-list id="offers"></offers-list>
+          <offers-list></offers-list>
         </div>
         <aside class="delivery-cart-panel">
           <delivery-cart></delivery-cart>
@@ -221,9 +221,10 @@ class HomePage extends HTMLElement {
   }
 
   appendMenuGroup(label, items) {
-    if (!items.length || !this.whatSel) return;
+    if (items.length===0 || !this.whatSel) return;
     const group = document.createElement("optgroup");
     group.label = label;
+    
     items.forEach((item) => {
       const opt = document.createElement("option");
       opt.value = item.id;
@@ -265,7 +266,7 @@ class HomePage extends HTMLElement {
   }
 
   hideConfirmModal() {
-    if (this.confirmModal && typeof this.confirmModal.close === "function") {
+    if (this.confirmModal?.close) {
       this.confirmModal.close();
     }
     this.pendingOrder = null;
@@ -285,38 +286,34 @@ class HomePage extends HTMLElement {
     }
 
     const cartSummary = this.getCartSummary();
-    const itemOpt = this.whatSel.selectedOptions?.[0];
 
-    if (cartSummary.totalQty === 0 && (!itemOpt || !itemOpt.value)) {
+    if (cartSummary.totalQty === 0) {
       alert("Юуг (хоол/бараа) сонгоно уу");
       return;
     }
 
-    const { fromName, fromDetail } = this.parseFromPlace(this.fromSel);
     const scheduledAt = this.getScheduledAtISO();
-    const items = cartSummary.totalQty > 0
-      ? this.buildItemsFromCart(cartSummary)
-      : this.buildSingleItem(itemOpt);
+
+    const items = this.buildItemsFromCart(cartSummary);
+    // console.log(cartSummary.items, "ii");
+
 
     this.pendingOrder = {
       fromId: this.fromSel.value,
       toId: this.toSel.value,
-      from: fromName,
-      fromDetail,
+      from: this.fromSel.selectedOptions[0].textContent,
       to: this.toSel.selectedOptions[0].textContent,
       createdAt: scheduledAt,
     };
 
     this.pendingOffer = {
       items,
-      total: cartSummary.totalQty > 0
-        ? cartSummary.total
-        : items.reduce((sum, it) => sum + (it.price * it.qty), 0),
+      total: cartSummary.total,
       deliveryFee: cartSummary.totalQty > 0 ? cartSummary.deliveryFee : 500,
-      thumb: cartSummary.deliveryIcon || "assets/img/box.svg",
+      thumb: cartSummary.deliveryIcon || "assets/img/document.svg",
     };
 
-    if (this.confirmModal && typeof this.confirmModal.open === "function") {
+    if (this.confirmModal?.open) {
       this.confirmModal.open(this.pendingOrder, this.pendingOffer);
     }
   }
@@ -326,32 +323,13 @@ class HomePage extends HTMLElement {
     return cartEl?.getSummary() || { totalQty: 0, items: [], total: 0, deliveryFee: 0 };
   }
 
-  parseFromPlace(select) {
-    const raw = select.selectedOptions[0].textContent || "";
-    const parts = raw.split(" - ");
-    return {
-      fromName: parts[0] || raw,
-      fromDetail: parts[1] || "",
-    };
-  }
-
   buildItemsFromCart(cartSummary) {
     return cartSummary.items.map((it) => ({
-      id: it.key || it.name,
+      id: it.name,
       name: it.name,
-      price: Number(it.unitPrice ?? it.price ?? 0),
+      price: it.price,
       qty: it.qty,
     }));
-  }
-
-  buildSingleItem(itemOpt) {
-    if (!itemOpt) return [];
-    return [{
-      id: itemOpt.value,
-      name: (itemOpt.textContent || "").split(" — ")[0],
-      price: Number(itemOpt.dataset.price || 0),
-      qty: 1,
-    }];
   }
 
   async confirmOrder() {
@@ -374,21 +352,18 @@ class HomePage extends HTMLElement {
       return;
     }
 
-    if (!Array.isArray(this.pendingOffer.items) || this.pendingOffer.items.length === 0) {
+    if (this.pendingOffer.items.length === 0) {
       alert("Сагс хоосон байна");
       return;
     }
 
     const safeItems = this.pendingOffer.items
       .map((i) => {
-        const unitPrice = Number(i.price);
-        const qty = Number(i.qty);
         return {
           menuItemKey: i.id,
           name: i.name,
-          unitPrice: Number.isFinite(unitPrice) ? unitPrice : 0,
-          qty: Number.isFinite(qty) && qty > 0 ? qty : 1,
-          options: {},
+          unitPrice: i.price,
+          qty: i.qty,
         };
       })
       .filter((i) => i.qty > 0);
@@ -398,12 +373,11 @@ class HomePage extends HTMLElement {
       fromPlaceId: this.pendingOrder.fromId,
       toPlaceId: this.pendingOrder.toId,
       scheduledAt: this.pendingOrder.createdAt,
-      deliveryFee: Number.isFinite(this.pendingOffer.deliveryFee) ? this.pendingOffer.deliveryFee : 0,
+      deliveryFee: this.pendingOffer.deliveryFee,
       items: safeItems,
-      customerName: user.name || "Зочин хэрэглэгч",
-      customerPhone: user.phone || "00000000",
-      customerStudentId: user.student_id || "",
-      note: this.pendingOrder.fromDetail ? `Pickup: ${this.pendingOrder.fromDetail}` : null,
+      customerName: user.name,
+      customerPhone: user.phone,
+      customerStudentId: user.student_id,
     };
 
     try {
@@ -413,24 +387,22 @@ class HomePage extends HTMLElement {
         body: JSON.stringify(payload),
       });
 
-      const data = await resp.json().catch(() => ({}));
+      const data = await resp.json();
       if (!resp.ok) {
         alert(data?.error || "Захиалга үүсгэхэд алдаа гарлаа");
         return;
       }
 
-      if (data?.customerId) {
-        this.syncCustomerInfo(data.customerId);
-      }
-
       const activeOrder = {
         ...this.pendingOrder,
         customer: {
-          name: user.name || "Зочин хэрэглэгч",
-          phone: user.phone || "00000000",
-          studentId: user.student_id || "",
+          name: user.name,
+          phone: user.phone,
+          studentId: user.student_id,
         },
       };
+
+      // console.log(activeOrder, "aa");
 
       try {
         await apiFetch("/api/active-order", {
@@ -439,7 +411,7 @@ class HomePage extends HTMLElement {
           body: JSON.stringify({ order: activeOrder }),
         });
       } catch {
-        // ignore
+        
       }
 
       window.NumAppState?.setState("customer", "order_created");
@@ -460,15 +432,14 @@ class HomePage extends HTMLElement {
       orderId: data.orderId,
       meta: this.formatMeta(this.pendingOrder.createdAt),
       from: this.pendingOrder.from,
-      fromDetail: this.pendingOrder.fromDetail,
       to: this.pendingOrder.to,
       title: `${this.pendingOrder.from} - ${this.pendingOrder.to}`,
       price: this.formatPrice((data?.total ?? this.pendingOffer.total) || 0),
       thumb: this.pendingOffer.thumb || "assets/img/box.svg",
       customer: {
-        name: user.name || "Зочин хэрэглэгч",
-        phone: user.phone || "00000000",
-        studentId: user.student_id || "",
+        name: user.name,
+        phone: user.phone,
+        studentId: user.student_id,
         avatar: user.avatar || "assets/img/profile.jpg",
       },
       sub: this.pendingOffer.items.map((it) => ({
@@ -478,16 +449,15 @@ class HomePage extends HTMLElement {
     });
 
     localStorage.setItem("offers", JSON.stringify(existingOffers));
-    const offersEl = this.querySelector("#offers");
-    if (offersEl && "items" in offersEl) {
+    const offersEl = this.querySelector("offers-list");
+    if ("items" in offersEl) {
       offersEl.items = existingOffers;
     }
     window.dispatchEvent(new Event("offers-updated"));
   }
 
   scrollOffersIntoView() {
-    const offersSection = document.querySelector("#offers");
-    if (!offersSection || !offersSection.scrollIntoView) return;
+    const offersSection = document.querySelector("offers-list");
     setTimeout(() => {
       offersSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 150);
