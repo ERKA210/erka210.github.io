@@ -7,7 +7,7 @@ class DeliveryOrderPage extends HTMLElement {
           <h2>Миний захиалга</h2>
           <sh-cart></sh-cart>
 
-          <couriers-card></couriers-card>
+          <courier-card></courier-card>
         </section>
 
         <order-progress id="progress"></order-progress>
@@ -15,7 +15,7 @@ class DeliveryOrderPage extends HTMLElement {
         <rating-stars max="5" color="orange" size="28px"></rating-stars>
       `;
 
-        // Rating event
+
         this.querySelector('rating-stars').addEventListener('rate', e => {
           console.log("Үнэлгээ:", e.detail);
         });

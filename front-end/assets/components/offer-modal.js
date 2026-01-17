@@ -310,7 +310,6 @@ class OfferModal extends HTMLElement {
     this.confirmBtn.addEventListener('click', () => this.handleConfirm());
   }
 
-  // Offers жагсаалтыг шинэчлэх туслах арга
   refreshOffersList() {
     window.dispatchEvent(new Event('offers-updated'));
   }

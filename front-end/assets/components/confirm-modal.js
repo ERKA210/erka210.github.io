@@ -174,7 +174,7 @@ class ConfirmModal extends HTMLElement {
   }
 
   open(order, summary) {
-    console.log("confirm modal open", order, summary);
+    // console.log("confirm modal open", order, summary);
     if (!this.modal || !this.confirmTextEl) return;
     //zahialah button focus buyu keyb nii enter ajilldg bsn umnu n
     this._lastFocus = document.activeElement;
@@ -205,7 +205,7 @@ class ConfirmModal extends HTMLElement {
         <span class="total-price">${totalText}</span>
       </div>
     `;
-
+    //show class nemeed hidden attribute arilgana
     this.modal.removeAttribute("hidden");
     this.modal.classList.add("show");
     //confirm button enter,space darh uyd ajilldg bolgsn

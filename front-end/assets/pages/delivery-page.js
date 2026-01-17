@@ -179,7 +179,7 @@ class DeliveryPage extends HTMLElement {
       const qty = Number(item.qty || 1);
       const detailParts = [];
       if (item.meta) detailParts.push(item.meta);
-      console.log(item?.menuItemName);
+      // console.log(item?.menuItemName);
       if (qty) detailParts.push(`x${qty}`);
       const detail = detailParts.join(' • ');
 

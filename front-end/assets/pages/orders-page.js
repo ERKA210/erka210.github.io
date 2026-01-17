@@ -85,8 +85,6 @@ async loadCourierForOrder(order) {
     if (meRes.ok) {
       const { user } = await meRes.json();
       
-      console.log("Одоогийн хэрэглэгч:", user);
-      console.log("Захиалгын хүргэгч:", courier);
       // Хэрэв одоогийн хэрэглэгч хүргэгчтэй ижил бол хоосон харуул
       if (user && courier && String(user.id) === String(courier.id)) {
         box.setEmpty?.();
