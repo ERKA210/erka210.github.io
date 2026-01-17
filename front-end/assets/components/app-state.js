@@ -1,4 +1,3 @@
-// assets/components/app-state.js
 import { apiFetch } from "../api_client.js";
 const KEY = "appState";
 const VALID = new Set(["guest", "customer", "courier"]);

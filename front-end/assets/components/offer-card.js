@@ -7,7 +7,7 @@ class OfferCard extends HTMLElement {
     if (this._ready) return;
     this._ready = true;
     this.render();
-    this.attach();
+    this.events();
   }
 
   attributeChangedCallback() {
@@ -42,7 +42,7 @@ class OfferCard extends HTMLElement {
     `;
   }
 
-  attach() {
+  events() {
     this.addEventListener("click", () => {
       const detail = this.data;
       this.dispatchEvent(new CustomEvent("offer-select", { bubbles: true, detail }));
