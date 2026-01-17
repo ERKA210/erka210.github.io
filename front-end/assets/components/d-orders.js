@@ -1,4 +1,3 @@
-// assets/components/orders.js
 class DOrders extends HTMLElement {
   connectedCallback() {
     const isActive = this.hasAttribute('data-active');
@@ -37,16 +36,21 @@ class DOrders extends HTMLElement {
       const res = await fetch("/api/active-order");
       if (!res.ok) return;
       const data = await res.json();
+      console.log("active order data", data);
       const order = data?.order;
+      
       if (!order) return;
       const header = order.from && order.to ? `${order.from} → ${order.to}` : "";
       const detail = order.item || "";
+
+      console.log("detail", detail);
+      //haanaas-haashaa
       const titleEl = this.querySelector(".order-info h3");
+      //meta
       const detailEl = this.querySelector(".order-info p");
       if (titleEl) titleEl.textContent = header;
       if (detailEl) detailEl.textContent = detail;
     } catch (e) {
-      // ignore
     }
   }
 }

@@ -79,7 +79,7 @@ class ProfilePage extends HTMLElement {
         <div class="profile-hero">
           <div class="profile-hero__content">
             <div class="avatar-wrap">
-              <img src="${this.profileData.avatar || 'assets/img/profile.jpg'}" alt="Профайл зураг" class="avatar profile-avatar" width="120" height="120" decoding="async" />
+              <img src="${this.profileData.avatar || 'assets/img/profile.jpg'}" alt="Профайл зураг" class="avatar profile-avatar" width="40" height="40" decoding="async" />
             </div>
 
             <div class="profile-meta">

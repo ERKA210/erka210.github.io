@@ -1,3 +1,5 @@
+import { formatPrice, formatMetaFromDate } from "./format-d-ts-p";
+
 class ConfirmModal extends HTMLElement {
   constructor() {
     super();
@@ -6,8 +8,8 @@ class ConfirmModal extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    this.cacheEls();
-    this.bindEvents();
+    this.elements();
+    this.events();
   }
 
   render() {
@@ -100,6 +102,9 @@ class ConfirmModal extends HTMLElement {
           display: inline-block;
           min-width: 4.7rem;
         }
+        #confirm-modal .total-price {
+          color: var(--color-accent);
+        }
         @media (prefers-color-scheme: dark) {
           #confirm-modal .modal-content {
             background: #0f172a;
@@ -139,14 +144,14 @@ class ConfirmModal extends HTMLElement {
     `;
   }
 
-  cacheEls() {
+  elements() {
     this.modal = this.shadowRoot.querySelector("#confirm-modal");
     this.confirmTextEl = this.shadowRoot.querySelector("#confirm-text");
     this.cancelBtn = this.shadowRoot.querySelector("#cancel-order");
     this.confirmBtn = this.shadowRoot.querySelector("#confirm-order");
   }
 
-  bindEvents() {
+  events() {
     if (this.cancelBtn) {
       this.cancelBtn.addEventListener("click", () => {
         this.close();
@@ -168,49 +173,48 @@ class ConfirmModal extends HTMLElement {
     }
   }
 
-  formatPrice(n) {
-    return Number(n || 0).toLocaleString("mn-MN") + "₮";
-  }
-
   open(order, summary) {
+    console.log("confirm modal open", order, summary);
     if (!this.modal || !this.confirmTextEl) return;
+    //zahialah button focus buyu keyb nii enter ajilldg bsn umnu n
     this._lastFocus = document.activeElement;
 
     const items = summary?.items?.length
       ? summary.items.map((i) => `• ${i.name} — ${i.qty} ширхэг`).join("<br>")
       : "Бараа сонгогдоогүй";
 
-    const d = new Date(order.createdAt);
+    // console.log("summary total", summary?.total);
+    const totalText = formatPrice(summary.total ?? 0);
 
-    const totalRaw = summary?.total;
-    const totalText = Number.isFinite(Number(totalRaw))
-      ? this.formatPrice(Number(totalRaw))
-      : (totalRaw || "0₮");
+    const when = formatMetaFromDate(order.scheduledAt); 
+    const [dayText, timeText] = when ? when.split("•") : ["", ""];
 
     this.confirmTextEl.innerHTML = `
       <div class="detail-row">
         <strong>Хаанаас:</strong> ${order.from}<br>
         <strong>Хаашаа:</strong> ${order.to}<br>
-        <strong>Өдөр:</strong> ${order.createdAt.split("T")[0]}<br>
-        <strong>Цаг:</strong> ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+        <strong>Өдөр:</strong> ${dayText || "-"}<br>
+        <strong>Цаг:</strong> ${timeText || "-"}
       </div>
       <div class="detail-row">
         <strong>Таны хоол:</strong><br>
         ${items}
       </div>
       <div class="detail-row" style="text-align:center;">
-        <strong>Нийт үнэ:</strong> ${totalText}
+        <strong>Нийт үнэ:</strong> 
+        <span class="total-price">${totalText}</span>
       </div>
     `;
 
     this.modal.removeAttribute("hidden");
     this.modal.classList.add("show");
+    //confirm button enter,space darh uyd ajilldg bolgsn
     if (this.confirmBtn) this.confirmBtn.focus();
   }
 
   close() {
     if (!this.modal) return;
-    if (this._lastFocus && typeof this._lastFocus.focus === "function") {
+    if (this._lastFocus) {
       this._lastFocus.focus();
     }
     this.modal.classList.remove("show");

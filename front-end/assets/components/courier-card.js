@@ -1,65 +1,22 @@
 import { apiFetch } from "../api_client.js";
+import { escapeAttr } from "./escape-attr.js";
 
-class Couriers extends HTMLElement {
+class Courier extends HTMLElement {
   connectedCallback() {
-    this.render();
-    this.loadCourier();
+    this.setEmpty();
   }
 
-  async loadCourier() {
-    try {
-      const me = await apiFetch("/api/auth/me");
-      if (me.ok) {
-        const payload = await me.json();
-        const user = payload?.user || null;
-        if (user?.role === "courier") {
-          const r = await apiFetch("/api/courier/me");
-          if (r.ok) {
-            const courier = await r.json();
-            if (courier) {
-              this.setData(courier);
-              return;
-            }
-          }
-        }
-        if (user) {
-          this.setData(user);
-          return;
-        }
-      }
-      this.setEmpty();
-    } catch {
-      this.setEmpty();
-    }
-  }
-
-  render() {
-    this.innerHTML = `
-      <article class="courier-card">
-        <div class="delivery loading">
-          <div class="avatar skeleton"></div>
-          <div class="delivery-info">
-            <div class="line skeleton"></div>
-            <div class="line skeleton short"></div>
-            <div class="line skeleton short"></div>
-          </div>
-        </div>
-      </article>
-    `;
-  }
-
-  setData({ name, phone, courier_id, student_id, studentId, id }) {
-    const displayId = courier_id || student_id || studentId || id || "";
+  setData({ name, phone, student_id, id }) {
+    console.log("Courier data:", { name, phone, student_id, id });
+    
     this.innerHTML = `
       <article class="courier-card">
         <div class="delivery">
-          <div class="avatar">
-            <img src="assets/img/profile.jpg" alt="Хүргэгчийн зураг">
-          </div>
+          <img src="assets/img/profile.jpg" alt="Хүргэгчийн зураг">
           <div class="courier-info">
-            <h3>Нэр : ${this.escape(name || "Хүргэгч")}</h3>
-            <p>${phone ? `Утас: ${this.escape(phone || "Хүргэгч")}` : ""}</p>
-            <p>${displayId ? `ID: ${this.escape(displayId)}` : ""}</p>
+            <h3>Нэр: ${escapeAttr(name || "Хүргэгч")}</h3>
+            <p>Утас: ${escapeAttr(phone)}</p>
+            <p>ID: ${escapeAttr(student_id)}</p>
           </div>
         </div>
       </article>
@@ -69,21 +26,11 @@ class Couriers extends HTMLElement {
   setEmpty() {
     this.innerHTML = `
       <article class="courier-card">
-        <p class="muted">Хүргэгчийн мэдээлэл олдсонгүй.</p>
+        <p class="muted">Хүргэгч хүлээж аваагүй байна.</p>
       </article>
     `;
   }
-
-  escape(s) {
-    return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;");
-  }
-
-  generateDisplayId(name, phone) {
-    if (!name || !phone) return '';
-    const namePart = name.substring(0, 3).toUpperCase();
-    const phonePart = phone.substring(phone.length - 4);
-    return `${namePart}${phonePart}`;
-  }
+  
 }
 
-customElements.define("couriers-card", Couriers);
+customElements.define("courier-card", Courier);

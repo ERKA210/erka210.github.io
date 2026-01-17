@@ -256,49 +256,41 @@ function readRemovedOfferIds() {
   }
 }
 
-function readRemovedOfferKeys() {
-  const raw = localStorage.getItem(getRemovedStorageKey("removed_offer_keys"));
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw) || [];
-  } catch {
-    return [];
-  }
-}
-
 function filterRemovedOffers(offers) {
   const removedIds = readRemovedOfferIds();
-  const removedKeys = readRemovedOfferKeys();
-  if (!removedIds.length && !removedKeys.length) return offers;
+  if (!removedIds.length) return offers;
+
   return offers.filter((offer) => {
-    const offerId = offer?.orderId || offer?.id || null;
-    if (offerId && removedIds.includes(String(offerId))) return false;
-    const key = `${offer?.title || ""}|${offer?.meta || ""}|${offer?.price || ""}`;
-    return !removedKeys.includes(key);
+    const offerId = offer?.orderId ?? offer?.id ?? null;
+    if (!offerId) return true; 
+    return !removedIds.includes(String(offerId));
   });
 }
 
 function filterExpiredOffers(offers) {
   return offers.filter((offer) => {
     if (!offer?.meta) return true;
-    const parsed = parseMetaDate(offer.meta);
-    if (!parsed) return true;
-    return parsed.getTime() >= Date.now();
+
+    const date = parseMetaDate(offer.meta);
+    if (!date) return true;
+
+    return date.getTime() >= Date.now();
   });
 }
 
 async function loadOffers() {
   let offers = [];
+
   try {
     offers = await fetchOffersFromApi();
-  } catch {
-    offers = readLocalOffers();
+  } catch (err) {
+    console.error("Offers API-аас авахад алдаа:", err);
+    offers = [];
   }
-
-  if (!offers.length) offers = SEED_OFFERS;
-
   offers = filterExpiredOffers(offers);
+
   offers = filterRemovedOffers(offers);
+
   localStorage.setItem("offers", JSON.stringify(offers));
 
   document.querySelectorAll("offers-list").forEach((list) => {

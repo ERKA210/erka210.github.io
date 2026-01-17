@@ -288,7 +288,7 @@ class HomePage extends HTMLElement {
       toId: this.toSel.value,
       from: this.fromSel.selectedOptions[0].textContent,
       to: this.toSel.selectedOptions[0].textContent,
-      createdAt: scheduledAt,
+      scheduledAt: scheduledAt,
     };
 
     this.pendingOffer = {
@@ -357,7 +357,7 @@ class HomePage extends HTMLElement {
       customerId: user.id,
       fromPlaceId: this.pendingOrder.fromId,
       toPlaceId: this.pendingOrder.toId,
-      scheduledAt: this.pendingOrder.createdAt,
+      scheduledAt: this.pendingOrder.scheduledAt,
       deliveryFee: this.pendingOffer.deliveryFee,
       items: safeItems,
       customerName: user.name,
@@ -415,7 +415,7 @@ class HomePage extends HTMLElement {
     existingOffers.unshift({
       ...this.pendingOffer,
       orderId: data.orderId,
-      meta: formatMeta(this.pendingOrder.createdAt),
+      meta: formatMeta(this.pendingOrder.scheduledAt),
       from: this.pendingOrder.from,
       to: this.pendingOrder.to,
       title: `${this.pendingOrder.from} - ${this.pendingOrder.to}`,

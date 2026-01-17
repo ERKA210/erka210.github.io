@@ -1,4 +1,3 @@
-import '../js/api.js';
 import './site-header.js';
 import './num-router.js';
 import './state-ui.js';

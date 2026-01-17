@@ -49,7 +49,13 @@ orders-page {
     color: var(--color-text);
   }
   .courier-info h3{
-    height: 3rem;
+    margin-bottom: 5px;
+    font-size: 16px;
+  }
+  .courier-info p{
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-muted);
   }
   .order-list {
     display: flex;
@@ -391,7 +397,7 @@ order-progress {
   .delivery {
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    gap: 20px;
     border: 1px solid var(--color-accent);
     border-radius: var(--radius);
     padding: 15px;
@@ -538,11 +544,9 @@ order-progress {
     height: 5rem;
   }
   .delivery img {
-    width: 9rem;
-    height: 9rem;
-    border-radius: 100%;
-    margin-top: -10%;
-    margin-left: -5%;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
   }
 
   @media (max-width: 756px) {

@@ -62,10 +62,44 @@ class OrdersPage extends HTMLElement {
     box.setData?.(courier);
   }
 
-  async loadCourierForOrder(order) {
-    const courier = order?.courier || null;
-    this.renderCourier(courier);
+async loadCourierForOrder(order) {
+  const box = this.querySelector("#courierBox");
+  if (!box) return;
+  
+  // Захиалга байхгүй бол хоосон харуул
+  if (!order) {
+    box.setEmpty?.();
+    return;
   }
+  
+  // Хүргэгч байхгүй бол хоосон харуул
+  const courier = order?.courier || null;
+  if (!courier) {
+    box.setEmpty?.();
+    return;
+  }
+  
+  // Одоогийн хэрэглэгчийн мэдээлэл авах
+  try {
+    const meRes = await apiFetch("/api/auth/me");
+    if (meRes.ok) {
+      const { user } = await meRes.json();
+      
+      console.log("Одоогийн хэрэглэгч:", user);
+      console.log("Захиалгын хүргэгч:", courier);
+      // Хэрэв одоогийн хэрэглэгч хүргэгчтэй ижил бол хоосон харуул
+      if (user && courier && String(user.id) === String(courier.id)) {
+        box.setEmpty?.();
+        return;
+      }
+    }
+  } catch {
+    // Алдаа гарвал үргэлжлүүл
+  }
+  
+  // Өөр хүргэгч бол харуул
+  this.renderCourier(courier);
+}
 
   render() {
     this.innerHTML = `
@@ -79,7 +113,7 @@ class OrdersPage extends HTMLElement {
           </section>
 
           <section class="delivery-info">
-            <couriers-card id="courierBox"></couriers-card>
+            <courier-card id="courierBox"></courier-card>
           </section>
         </section>
 
@@ -177,7 +211,7 @@ class OrdersPage extends HTMLElement {
       const notRated = filtered.filter((o) => !this.isOrderRated(o.id));
 
       if (Array.isArray(data) && data.length > 0 && filtered.length === 0) {
-        window.NumAppState?.resetToGuest("order_expired");
+        window.NumAppState?.logout("order_expired");
       }
 
       this.renderOrders(notRated);
@@ -392,7 +426,7 @@ class OrdersPage extends HTMLElement {
             // ignore
           }
 
-          await window.NumAppState?.resetToGuest("rating_submitted");
+          await window.NumAppState?.logout("rating_submitted");
           window.dispatchEvent(new Event("delivery-cart-updated"));
           window.dispatchEvent(new Event("order-updated"));
           if (localStorage.getItem("authLoggedIn") === "1") {
