@@ -210,10 +210,6 @@ delivery-page {
     border-color: var(--color-accent);
   }
 
-  .step.active .step-indicator svg path {
-    fill: var(--color-bg);
-  }
-
   @media (prefers-color-scheme: dark) {
     .step.active .step-indicator svg path {
       fill: #fff;
@@ -231,19 +227,6 @@ delivery-page {
 
   .step.active .step-desc {
     visibility: inherit;
-  }
-
-  .next-btn {
-    margin-top: 30px;
-    padding: 12px 40px;
-    margin-left: 32px;
-    background: var(--color-accent);
-    color: #fff;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 15px;
-    transition: var(--transition);
   }
 
 
@@ -306,6 +289,7 @@ delivery-page {
     cursor: pointer;
     font-size: 15px;
     transition: var(--transition);
+    margin-left: 32px;
   }
 
   .next-btn:hover {

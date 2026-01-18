@@ -2,6 +2,10 @@ function formatPrice(amount) {
   return Number(amount || 0).toLocaleString("mn-MN") + "₮";
 }
 
+function parsePrice(str) {
+    return parseInt(String(str || "").replace(/[^\d]/g, ""), 10) || 0;
+  }
+
 function formatMeta(ts) {
   const d = new Date(ts);
   if (isNaN(d.getTime())) return "";
@@ -25,4 +29,4 @@ function formatMetaFromDate(ts) {
   return `${mm}/${dd}/${yy}•${hh}:${min}`;
 }
 
-export { formatMeta, formatMetaFromDate, formatPrice };
+export { formatMeta, formatMetaFromDate, formatPrice, parsePrice };

@@ -1,4 +1,4 @@
-import { formatPrice, formatMetaFromDate } from "./format-d-ts-p";
+import { formatPrice, formatMetaFromDate } from "../helper/format-d-ts-p";
 
 class ConfirmModal extends HTMLElement {
   constructor() {

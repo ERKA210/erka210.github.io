@@ -1,6 +1,5 @@
 /* Profile page */
 .profile-page {
-  --accent: #c90d30;
   --accent-2: #f65f7c;
   --card: #ffffff;
   --border: #e6eaf2;
@@ -314,12 +313,12 @@
   letter-spacing: 0.08em;
   font-size: 0.75rem;
   margin: 0;
-  color: var(--accent);
+  color: var(--color-accent);
   font-weight: 700;
 }
 
 .profile-page .accent-eyebrow {
-  color: var(--accent);
+  color: var(--color-accent);
   font-size: 1rem;
   letter-spacing: 0.08em;
   font-weight: 800;
@@ -407,7 +406,7 @@
 }
 
 .profile-page .btn.primary {
-  background: var(--accent);
+  background: var(--color-accent);
   color: #fff;
   box-shadow: 0 10px 25px rgba(201, 13, 48, 0.24);
 }
@@ -429,7 +428,7 @@
 }
 
 .profile-card .btn.ghost {
-  color: var(--accent);
+  color: var(--color-accent);
   border-color: rgba(201, 13, 48, 0.25);
 }
 
@@ -446,7 +445,7 @@
 
 .profile-page .ghost-btn.small {
   padding: 0.45rem 0.8rem;
-  color: var(--accent);
+  color: var(--color-accent);
   background: rgba(201, 13, 48, 0.08);
   border-color: rgba(201, 13, 48, 0.15);
 }
@@ -511,7 +510,7 @@
 
 .modal-title {
   margin: 0;
-  color: var(--accent);
+  color: var(--color-accent);
   font-size: 1.25rem;
   letter-spacing: 0.02em;
   font-weight: 800;

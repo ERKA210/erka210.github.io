@@ -57,6 +57,15 @@ class RatingStars extends HTMLElement {
       s.classList.toggle('filled', idx < count);
     });
   }
+
+  getValue() {
+    return this.value;
+  }
+
+  reset() {
+    this.value = 0;
+    this.updateStars(0);
+  }
 }
 
 customElements.define('rating-stars', RatingStars);

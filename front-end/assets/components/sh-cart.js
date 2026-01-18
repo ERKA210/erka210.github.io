@@ -1,3 +1,7 @@
+import { } from "../helper/escape-attr.js";
+import { getDeliveryIcon } from "../helper/delivery-icon.js";
+import { getDeliveryFee } from "../helper/delivery-fee.js";
+
 class ShCart extends HTMLElement {
     constructor() {
         super();
@@ -12,11 +16,6 @@ class ShCart extends HTMLElement {
             "Жүүс 0.33л": 2500
         };
 
-        this.deliveryIcons = {
-            single: 'assets/img/document.svg',  
-            medium: 'assets/img/tor.svg',       
-            large: 'assets/img/box.svg'         
-        };
     }
 
     connectedCallback() {
@@ -159,21 +158,7 @@ class ShCart extends HTMLElement {
             items.push({ name, qty, price: base, unitPrice: base });
         });
 
-        let deliveryFee = 0;
-        let iconSrc = 'assets/img/box.svg';
-        if (totalQty > 10) {
-            deliveryFee = 1500;
-            iconSrc = this.deliveryIcons.large;
-        } else if (totalQty >= 2) {
-            deliveryFee = 1000;
-            iconSrc = this.deliveryIcons.medium;
-        } else if (totalQty === 1) {
-            deliveryFee = 500;
-            iconSrc = this.deliveryIcons.single;
-        } else {
-            deliveryFee = 0;
-            iconSrc = 'assets/img/box.svg';
-        }
+        const deliveryFee = getDeliveryFee(totalQty);
 
         const deliveryText = itemsTotal > 0 ? this.formatPrice(deliveryFee) : '0₮';
         if (this.deliveryPriceEl) this.deliveryPriceEl.textContent = deliveryText;
@@ -183,10 +168,11 @@ class ShCart extends HTMLElement {
 
         if (this.cartBadge) this.cartBadge.textContent = String(totalQty);
 
-        if (this.deliveryImgEl) {
-            this.deliveryImgEl.src = itemsTotal > 0 ? iconSrc : 'assets/img/box.svg';
+        const iconSrc = getDeliveryIcon(totalQty);
+            if (this.deliveryImgEl) {
+            this.deliveryImgEl.src = iconSrc;
             this.deliveryImgEl.alt = `delivery tier ${totalQty}`;
-        }
+            }
 
         this.style.display = totalQty === 0 ? "none" : "block";
 

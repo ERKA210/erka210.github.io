@@ -9,7 +9,7 @@ class OfferModal extends HTMLElement {
   connectedCallback() {
     this.render();
     this.elements();
-    this.attachEvents();
+    this.events();
   }
 
   render() {
@@ -296,13 +296,11 @@ class OfferModal extends HTMLElement {
     this.confirmBtn = this.shadowRoot.querySelector('.confirm');
   }
 
-  attachEvents() {
+  events() {
     this.closeBtn.addEventListener('click', () => this.close());
     this.modal.addEventListener('click', (e) => {
       if (e.target === this.modal) this.close();
     });
-
-    // Устгах товч дарсан үед санал устгах
     this.deleteBtn.addEventListener('click', () => {
       this.handleDelete();
     });

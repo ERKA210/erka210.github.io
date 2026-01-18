@@ -1,7 +1,8 @@
 import { apiFetch } from "../api_client.js";
 import "./offer-card.js";
-import { formatPrice, formatMetaFromDate } from "./format-d-ts-p.js";
-import { escapeAttr } from "./escape-attr.js";
+import { formatPrice, formatMetaFromDate } from "../helper/format-d-ts-p.js";
+import { escapeAttr } from "../helper/escape-attr.js";
+import { getDeliveryIcon } from "../helper/delivery-icon.js";
 
 class OffersList extends HTMLElement {
   connectedCallback() {
@@ -66,11 +67,6 @@ if (!customElements.get("offers-list")) {
   customElements.define("offers-list", OffersList);
 }
 
-const DELIVERY_ICONS = {
-  single: "assets/img/document.svg",
-  medium: "assets/img/tor.svg",
-  large: "assets/img/box.svg",
-};
 
 const SEED_OFFERS = [
   {
@@ -174,13 +170,6 @@ function isOrderExpired(order) {
   const ts = parseOrderTimestamp(order);
   if (!ts) return true;
   return ts < Date.now();
-}
-
-function getDeliveryIcon(totalQty) {
-  if (totalQty > 5) return DELIVERY_ICONS.large;
-  if (totalQty >= 2) return DELIVERY_ICONS.medium;
-  if (totalQty === 1) return DELIVERY_ICONS.single;
-  return DELIVERY_ICONS.large;
 }
 
 function buildOrderTitle(order) {

@@ -2,6 +2,7 @@ class DateTimePicker extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+    // 30 sec tutmiin intervald tsag shinechlhd hdglh id huvisgch
     this._timer = null;
   }
 
@@ -126,14 +127,21 @@ class DateTimePicker extends HTMLElement {
   startAutoUpdate() {
     this._timer = setInterval(() => {
       this.updateToNow();
-    }, 1000 * 30); 
+    }, 1000 * 60); 
   }
 
   get value() {
     const d = this.shadowRoot.querySelector(".date").value;
     const t = this.shadowRoot.querySelector(".time").value;
-    return `${d} • ${t}`;
+    return `${d}•${t}`;
   }
+
+  get iso() {
+  const d = this.shadowRoot.querySelector(".date").value;
+  const t = this.shadowRoot.querySelector(".time").value;
+  const dt = new Date(`${d}T${t}:00`);
+  return isNaN(dt.getTime()) ? null : dt.toISOString();
+}
 }
 
 customElements.define("date-time-picker", DateTimePicker);

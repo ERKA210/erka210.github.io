@@ -1,5 +1,5 @@
 import { apiFetch } from "../api_client.js";
-import { formatMeta, formatPrice } from "../components/format-d-ts-p.js";
+import { formatMeta, formatPrice } from "../helper/format-d-ts-p.js";
 
 class HomePage extends HTMLElement {
   connectedCallback() {
@@ -238,16 +238,8 @@ class HomePage extends HTMLElement {
   }
 
   getScheduledAtISO() {
-    const picker = this.querySelector("date-time-picker");
-    const dateVal = picker?.shadowRoot?.querySelector(".date")?.value;
-    const timeVal = picker?.shadowRoot?.querySelector(".time")?.value;
-
-    if (dateVal && timeVal) {
-      const iso = new Date(`${dateVal}T${timeVal}:00`);
-      if (!isNaN(iso.getTime())) return iso.toISOString();
-    }
-
-    return new Date().toISOString();
+    const dateTimePicker = this.querySelector("date-time-picker");
+    return dateTimePicker?.iso;
   }
 
   hideConfirmModal() {

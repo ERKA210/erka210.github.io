@@ -1,5 +1,5 @@
 import { apiFetch } from "../api_client.js";
-import { escapeAttr } from "./escape-attr.js";
+import { escapeAttr } from "../helper/escape-attr.js";
 
 class Courier extends HTMLElement {
   connectedCallback() {

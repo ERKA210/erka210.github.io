@@ -1,42 +1,34 @@
+import { formatPrice, parsePrice } from "../helper/format-d-ts-p.js";
+import { escapeAttr } from "../helper/escape-attr.js";
+import { escapeHtml } from "../helper/escape-html.js";
+import { apiFetch } from "../api_client.js";
+
 class DeliveryCart extends HTMLElement {
   connectedCallback() {
-    this.scheduleIdle = this.scheduleIdle?.bind(this) || ((work) => {
-      if (typeof window.requestIdleCallback === "function") {
-        window.requestIdleCallback(() => work(), { timeout: 1200 });
-      } else {
-        setTimeout(work, 300);
-      }
-    });
-    this.handleUpdate = this.handleUpdate.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.handleViewportChange = this.handleViewportChange.bind(this);
-    this._loaded = false;
-    this.handleRouteChange = this.handleRouteChange?.bind(this) || (() => this.onRouteChange());
     this.render();
-    this.cacheEls();
-    this.addEventListener("click", this.handleClick);
-    window.addEventListener("delivery-cart-updated", this.handleUpdate);
-    window.addEventListener("hashchange", this.handleRouteChange);
-    this.mediaQuery = window.matchMedia("(max-width: 900px)");
-    this.mediaQuery.addEventListener("change", this.handleViewportChange);
-    this.handleViewportChange();
-    this.handleRouteChange();
+    this.elements();
+
+    this.onClick = (e) => this.handleClick(e);
+    this.onUpdated = () => this.load();
+    this.onHashChange = () => this.load();
+    this.onMediaChange = () => this.onViewportChange();
+
+    this.addEventListener("click", this.onClick);
+    window.addEventListener("delivery-cart-updated", this.onUpdated);
+    window.addEventListener("hashchange", this.onHashChange);
+
+    this.media = window.matchMedia("(max-width: 54rem)");
+    this.media.addEventListener("change", this.onMediaChange);
+
+    this.onViewportChange();
+    this.load();
   }
 
   disconnectedCallback() {
-    window.removeEventListener("delivery-cart-updated", this.handleUpdate);
-    window.removeEventListener("hashchange", this.handleRouteChange);
-    this.removeEventListener("click", this.handleClick);
-    if (this.mediaQuery) {
-      this.mediaQuery.removeEventListener("change", this.handleViewportChange);
-    }
-  }
-
-  onRouteChange() {
-    if ((location.hash || "#home") !== "#home") return;
-    if (this._loaded) return;
-    this._loaded = true;
-    this.scheduleIdle(() => this.load());
+    this.removeEventListener("click", this.onClick);
+    window.removeEventListener("delivery-cart-updated", this.onUpdated);
+    window.removeEventListener("hashchange", this.onHashChange);
+    if (this.media) this.media.removeEventListener("change", this.onMediaChange);
   }
 
   render() {
@@ -46,164 +38,163 @@ class DeliveryCart extends HTMLElement {
           <h3>Хүргэлтийн сагс</h3>
           <span class="delivery-cart__count">0</span>
         </div>
+
         <div class="delivery-cart__list"></div>
+
         <p class="delivery-cart__empty">Одоогоор хүргэлт сонгоогүй байна.</p>
+
         <button class="delivery-cart__go" type="button">Хүргэлт рүү</button>
       </div>
     `;
   }
 
-  cacheEls() {
+  elements() {
     this.listEl = this.querySelector(".delivery-cart__list");
     this.emptyEl = this.querySelector(".delivery-cart__empty");
     this.countEl = this.querySelector(".delivery-cart__count");
     this.goBtn = this.querySelector(".delivery-cart__go");
   }
 
+
   load() {
-    if (this.isHiddenOnMobile) {
+    if ((location.hash || "#home") !== "#home") return;
+
+    if (this.isMobile) {
+      this.hideCart();
       return;
     }
+
     this.fetchItems();
   }
 
   async fetchItems() {
     try {
-      const res = await fetch("/api/delivery-cart");
+      const res = await apiFetch("/api/delivery-cart");
       if (!res.ok) {
         this.items = [];
       } else {
         const data = await res.json();
         this.items = Array.isArray(data?.items) ? data.items : [];
       }
-    } catch (e) {
+    } catch {
       this.items = [];
     }
+
     this.renderList();
   }
 
+
   renderList() {
     if (!this.listEl) return;
-    if (this.isHiddenOnMobile) {
-      this.style.display = "none";
-      const layout = this.closest(".offers-layout");
-      if (layout) layout.classList.remove("has-cart");
-      return;
-    }
+
     const items = Array.isArray(this.items) ? this.items : [];
     this.listEl.innerHTML = "";
-    const layout = this.closest(".offers-layout");
 
     if (!items.length) {
-      this.style.display = "none";
-      if (layout) layout.classList.remove("has-cart");
-      if (this.emptyEl) this.emptyEl.style.display = "block";
-      if (this.countEl) this.countEl.textContent = "0";
-      if (this.goBtn) this.goBtn.style.display = "none";
+      this.hideCart();
       return;
     }
 
-    this.style.display = "block";
-    if (layout) layout.classList.add("has-cart");
-    if (this.emptyEl) this.emptyEl.style.display = "none";
-    if (this.goBtn) this.goBtn.style.display = "inline-flex";
+    this.showCart();
 
-    let count = 0;
+    let totalCount = 0;
+
     items.forEach((item) => {
       const qty = Number(item.qty || 1);
-      const price = this.parsePrice(item.price);
-      count += qty;
+      totalCount += qty;
 
-      const sub = Array.isArray(item.sub) ? item.sub : [];
-      const subText = sub.length
-        ? sub.map((s) => s.name).filter(Boolean).join(", ")
-        : "Бараа алга";
+      const price = parsePrice(item.price);
+      const subText = this.buildSubText(item.sub);
 
       const row = document.createElement("div");
       row.className = "delivery-cart__item";
       row.dataset.id = item.id || "";
+
       row.innerHTML = `
         <div class="delivery-cart__thumb">
-          <img src="${this.escapeAttr(item.thumb || "assets/img/box.svg")}" alt="" width="57" height="57" decoding="async">
+          <img src="${escapeAttr(item.thumb || "assets/img/box.svg")}" alt="" width="57" height="57" decoding="async">
         </div>
+
         <div class="delivery-cart__info">
-          <div class="delivery-cart__title">${this.escapeHtml(item.title || "")}</div>
-          <div class="delivery-cart__meta">${this.escapeHtml(item.meta || "")}</div>
-          <div class="delivery-cart__sub">${this.escapeHtml(subText)}</div>
+          <div class="delivery-cart__title">${escapeHtml(item.title || "")}</div>
+          <div class="delivery-cart__meta">${escapeHtml(item.meta || "")}</div>
+          <div class="delivery-cart__sub">${escapeHtml(subText)}</div>
         </div>
+
         <div class="delivery-cart__price">
-          <span>${this.formatPrice(price * qty)}</span>
+          <span>${formatPrice(price * qty)}</span>
           <button class="delivery-cart__remove" type="button" data-action="remove">−</button>
           <span class="delivery-cart__qty">x${qty}</span>
         </div>
       `;
+
       this.listEl.appendChild(row);
     });
 
-    if (this.countEl) this.countEl.textContent = String(count);
+    if (this.countEl) this.countEl.textContent = String(totalCount);
   }
 
+  buildSubText(sub) {
+    const arr = Array.isArray(sub) ? sub : [];
+    const names = arr.map((s) => s?.name).filter(Boolean);
+    return names.length ? names.join(", ") : "Бараа алга";
+  }
+
+
   handleClick(e) {
-    const goBtn = e.target.closest(".delivery-cart__go");
-    if (goBtn) {
+    if (e.target.closest(".delivery-cart__go")) {
       location.hash = "#delivery";
       return;
     }
-    const btn = e.target.closest("[data-action='remove']");
-    if (!btn) return;
-    const itemEl = btn.closest(".delivery-cart__item");
+
+    const removeBtn = e.target.closest("[data-action='remove']");
+    if (!removeBtn) return;
+
+    const itemEl = removeBtn.closest(".delivery-cart__item");
     const id = itemEl?.dataset?.id;
     if (!id) return;
+
     this.decrementItem(id);
   }
 
-  handleUpdate() {
-    this.load();
-  }
-
-  handleViewportChange() {
-    this.isHiddenOnMobile = this.mediaQuery?.matches;
-    if (this.isHiddenOnMobile) {
-      this.style.display = "none";
-      const layout = this.closest(".offers-layout");
-      if (layout) layout.classList.remove("has-cart");
-      return;
-    }
+  onViewportChange() {
+    this.isMobile = this.media?.matches === true;
     this.load();
   }
 
   async decrementItem(id) {
     try {
-      const res = await fetch(`/api/delivery-cart/${encodeURIComponent(id)}`, {
+      const res = await fetch(`/api/delivery-cart/${(id)}`, {
         method: "PATCH",
       });
-      if (!res.ok) {
-        return;
-      }
-    } catch (e) {
+      if (!res.ok) return;
+    } catch {
       return;
     }
+
     this.load();
+
     window.dispatchEvent(new Event("delivery-cart-updated"));
   }
 
-  parsePrice(str) {
-    return parseInt(String(str || "").replace(/[^\d]/g, ""), 10) || 0;
+
+  showCart() {
+    this.style.display = "block";
+    const layout = this.closest(".offers-layout");
+    if (layout) layout.classList.add("has-cart");
+
+    if (this.emptyEl) this.emptyEl.style.display = "none";
+    if (this.goBtn) this.goBtn.style.display = "inline-flex";
   }
 
-  formatPrice(n) {
-    return Number(n || 0).toLocaleString("mn-MN") + "₮";
-  }
+  hideCart() {
+    this.style.display = "none";
+    const layout = this.closest(".offers-layout");
+    if (layout) layout.classList.remove("has-cart");
 
-  escapeHtml(s) {
-    return String(s || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-  }
-
-  escapeAttr(s) {
-    return String(s || "").replace(/"/g, "&quot;");
+    if (this.emptyEl) this.emptyEl.style.display = "block";
+    if (this.countEl) this.countEl.textContent = "0";
+    if (this.goBtn) this.goBtn.style.display = "none";
   }
 }
 

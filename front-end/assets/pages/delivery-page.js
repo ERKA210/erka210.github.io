@@ -1,3 +1,5 @@
+import { escapeAttr } from "../helper/escape-attr.js";
+
 class DeliveryPage extends HTMLElement {
   constructor() {
     super();
@@ -136,13 +138,6 @@ class DeliveryPage extends HTMLElement {
     document.dispatchEvent(event);
   }
 
-  escapeAttr(value) {
-    return String(value || '')
-      .replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
 
   async fetchDeliveryItems(listEl) {
     let items = [];
@@ -201,13 +196,13 @@ class DeliveryPage extends HTMLElement {
 
     listEl.innerHTML = normalized.map((item) => `
         <d-orders
-          data-id="${this.escapeAttr(item.id || '')}"
-          data-order-id="${this.escapeAttr(item.orderId || '')}"
-          data-from="${this.escapeAttr(item.from || '')}"
-          data-to="${this.escapeAttr(item.to || '')}"
-          data-created-at="${this.escapeAttr(item.createdAt || '')}"
-          header="${this.escapeAttr(item.title || '')}"
-          detail="${this.escapeAttr(item.detail || '')}">
+          data-id="${escapeAttr(item.id || '')}"
+          data-order-id="${escapeAttr(item.orderId || '')}"
+          data-from="${escapeAttr(item.from || '')}"
+          data-to="${escapeAttr(item.to || '')}"
+          data-created-at="${escapeAttr(item.createdAt || '')}"
+          header="${escapeAttr(item.title || '')}"
+          detail="${escapeAttr(item.detail || '')}">
         </d-orders>
       `).join('');
 
