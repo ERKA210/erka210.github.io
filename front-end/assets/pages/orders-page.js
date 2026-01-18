@@ -66,8 +66,7 @@ class OrdersPage extends HTMLElement {
         <section class="details">
           <h2>Захиалгын явц</h2>
           <order-progress></order-progress>
-          
-          <button id="openRatingBtn" style="display:none;">Үнэлгээ өгөх</button>
+
           <rating-modal></rating-modal>
         </section>
       </main>
