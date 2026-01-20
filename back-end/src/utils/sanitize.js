@@ -1,13 +1,15 @@
-const entityMap = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;",
-};
+export function sanitizeText(value) {
+  let text = String(value || "");
 
-export const sanitizeText = (value, { maxLen = 500 } = {}) => {
-  const raw = String(value ?? "").trim();
-  const sliced = raw.slice(0, maxLen);
-  return sliced.replace(/[&<>"']/g, (ch) => entityMap[ch] || ch);
-};
+  text = text.trim();
+
+  text = text.slice(0, 500);
+
+  text = text.replace(/&/g, "&amp;");
+  text = text.replace(/</g, "&lt;");
+  text = text.replace(/>/g, "&gt;");
+  text = text.replace(/"/g, "&quot;");
+  text = text.replace(/'/g, "&#39;");
+
+  return text;
+}

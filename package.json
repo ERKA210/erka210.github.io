@@ -21,11 +21,11 @@
     "build:js": "esbuild front-end/assets/components/app.js --bundle --outfile=front-end/dist/app.js --minify",
     "build:css": "esbuild front-end/assets/css/styles.css --bundle --outfile=front-end/dist/style.css --minify",
     "build": "npm-run-all build:js build:css"
-
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.16.3"
   },
   "devDependencies": {
