@@ -1,7 +1,7 @@
 import { verifyJwt } from "./jwt.js";
 import { getCookie } from "./cookies.js";
 
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret = process.env.JWT_SECRET || "dev-secret-change-me";
 
 export function requireAuth(req, _res, next) {
   try {
@@ -20,7 +20,7 @@ export function requireAuth(req, _res, next) {
     const payload = verifyJwt(token, jwtSecret);
     req.user = payload;
     next();
-  } catch (e) {
+  } catch {
     const err = new Error("Unauthorized");
     err.status = 401;
     next(err);

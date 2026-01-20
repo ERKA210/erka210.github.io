@@ -19,10 +19,13 @@ export function removeSseClient(id) {
 }
 
 export function broadcastOrderEvent({ event, orderId, status, courierId, customerId }) {
-  const payload = { orderId, status, courierId, customerId, ts: Date.now() };
-  for (const { res, userId } of clients.values()) {
-    if (userId === customerId || userId === courierId) {
-      writeEvent(res, event, payload);
+  const data = { orderId, status, courierId, customerId, ts: Date.now() };
+  for (const client of clients.values()) {
+    if (
+      client.userId === customerId ||
+      client.userId === courierId
+    ) {
+      sendEvent(client.res, event, data);
     }
   }
 }

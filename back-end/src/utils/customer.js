@@ -1,9 +1,7 @@
-import { uuidRe } from "./validation.js";
+import { assertUuid } from "./validation.js";
 
 export async function ensureCustomerUser(client, { id, name, phone, studentId }) {
-  if (!id || !uuidRe.test(String(id))) {
-    throw new Error("customerId must be UUID");
-  }
+  assertUuid(id, "customerId must be UUID");
 
   const fullName = (name || "Зочин хэрэглэгч").trim() || "Зочин хэрэглэгч";
   const phoneSafe = (phone || "00000000").trim() || "00000000";

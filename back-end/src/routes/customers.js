@@ -1,14 +1,13 @@
 import { Router } from "express";
 import { pool } from "../db.js";
-import { uuidRe } from "../utils/validation.js";
+import { assertUuid } from "../utils/validation.js";
 
 const router = Router();
 
 router.get("/customers/:id", async (req, res) => {
   const { id } = req.params;
-  if (!uuidRe.test(id || "")) {
-    return res.status(400).json({ error: "customerId must be UUID" });
-  }
+  
+  assertUuid(id, "customerId must be UUID");
 
   try {
     const r = await pool.query(

@@ -1,5 +1,6 @@
 import { pool } from "../db.js";
 
+//table uussn uguig shlgj negl udaa uusghyn tuld ashiglj bgashu
 let initialized = false;
 
 export async function ensureStorageTables() {
@@ -20,6 +21,7 @@ export async function ensureStorageTables() {
       UNIQUE (user_id, title, meta, price)
     );
   `);
+
   await pool.query(`
     ALTER TABLE delivery_cart_items
     ADD COLUMN IF NOT EXISTS order_id UUID;
