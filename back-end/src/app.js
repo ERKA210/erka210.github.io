@@ -44,13 +44,11 @@ function sendIndexHtml(req, res) {
   const nonce = res.locals.cspNonce || "";
   const indexPath = path.join("front-end", "index.html");
 
-  // index.html уншина
+  // index.html unshina
   let html = fs.readFileSync(indexPath, "utf8");
 
-  // __CSP_NONCE__ гэдгийг бодит nonce-р сольж өгнө
+  // __CSP_NONCE__ gedgiig nonce r solino
   html = html.replaceAll("__CSP_NONCE__", nonce);
-
-  // HTML гэж хэлээд буцаана
   res.type("html").send(html);
 }
 
