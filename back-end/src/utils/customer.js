@@ -3,35 +3,43 @@ import { assertUuid } from "./validation.js";
 export async function ensureCustomerUser(client, { id, name, phone, studentId }) {
   assertUuid(id, "customerId must be UUID");
 
-  const fullName = (name || "Зочин хэрэглэгч").trim() || "Зочин хэрэглэгч";
-  const phoneSafe = (phone || "00000000").trim() || "00000000";
-  const studentSafe = (studentId || "").trim();
-  const studentValue = studentSafe ? studentSafe : null;
+  const phoneNumber = String(phone || "").trim();
+  if (!phoneNumber) {
+    const err = new Error("phone is required");
+    err.status = 400;
+    throw err;
+  }
+
+
+  const fullName = String(name || "").trim();
+  if (!fullName) {
+    const err = new Error("name is required");
+    err.status = 400;
+    throw err;
+  }
+
+
+  const studentID = String(studentId || "").trim();
+  if (!studentID) {
+    const err = new Error("studentId is required");
+    err.status = 400;
+    throw err;
+  }
+
 
   const existing = await client.query(
-    `SELECT id FROM users WHERE phone = $1 LIMIT 1`,
-    [phoneSafe]
+    "SELECT id FROM users WHERE phone = $1 LIMIT 1",
+    [phoneNumber]
   );
+
   if (existing.rows.length) {
-    const existingId = existing.rows[0].id;
-    await client.query(
-      `UPDATE users
-         SET full_name = $2,
-             student_id = COALESCE($3::text, student_id)
-       WHERE id = $1`,
-      [existingId, fullName, studentValue]
-    );
-    return existingId;
+    return existing.rows[0].id;
   }
 
   await client.query(
     `INSERT INTO users (id, full_name, phone, student_id, role)
-     VALUES ($1,$2,$3,$4,'customer')
-     ON CONFLICT (id) DO UPDATE
-       SET full_name = EXCLUDED.full_name,
-           phone = CASE WHEN EXCLUDED.phone <> '' THEN EXCLUDED.phone ELSE users.phone END,
-           student_id = COALESCE(EXCLUDED.student_id, users.student_id)`,
-    [id, fullName, phoneSafe, studentValue]
+     VALUES ($1, $2, $3, $4, 'customer')`,
+    [id, fullName, phoneNumber, studentID]
   );
 
   return id;
