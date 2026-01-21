@@ -9,6 +9,7 @@ router.get("/delivery-cart", requireAuth, async (req, res) => {
   try {
     await ensureStorageTables();
     const userId = req.user?.sub;
+    // console.log(userId);
     const r = await pool.query(
       `SELECT id, order_id, title, meta, price, thumb, sub, qty
          FROM delivery_cart_items
