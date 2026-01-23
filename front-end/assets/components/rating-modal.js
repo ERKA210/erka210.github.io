@@ -151,7 +151,7 @@ class RatingModal extends HTMLElement {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        alert(err.error || "Сэтгэгдэл хадгалахад алдаа гарлаа");
+        alert(err.error || "Сэтгэгдэл  алдаа гарлаа");
         return;
       }
 
@@ -178,9 +178,10 @@ class RatingModal extends HTMLElement {
 
       // Reload orders
       window.dispatchEvent(new Event("rating-completed"));
-    } catch {
-      alert("Сэтгэгдэл хадгалахад алдаа гарлаа");
-    }
+    } catch (e) {
+  console.error("submitRating error:", e);
+  alert((e && e.message) ? e.message : "Сэтгэгдэл хадгалахад алдаа гарлаа");
+}
   }
 
   markOrderRated(orderId) {

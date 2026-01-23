@@ -3,9 +3,17 @@ import "../components/my-order.js";
 
 class OrdersPage extends HTMLElement {
   connectedCallback() {
-    this._initialized = false;
+    this.render()
+    this.OrderCardClicks()
+
     this.selectedOrder = null;
-    this.handleRouteChange = this.handleRouteChange?.bind(this) || (() => this.onRouteChange());
+    this.orderStream = null;
+
+
+    this.handleRouteChange = () => {
+        this.onRouteChange();
+      };
+
     window.addEventListener("hashchange", this.handleRouteChange);
     this.handleRouteChange();
   }
@@ -16,16 +24,10 @@ class OrdersPage extends HTMLElement {
       return;
     }
 
-    this.selectedOrder = null;
-    if (!this._initialized) {
-      this.render();
-      this.bindOrderCardClicks();
-      this._initialized = true;
-    }
-    this.loadOrders();
-    this.initOrderStream();
-    this.bindRatingComplete();
-  }
+  this.loadOrders();
+  this.initOrderStream();
+  this.RatingComplete();
+}
 
   disconnectedCallback() {
     window.removeEventListener("hashchange", this.handleRouteChange);
@@ -46,7 +48,7 @@ class OrdersPage extends HTMLElement {
       }
       this.orderStream.close();
       this.orderStream = null;
-    }
+    } 
   }
 
   render() {
@@ -85,30 +87,28 @@ class OrdersPage extends HTMLElement {
       return;
     }
 
-    const qs = `?customerId=${encodeURIComponent(userId)}`;
+   const qs = `?customerId=${userId}`;
 
     try {
       const res = await apiFetch(`/api/orders${qs}`);
-      const data = await res.json().catch(() => []);
+      const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Алдаа");
 
-      const filtered = this.filterExpired(Array.isArray(data) ? data : []);
+      const filtered = this.filterExpired(data);
       const notRated = filtered.filter((o) => !this.isOrderRated(o.id));
 
-      if (Array.isArray(data) && data.length > 0 && filtered.length === 0) {
+      if (filtered.length === 0) {
         window.NumAppState?.logout("order_expired");
       }
 
       myOrder.renderOrders(notRated);
 
-      // Эхний захиалгыг автоматаар сонгох
       if (notRated.length > 0) {
         this.selectOrder(notRated[0]);
       } else {
         this.selectOrder(null);
       }
-    } catch (e) {
-      myOrder.showError(e.message);
+    } catch {
     }
   }
 
@@ -117,7 +117,7 @@ class OrdersPage extends HTMLElement {
       const res = await apiFetch("/api/auth/me");
       if (res.ok) {
         const data = await res.json();
-        return data?.user?.id || "";
+        return data?.user?.id;
       }
     } catch {}
     return "";
@@ -126,7 +126,7 @@ class OrdersPage extends HTMLElement {
   filterExpired(orders) {
     return orders.filter((o) => {
       const myOrder = this.querySelector("my-order");
-      if (!myOrder) return false;
+      if (!myOrder) return;
       const ts = myOrder.parseOrderTimestamp(o);
       return ts !== null && ts >= Date.now();
     });
@@ -134,7 +134,9 @@ class OrdersPage extends HTMLElement {
 
   isOrderRated(orderId) {
     try {
-      const arr = JSON.parse(localStorage.getItem("ratedOrders") || "[]");
+      const arr = JSON.parse(localStorage.getItem("ratedOrders") || "{}");
+
+      console.log(arr)
       return arr.map(String).includes(String(orderId));
     } catch {
       return false;
@@ -147,7 +149,7 @@ class OrdersPage extends HTMLElement {
     this.loadCourierForOrder(order);
   }
 
-  bindOrderCardClicks() {
+  OrderCardClicks() {
     const myOrder = this.querySelector("my-order");
     if (!myOrder) return;
 
@@ -192,7 +194,7 @@ class OrdersPage extends HTMLElement {
     box.setData?.(courier);
   }
 
-  bindRatingComplete() {
+  RatingComplete() {
     this.handleRatingComplete = () => {
       this.loadOrders();
     };
