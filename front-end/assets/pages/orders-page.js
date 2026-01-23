@@ -134,10 +134,8 @@ class OrdersPage extends HTMLElement {
 
   isOrderRated(orderId) {
     try {
-      const arr = JSON.parse(localStorage.getItem("ratedOrders") || "{}");
-
-      console.log(arr)
-      return arr.map(String).includes(String(orderId));
+      const arr = JSON.parse(localStorage.getItem("ratedOrders") || "[]");
+      return arr.includes(String(orderId));
     } catch {
       return false;
     }
