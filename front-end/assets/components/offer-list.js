@@ -5,12 +5,14 @@ import { escapeAttr } from "../helper/escape-attr.js";
 import { getDeliveryIcon } from "../helper/delivery-icon.js";
 
 class OffersList extends HTMLElement {
+  
   connectedCallback() {
     if (this._ready) return;
     this._ready = true;
     this._loaded = false;
-    this.handleRouteChange = this.handleRouteChange?.bind(this) || (() => this.onRouteChange());
-    this.render();
+    
+    this.handleRouteChange = () => { this.onRouteChange();};
+    this.renderList();
 
     this.handleOffersUpdated = () => loadOffers();
     window.addEventListener("offers-updated", this.handleOffersUpdated);
@@ -28,7 +30,7 @@ class OffersList extends HTMLElement {
     this.removeEventListener("offer-select", this.handleOfferSelect);
   }
 
-  render() {
+  renderList() {
     this.innerHTML = `
       <section class="offers-container">
         <div class="offers-row"></div>
@@ -36,29 +38,44 @@ class OffersList extends HTMLElement {
     `;
   }
 
-  set items(items) {
-    this.renderItems(items);
+  set items(offersArray) {
+    this.renderItems(offersArray);
   }
 
-  renderItems(items) {
-    const row = this.querySelector(".offers-row");
-    row.innerHTML = items.map(renderOfferCard).join("");
+  renderItems(offersArray) {
+    const rowElement = this.querySelector(".offers-row");
+    
+    if (!rowElement) return;
+
+    if (!offersArray || offersArray.length === 0) {
+      rowElement.innerHTML = '<p style="text-align: center; padding: 2rem;">Одоогоор саналгүй байна</p>';
+      return;
+    }
+ 
+    rowElement.innerHTML = offersArray.map(createOfferCardHTML).join("");
   }
 
   handleOfferSelect(event) {
     const modal = document.querySelector("offer-modal");
-    if (!modal) return;
+    if (!modal) {
+      console.warn('offer-modal олдсонгүй');
+      return;
+    }
+    
     modal.show(event.detail);
   }
 
   onRouteChange() {
-    if (location.hash !== "#home" && location.hash !== "") return;
+    const currentHash = location.hash;
+    
+    if (currentHash !== "#home" && currentHash !== "") return;
+
     if (this._loaded === true) return;
     this._loaded = true;
-    //localstorage dahi offer local object n
-    const local = readLocalOffers();
-    // console.log("local offers", local);
-    this.renderItems(local);
+    
+    const localOffers = readLocalOffers();
+    this.renderItems(localOffers);
+    
     loadOffers();
   }
 }
@@ -67,166 +84,148 @@ if (!customElements.get("offers-list")) {
   customElements.define("offers-list", OffersList);
 }
 
-
-const SEED_OFFERS = [
-  {
-    thumb: "assets/img/box.svg",
-    title: "GL burger - 7-р байр 207",
-    meta: "11/21/25 • 14:00",
-    price: "10,000₮",
-    sub: [
-      { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" },
-    ],
-  },
-  {
-    thumb: "assets/img/document.svg",
-    title: "GL burger - 7-р байр 207",
-    meta: "11/21/25 • 14:00",
-    price: "10,000₮",
-    sub: [
-      { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" },
-    ],
-  },
-  {
-    thumb: "assets/img/tor.svg",
-    title: "GL burger - 7-р байр 207",
-    meta: "11/21/25 • 14:00",
-    price: "10,000₮",
-    sub: [
-      { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" },
-    ],
-  },
-  {
-    thumb: "assets/img/tor.svg",
-    title: "GL burger - 7-р байр 207",
-    meta: "12/31/25 • 22:20",
-    price: "10,000₮",
-    sub: [
-      { name: "Бууз", price: "5000₮" },
-      { name: "Сүү", price: "2000₮" },
-    ],
-  },
-];
-
-function renderOfferCard(item) {
-  const thumb = item.thumb || "assets/img/document.svg";
-  const title = item.title || "";
-  const meta = item.meta || "";
-  const price = item.price || "";
-  const orderId = item.orderId || item.id || "";
-  const sub = escapeAttr(JSON.stringify(item.sub || []));
-  const customer = escapeAttr(JSON.stringify(item.customer || {}));
-  // console.log("rendering offer card", item);
+function createOfferCardHTML(offer) {
+  const thumbnailImage = offer.thumb || "assets/img/document.svg";
+  const offerTitle = offer.title || "";
+  const offerMeta = offer.meta || "";
+  const offerPrice = offer.price || "";
+  const orderId = offer.orderId || offer.id || "";
+  const subItemsJSON = escapeAttr(JSON.stringify(offer.sub || []));
+  const customerJSON = escapeAttr(JSON.stringify(offer.customer || {}));
 
   return `
     <offer-card
-      thumb="${thumb}"
-      title="${title}"
-      meta="${meta}"
-      sub="${sub}"
-      price="${price}"
+      thumb="${thumbnailImage}"
+      title="${offerTitle}"
+      meta="${offerMeta}"
+      sub="${subItemsJSON}"
+      price="${offerPrice}"
       order-id="${orderId}"
-      customer="${customer}">
+      customer="${customerJSON}">
     </offer-card>
   `;
 }
 
-
-function parseMetaDate(metaString) {
+function parseMetaDateString(metaString) {
   try {
     const parts = String(metaString).split("•");
-
-    // console.log("parsing meta date", metaString, parts);
-
     const [datePart, timePart] = parts;
+    
     const [month, day, year] = datePart.split("/");
+
     const [hours, minutes] = timePart.split(":");
+
     const fullYear = 2000 + Number.parseInt(year, 10);
 
-
-    return new Date(fullYear, Number(month) - 1, Number(day), Number(hours), Number(minutes));
-  } catch (e) {
-    console.error("date error shu:", e, metaString);
+    return new Date(
+      fullYear,
+      Number(month) - 1, 
+      Number(day),
+      Number(hours),
+      Number(minutes)
+    );
+  } catch (error) {
   }
 }
 
-function parseOrderTimestamp(order) {
-  const raw =order?.scheduled_at;
-  if (!raw) return null;
+function getOrderTimestamp(order) {
+  const rawDate = order?.scheduled_at;
+  
+  if (!rawDate) return null;
 
-  const parsed = Date.parse(raw);
-  if (!isNaN(parsed)) return parsed;
+  const parsedDate = Date.parse(rawDate);
+  if (!isNaN(parsedDate)) return parsedDate;
 
-  const metaDate = parseMetaDate(raw);
+  const metaDate = parseMetaDateString(rawDate);
   if (metaDate) return metaDate.getTime();
 
   return null;
 }
 
 function isOrderExpired(order) {
-  const ts = parseOrderTimestamp(order);
-  if (!ts) return true;
-  return ts < Date.now();
+  const timestamp = getOrderTimestamp(order);
+  
+  if (!timestamp) return true; 
+  
+  return timestamp < Date.now();
 }
 
 function buildOrderTitle(order) {
-  const from = order?.from_name || "";
-  const to = order?.to_name || "";
-  return [from, to].filter(v => v !== "").join(" - ");
+  const fromLocation = order?.from_name || "";
+  const toLocation = order?.to_name || "";
+  
+  return [fromLocation, toLocation]
+    .filter(location => location !== "")
+    .join(" - ");
 }
 
-function mapOrdersToOffers(orders) {
-  const list = orders;
-  // console.log(list, "ll")
-
-  return list
+function convertOrdersToOffers(ordersArray) {
+  
+  return ordersArray
     .filter((order) => {
-     const status = order?.status;
-    // console.log(status, "ss")
-      if (status === "delivered" || status === "cancelled") return false;
-      if (order?.courier) return false;
+      const orderStatus = order?.status;
+      
+      if (orderStatus === "delivered" || orderStatus === "cancelled") {
+        return false;
+      }
+
+      if (order?.courier) {
+        return false;
+      }
+
       return !isOrderExpired(order);
     })
     .map((order) => {
+      const orderItems = order?.items || [];
       
-      const items = order?.items;
-      const totalQty = items.reduce((sum, it) => sum + (it?.qty??0), 0);
-      // console.log("qty too bnu", totalQty); 
-      const sub = items.map((it) => ({
-        name: `${it?.name} x${it?.qty}`,
+      const totalQuantity = orderItems.reduce(
+        (sum, item) => sum + (item?.qty ?? 0), 
+        0
+      );
+      
+      const subItems = orderItems.map((item) => ({
+        name: `${item?.name || 'Бараа'} x${item?.qty || 1}`,
       }));
 
-      const ts = parseOrderTimestamp(order);
+      const timestamp = getOrderTimestamp(order);
   
       return {
         orderId: order?.id || "",
         title: buildOrderTitle(order),
-        meta: formatMetaFromDate(ts),
+        meta: formatMetaFromDate(timestamp),
         price: formatPrice(order?.total_amount),
-        thumb: getDeliveryIcon(totalQty),
+        thumb: getDeliveryIcon(totalQuantity),
         customer: order?.customer,
-        sub,
+        sub: subItems,
       };
     });
 }
 
-async function fetchOffersFromApi() {
-  const res = await apiFetch("/api/orders");
-  if (!res.ok) return [];
-  const data = await res.json();
-  return mapOrdersToOffers(data);
+
+async function fetchOffersFromServer() {
+  try {
+    const response = await apiFetch("/api/orders");
+    
+    if (!response.ok) {
+      console.error('Саналууд татахад алдаа:', response.status);
+      return [];
+    }
+    
+    const ordersData = await response.json();
+    return convertOrdersToOffers(ordersData);
+    
+  } catch (error) {
+  }
 }
 
 function readLocalOffers() {
-  const raw = localStorage.getItem("offers");
-  if (!raw) return [];
+  const offersJSON = localStorage.getItem("offers");
+  
+  if (!offersJSON) return [];
+  
   try {
-    return JSON.parse(raw) || [];
-  } catch {
-    return [];
+    return JSON.parse(offersJSON) || [];
+  } catch (error) {
   }
 }
 
@@ -236,55 +235,64 @@ function getRemovedStorageKey(baseKey) {
 }
 
 function readRemovedOfferIds() {
-  const raw = localStorage.getItem(getRemovedStorageKey("removed_offer_ids"));
-  if (!raw) return [];
+  const storageKey = getRemovedStorageKey("removed_offer_ids");
+  const removedIdsJSON = localStorage.getItem(storageKey);
+  
+  if (!removedIdsJSON) return [];
+  
   try {
-    return JSON.parse(raw) || [];
-  } catch {
-    return [];
+    return JSON.parse(removedIdsJSON) || [];
+  } catch (error) {
   }
 }
 
-function filterRemovedOffers(offers) {
+function filterRemovedOffers(offersArray) {
   const removedIds = readRemovedOfferIds();
-  if (!removedIds.length) return offers;
+  
+  if (!removedIds.length) return offersArray;
 
-  return offers.filter((offer) => {
+  return offersArray.filter((offer) => {
     const offerId = offer?.orderId ?? offer?.id ?? null;
-    if (!offerId) return true; 
+    
+    if (!offerId) return true;
+    
     return !removedIds.includes(String(offerId));
   });
 }
 
-function filterExpiredOffers(offers) {
-  return offers.filter((offer) => {
+function filterExpiredOffers(offersArray) {
+  return offersArray.filter((offer) => {
     if (!offer?.meta) return true;
 
-    const date = parseMetaDate(offer.meta);
-    if (!date) return true;
+    const offerDate = parseMetaDateString(offer.meta);
+    
+    if (!offerDate) return true;
 
-    return date.getTime() >= Date.now();
+    return offerDate.getTime() >= Date.now();
   });
 }
 
 async function loadOffers() {
-  let offers = [];
+  
+  let offersArray = [];
 
   try {
-    offers = await fetchOffersFromApi();
-  } catch (err) {
-    console.error("Offers API-аас авахад алдаа:", err);
-    offers = [];
+    offersArray = await fetchOffersFromServer();
+  } catch (error) {
   }
-  offers = filterExpiredOffers(offers);
+  
+  offersArray = filterExpiredOffers(offersArray);
+  console.log('Хугацаа дууссан хассаны дараа:', offersArray.length);
 
-  offers = filterRemovedOffers(offers);
+  offersArray = filterRemovedOffers(offersArray);
+  console.log('Устгасан хассаны дараа:', offersArray.length);
 
-  localStorage.setItem("offers", JSON.stringify(offers));
+  localStorage.setItem("offers", JSON.stringify(offersArray));
 
-  document.querySelectorAll("offers-list").forEach((list) => {
-    list.items = offers;
+  document.querySelectorAll("offers-list").forEach((listElement) => {
+    listElement.items = offersArray;
   });
+  
 }
 
 export { OffersList };

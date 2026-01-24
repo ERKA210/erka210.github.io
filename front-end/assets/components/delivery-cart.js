@@ -1,36 +1,23 @@
+// Бусад файлуудаас функцүүдийг авч ирэх
 import { formatPrice, parsePrice } from "../helper/format-d-ts-p.js";
 import { escapeAttr } from "../helper/escape-attr.js";
 import { escapeHtml } from "../helper/escape-html.js";
 import { apiFetch } from "../api_client.js";
 
 class DeliveryCart extends HTMLElement {
+
   connectedCallback() {
     this.render();
-    this.elements();
-
-    this.onClick = (e) => this.handleClick(e);
-    this.onUpdated = () => this.load();
-    this.onHashChange = () => this.load();
-    this.onMediaChange = () => this.onViewportChange();
-
-    this.addEventListener("click", this.onClick);
-    window.addEventListener("delivery-cart-updated", this.onUpdated);
-    window.addEventListener("hashchange", this.onHashChange);
-
-    this.media = window.matchMedia("(max-width: 54rem)");
-    this.media.addEventListener("change", this.onMediaChange);
-
-    this.onViewportChange();
-    this.load();
+    this.getElements();
+    this.setupEventListeners();
+    this.checkViewportSize();
+    this.loadCartItems();
   }
-
+  
   disconnectedCallback() {
-    this.removeEventListener("click", this.onClick);
-    window.removeEventListener("delivery-cart-updated", this.onUpdated);
-    window.removeEventListener("hashchange", this.onHashChange);
-    if (this.media) this.media.removeEventListener("change", this.onMediaChange);
+    this.removeEventListeners();
   }
-
+  
   render() {
     this.innerHTML = `
       <div class="delivery-cart">
@@ -38,79 +25,114 @@ class DeliveryCart extends HTMLElement {
           <h3>Хүргэлтийн сагс</h3>
           <span class="delivery-cart__count">0</span>
         </div>
-
+        
         <div class="delivery-cart__list"></div>
-
-        <p class="delivery-cart__empty">Одоогоор хүргэлт сонгоогүй байна.</p>
-
-        <button class="delivery-cart__go" type="button">Хүргэлт рүү</button>
+        
+        <div class="delivery-cart__empty">
+          Одоогоор хүргэлт сонгоогүй байна.
+        </div>
+        
+        <button class="delivery-cart__go">
+          Хүргэлт рүү
+        </button>
       </div>
     `;
   }
-
-  elements() {
+  
+  getElements() {
     this.listEl = this.querySelector(".delivery-cart__list");
     this.emptyEl = this.querySelector(".delivery-cart__empty");
     this.countEl = this.querySelector(".delivery-cart__count");
     this.goBtn = this.querySelector(".delivery-cart__go");
   }
-
-
-  load() {
-    if ((location.hash || "#home") !== "#home") return;
-
-    if (this.isMobile) {
-      this.hideCart();
+  
+  setupEventListeners() {
+    this.handleClickEvent = (event) => this.onCartClick(event);
+    this.addEventListener("click", this.handleClickEvent);
+    
+    this.handleCartUpdate = () => this.loadCartItems();
+    window.addEventListener("delivery-cart-updated", this.handleCartUpdate);
+    
+    this.handleHashChange = () => this.loadCartItems();
+    window.addEventListener("hashchange", this.handleHashChange);
+    
+    this.mediaQuery = window.matchMedia("(max-width: 54rem)");
+    this.handleMediaChange = () => this.checkViewportSize();
+    this.mediaQuery.addEventListener("change", this.handleMediaChange);
+  }
+  
+  removeEventListeners() {
+    this.removeEventListener("click", this.handleClickEvent);
+    window.removeEventListener("delivery-cart-updated", this.handleCartUpdate);
+    window.removeEventListener("hashchange", this.handleHashChange);
+    if (this.mediaQuery) {
+      this.mediaQuery.removeEventListener("change", this.handleMediaChange);
+    }
+  }
+  
+  checkViewportSize() {
+    this.isMobileDevice = this.mediaQuery?.matches === true;
+    this.loadCartItems();
+  }
+  
+  loadCartItems() {
+    const currentHash = location.hash || "#home";
+    if (currentHash !== "#home") {
       return;
     }
 
-    this.fetchItems();
-  }
+    if (this.isMobileDevice) {
+      this.hideCartDisplay();
+      return;
+    }
 
-  async fetchItems() {
+    this.fetchCartItemsFromServer();
+  }
+  
+  async fetchCartItemsFromServer() {
     try {
-      const res = await apiFetch("/api/delivery-cart");
-      if (!res.ok) {
+      const response = await apiFetch("/api/delivery-cart");
+      
+      if (!response.ok) {
         this.items = [];
       } else {
-        const data = await res.json();
+        const data = await response.json();
         this.items = Array.isArray(data?.items) ? data.items : [];
       }
-    } catch {
+    } catch (error) {
       this.items = [];
     }
-
-    this.renderList();
+    
+    this.displayCartItems();
   }
-
-
-  renderList() {
+  
+  displayCartItems() {
     if (!this.listEl) return;
-
-    const items = Array.isArray(this.items) ? this.items : [];
+    
+    const cartItems = Array.isArray(this.items) ? this.items : [];
     this.listEl.innerHTML = "";
 
-    if (!items.length) {
-      this.hideCart();
+    if (cartItems.length === 0) {
+      this.hideCartDisplay();
       return;
     }
-
-    this.showCart();
-
-    let totalCount = 0;
-
-    items.forEach((item) => {
-      const qty = Number(item.qty || 1);
-      totalCount += qty;
-
-      const price = parsePrice(item.price);
-      const subText = this.buildSubText(item.sub);
-
-      const row = document.createElement("div");
-      row.className = "delivery-cart__item";
-      row.dataset.id = item.id || "";
-
-      row.innerHTML = `
+    
+    this.showCartDisplay();
+    
+    let totalItemCount = 0;
+    
+    cartItems.forEach((item) => {
+      const quantity = Number(item.qty || 1);
+      totalItemCount += quantity;
+      
+      const itemPrice = parsePrice(item.price);
+      const subtitleText = this.createSubtitleText(item.sub);
+      
+      const itemElement = document.createElement("div");
+      itemElement.className = "delivery-cart__item";
+      itemElement.dataset.id = item.id || "";
+      
+      itemElement.innerHTML = `
         <div class="delivery-cart__thumb">
           <img src="${escapeAttr(item.thumb || "assets/img/box.svg")}" alt="" width="57" height="57" decoding="async">
         </div>
@@ -118,80 +140,83 @@ class DeliveryCart extends HTMLElement {
         <div class="delivery-cart__info">
           <div class="delivery-cart__title">${escapeHtml(item.title || "")}</div>
           <div class="delivery-cart__meta">${escapeHtml(item.meta || "")}</div>
-          <div class="delivery-cart__sub">${escapeHtml(subText)}</div>
+          <div class="delivery-cart__sub">${escapeHtml(subtitleText)}</div>
         </div>
 
         <div class="delivery-cart__price">
-          <span>${formatPrice(price * qty)}</span>
+          <span>${formatPrice(itemPrice * quantity)}</span>
           <button class="delivery-cart__remove" type="button" data-action="remove">−</button>
-          <span class="delivery-cart__qty">x${qty}</span>
+          <span class="delivery-cart__qty">x${quantity}</span>
         </div>
       `;
-
-      this.listEl.appendChild(row);
+      
+      this.listEl.appendChild(itemElement);
     });
-
-    if (this.countEl) this.countEl.textContent = String(totalCount);
+    
+    if (this.countEl) {
+      this.countEl.textContent = String(totalItemCount);
+    }
   }
-
-  buildSubText(sub) {
-    const arr = Array.isArray(sub) ? sub : [];
-    const names = arr.map((s) => s?.name).filter(Boolean);
-    return names.length ? names.join(", ") : "Бараа алга";
+  
+  createSubtitleText(subItems) {
+    const itemsArray = Array.isArray(subItems) ? subItems : [];
+    const itemNames = itemsArray.map((s) => s?.name).filter(Boolean);
+    
+    return itemNames.length > 0 ? itemNames.join(", ") : "Бараа алга";
   }
-
-
-  handleClick(e) {
-    if (e.target.closest(".delivery-cart__go")) {
+  
+  onCartClick(event) {
+    if (event.target.closest(".delivery-cart__go")) {
       location.hash = "#delivery";
       return;
     }
-
-    const removeBtn = e.target.closest("[data-action='remove']");
-    if (!removeBtn) return;
-
-    const itemEl = removeBtn.closest(".delivery-cart__item");
-    const id = itemEl?.dataset?.id;
-    if (!id) return;
-
-    this.decrementItem(id);
+    
+    const removeButton = event.target.closest("[data-action='remove']");
+    if (!removeButton) return;
+    
+    const itemElement = removeButton.closest(".delivery-cart__item");
+    const itemId = itemElement?.dataset?.id;
+    
+    if (!itemId) return;
+    
+    this.removeOneItemFromCart(itemId);
   }
-
-  onViewportChange() {
-    this.isMobile = this.media?.matches === true;
-    this.load();
-  }
-
-  async decrementItem(id) {
+  
+  async removeOneItemFromCart(itemId) {
     try {
-      const res = await fetch(`/api/delivery-cart/${(id)}`, {
+      const response = await fetch(`/api/delivery-cart/${itemId}`, {
         method: "PATCH",
       });
-      if (!res.ok) return;
-    } catch {
+      
+      if (!response.ok) return;
+    } catch (error) {
       return;
     }
-
-    this.load();
-
+    
+    this.loadCartItems();
     window.dispatchEvent(new Event("delivery-cart-updated"));
   }
-
-
-  showCart() {
+  
+  showCartDisplay() {
     this.style.display = "block";
-    const layout = this.closest(".offers-layout");
-    if (layout) layout.classList.add("has-cart");
-
+    
+    const layoutElement = this.closest(".offers-layout");
+    if (layoutElement) {
+      layoutElement.classList.add("has-cart");
+    }
+    
     if (this.emptyEl) this.emptyEl.style.display = "none";
     if (this.goBtn) this.goBtn.style.display = "inline-flex";
   }
-
-  hideCart() {
+  
+  hideCartDisplay() {
     this.style.display = "none";
-    const layout = this.closest(".offers-layout");
-    if (layout) layout.classList.remove("has-cart");
-
+    
+    const layoutElement = this.closest(".offers-layout");
+    if (layoutElement) {
+      layoutElement.classList.remove("has-cart");
+    }
+    
     if (this.emptyEl) this.emptyEl.style.display = "block";
     if (this.countEl) this.countEl.textContent = "0";
     if (this.goBtn) this.goBtn.style.display = "none";

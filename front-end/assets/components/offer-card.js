@@ -1,4 +1,5 @@
 class OfferCard extends HTMLElement {
+  
   static get observedAttributes() {
     return ["thumb", "title", "meta", "price", "sub", "customer", "order-id"];
   }
@@ -6,12 +7,15 @@ class OfferCard extends HTMLElement {
   connectedCallback() {
     if (this._ready) return;
     this._ready = true;
+    
     this.render();
-    this.events();
+    this.setupEvents();
   }
 
   attributeChangedCallback() {
-    if (this._ready) this.render();
+    if (this._ready) {
+      this.render();
+    }
   }
 
   get data() {
@@ -21,39 +25,71 @@ class OfferCard extends HTMLElement {
       meta: this.getAttribute("meta") || "",
       price: this.getAttribute("price") || "",
       orderId: this.getAttribute("order-id") || "",
-      sub: JSON.parse(this.getAttribute("sub") || "[]"),
-      customer: JSON.parse(this.getAttribute("customer") || "{}"),
+      sub: this.parseJSON(this.getAttribute("sub") || "[]"),
+      customer: this.parseJSON(this.getAttribute("customer") || "{}"),
     };
   }
 
+  parseJSON(text) {
+    try {
+      return JSON.parse(text);
+    } catch (error) {
+      return text.startsWith("[") ? [] : {};
+    }
+  }
+
   render() {
-    const { thumb, title, meta, price } = this.data;
+    const cardData = this.data;
+    const thumbnailImage = cardData.thumb;
+    const cardTitle = cardData.title;
+    const cardMeta = cardData.meta;
+    const cardPrice = cardData.price;
+    
     this.innerHTML = `
       <article class="offer-card" role="button" tabindex="0">
         <div class="offer-thumb">
-          <img src="${thumb}" alt="icon" width="57" height="57" decoding="async"/>
+          <img 
+            src="${thumbnailImage}" 
+            alt="icon" 
+            width="57" 
+            height="57" 
+            decoding="async"
+          />
         </div>
         <div class="offer-info">
-          <div class="offer-title">${title}</div>
-          <div class="offer-meta">${meta}</div>
+          <div class="offer-title">${cardTitle}</div>
+          <div class="offer-meta">${cardMeta}</div>
         </div>
-        <div class="offer-price">${price}</div>
+        <div class="offer-price">${cardPrice}</div>
       </article>
     `;
   }
 
-  events() {
+  setupEvents() {
     this.addEventListener("click", () => {
-      const detail = this.data;
-      this.dispatchEvent(new CustomEvent("offer-select", { bubbles: true, detail }));
+      this.sendSelectEvent();
     });
 
-    this.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
+    this.addEventListener("keydown", (event) => {
+      const isEnterKey = event.key === "Enter";
+      const isSpaceKey = event.key === " ";
+      
+      if (isEnterKey || isSpaceKey) {
+        event.preventDefault(); 
         this.click();
       }
     });
+  }
+
+  sendSelectEvent() {
+    const cardData = this.data;
+    
+    const selectEvent = new CustomEvent("offer-select", {
+      bubbles: true, 
+      detail: cardData 
+    });
+    
+    this.dispatchEvent(selectEvent);
   }
 }
 

@@ -1,6 +1,7 @@
 import { apiFetch } from "../api_client.js";
 
 class OfferModal extends HTMLElement {
+  
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -8,11 +9,11 @@ class OfferModal extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    this.elements();
-    this.events();
+    this.getElements();
+    this.setupEvents();
   }
 
-  render() {
+ render() {
     this.shadowRoot.innerHTML = `
       <style>
         :host {
@@ -278,7 +279,8 @@ class OfferModal extends HTMLElement {
     `;
   }
 
-  elements() {
+
+  getElements() {
     this.modal = this.shadowRoot.querySelector('.modal');
     this.card = this.shadowRoot.querySelector('.card');
     this.titleEl = this.shadowRoot.getElementById('title');
@@ -296,45 +298,50 @@ class OfferModal extends HTMLElement {
     this.confirmBtn = this.shadowRoot.querySelector('.confirm');
   }
 
-  events() {
-    this.closeBtn.addEventListener('click', () => this.close());
-    this.modal.addEventListener('click', (e) => {
-      if (e.target === this.modal) this.close();
+  setupEvents() {
+    this.closeBtn.addEventListener('click', () => this.closeModal());
+    
+    this.modal.addEventListener('click', (event) => {
+      if (event.target === this.modal) this.closeModal();
     });
+    
     this.deleteBtn.addEventListener('click', () => {
-      this.handleDelete();
+      this.deleteOffer();
     });
-
-    this.confirmBtn.addEventListener('click', () => this.handleConfirm());
+    this.confirmBtn.addEventListener('click', () => this.confirmDelivery());
   }
-
-  refreshOffersList() {
-    window.dispatchEvent(new Event('offers-updated'));
-  }
-
-
-  show(data) {
+  show(offerData) {
     if (!this.modal) return;
-    this.currentData = data;
-    this.thumbEl.src = data.thumb || 'assets/img/box.svg';
-    this.thumbEl.alt = data.title || 'offer thumbnail';
-    this.titleEl.textContent = data.title || 'Санал';
-    this.metaEl.textContent = data.meta || '';
-    const sub = Array.isArray(data.sub) ? data.sub : [];
-    this.subEl.innerHTML = sub.map((item) => {
-      const name = item?.name || '';
-      const price = item?.price || '';
-      return `<li><span>${name}</span><span class="price">${price}</span></li>`;
-    }).join('') || '<li><span>Бараа алга</span><span class="price">-</span></li>';
-    this.priceEl.textContent = data.price ? String(data.price) : '0₮';
-
-    const customer = data?.customer || {};
-    const customerName = customer?.name || "Тодорхойгүй";
-    const customerPhone = customer?.phone || "Утасгүй";
-    const customerId = customer?.student_id || customer?.studentId || "ID байхгүй";
-    if (this.customerCard) {
-      this.customerCard.style.display = customerName || customerPhone || customerId ? "" : "none";
+    
+    this.currentData = offerData;
+    
+    this.thumbEl.src = offerData.thumb;
+    this.thumbEl.alt = offerData.title;
+    
+    this.titleEl.textContent = offerData.title;
+    this.metaEl.textContent = offerData.meta;
+    
+    const subItems = offerData.sub;
+    console.log(offerData.sub);
+    
+    if (subItems.length === 0) {
+      this.subEl.innerHTML = '<li><span>Бараа алга</span><span class="price">-</span></li>';
+    } else {
+      this.subEl.innerHTML = subItems.map((item) => {
+        const itemName = item?.name;
+        const itemPrice = item?.price || "";
+        console.log(itemPrice);
+        return `<li><span>${itemName}</span><span class="price">${itemPrice}</span></li>`;
+      }).join('');
     }
+    
+    this.priceEl.textContent = offerData.price ? String(offerData.price) : '0₮';
+
+    const customer = offerData?.customer || {};
+    const customerName = customer?.name || "";
+    const customerPhone = customer?.phone || "";
+    const customerId = customer?.student_id || "";
+    
     if (this.customerAvatar) {
       this.customerAvatar.src = customer?.avatar || "assets/img/profile.jpg";
       this.customerAvatar.alt = customerName;
@@ -346,272 +353,330 @@ class OfferModal extends HTMLElement {
     this.modal.classList.add('open');
   }
 
-  close() {
+  closeModal() {
     if (this.modal) this.modal.classList.remove('open');
   }
 
-  parseMetaToISO(meta) {
-    if (!meta) return null;
-    const sanitized = meta.replace('•', '');
-    const parsed = Date.parse(sanitized);
-    if (!Number.isNaN(parsed)) return new Date(parsed).toISOString();
-    return null;
+async confirmDelivery() {
+  if (!this.currentData) {
+    this.closeModal();
+    return;
   }
 
-  buildActiveOrder(data, orderDetail) {
-    const [fromRaw = '', toRaw = ''] = (data.title || '').split('-').map((s) => s.trim());
-    const firstItem = Array.isArray(data.sub) && data.sub.length ? data.sub[0] : null;
-    const customer = orderDetail?.customer || data?.customer || null;
-    const customerName = customer?.name || "Чигцалмаа";
-    const customerPhone = customer?.phone || "99001234";
-    const customerId = customer?.studentId || "23b1num0245";
-    const customerAvatar = customer?.avatar || "assets/img/profile.jpg";
-    const from = orderDetail?.from_name || fromRaw;
-    const to = orderDetail?.to_name || toRaw;
-    const createdAt = orderDetail?.created_at || this.parseMetaToISO(data.meta) || new Date().toISOString();
-    return {
-      orderId: data?.orderId || null,
-      from,
-      to,
-      item: firstItem?.name || '',
-      items: Array.isArray(data.sub) ? data.sub : [],
-      total: data.price || '',
-      createdAt,
-      customer: {
-        name: this.normalizeName(customerName),
-        phone: customerPhone,
-        studentId: customerId,
-        avatar: customerAvatar,
-      },
-    };
+  await this.loadCurrentUser();
+  
+  const isUserCourier = this.currentUser?.role === "courier";
+  
+  if (!isUserCourier) {
+    localStorage.setItem("login_prefill_role", "courier");
+    localStorage.setItem("login_prefill_mode", "register");
+    location.hash = "#login";
+    return;
   }
 
-  normalizeName(value) {
-    const raw = String(value || "").trim();
-    if (!raw) return "Чигцалмаа";
-    const tokens = raw.split(/\s+/).filter((t) => t && t.length > 1);
-    return tokens.length ? tokens.join(" ") : raw;
+  const customer = this.currentData?.customer || {};
+  const customerId = customer?.id || customer?.customer_id || null;
+  const customerStudentId = customer?.student_id || customer?.studentId || null;
+  
+  const selfId = this.currentUser?.id || null;
+  const selfStudentId = this.currentUser?.student_id || this.currentUser?.studentId || null;
+  
+  if (
+    (customerId && selfId && String(customerId) === String(selfId)) ||
+    (customerStudentId && selfStudentId && String(customerStudentId) === String(selfStudentId))
+  ) {
+    alert("Өөрийн захиалгыг өөрөө хүргэх боломжгүй.");
+    return;
   }
 
-  async handleConfirm() {
-    if (!this.currentData) {
-      this.close();
-      return;
-    }
+  this.removeFromOffersList(this.currentData);
 
-    await this.fetchCurrentUser();
-    const isCourier = this.currentUser?.role === "courier";
-    if (!isCourier) {
-      localStorage.setItem("login_prefill_role", "courier");
-      localStorage.setItem("login_prefill_mode", "register");
-      location.hash = "#login";
-      return;
-    }
+  let orderDetails = null;
+  const orderId = this.currentData?.orderId;
 
-    const customer = this.currentData?.customer || {};
-    const customerId = customer?.id || customer?.customer_id || null;
-    const customerStudentId = customer?.student_id || customer?.studentId || null;
-    const selfId = this.currentUser?.id || null;
-    const selfStudentId = this.currentUser?.student_id || this.currentUser?.studentId || null;
-    if (
-      (customerId && selfId && String(customerId) === String(selfId)) ||
-      (customerStudentId && selfStudentId && String(customerStudentId) === String(selfStudentId))
-    ) {
-      alert("Өөрийн захиалгыг өөрөө хүргэх боломжгүй.");
-      return;
-    }
-
-    let orderDetail = null;
-    const orderId = this.currentData?.orderId;
-
-    //  ХҮРГЭХ товч дарсан үед offers жагсаалтаас устгах
-    this.removeOfferFromList(this.currentData);
-
-    if (orderId) {
-      try {
-        const assignRes = await apiFetch(`/api/orders/${orderId}/assign-courier`, {
-          method: "POST",
-          credentials: "include",
-        });
-        if (assignRes.ok) {
-          const payload = await assignRes.json();
-          orderDetail = payload?.order || null;
-        }
-      } catch (e) {
-        // алдааг үл тоомсорлоно
-      }
-    }
-
-    const activeOrder = this.buildActiveOrder(this.currentData, orderDetail);
-    const added = await this.addToDeliveryCart(this.currentData);
-
-    if (!added) {
-      // Хэрэв хүргэлтийн сагсанд нэмэхэд бүтэлгүйтвэл модалыг хаана
-      this.close();
-      return;
-    }
-
-    await this.saveActiveOrder(activeOrder);
-    // ✅ appState: хүргэлт эхэлсэн тул courier болгоно
-    window.NumAppState?.setState("courier", "delivery_started");
-    localStorage.setItem("deliveryActive", "1");
-
-
-    // Дахин устгах (давхардсан ч цэвэрлэгээний үүднээс)
-    this.removeOfferFromList(this.currentData);
-
+  if (orderId) {
     try {
-      const res = await apiFetch("/api/courier/me", {
+      const response = await apiFetch(`/api/orders/${orderId}/assign-courier`, {
+        method: "POST",
         credentials: "include",
       });
-
-      if (res.ok) {
-        const courier = await res.json();
+      
+      if (response.ok) {
+        const data = await response.json();
+        orderDetails = data?.order || null;
       }
-    } catch (e) {
-      console.warn('courier fetch failed', e);
-    }
-
-    this.close();
-
-    // UI-г шинэчлэх үйл явдлуудыг илгээх
-    window.dispatchEvent(new Event('order-updated'));
-    window.dispatchEvent(new Event('delivery-cart-updated'));
-    window.dispatchEvent(new Event('offers-updated')); // ✅ Offers жагсаалтыг шинэчлэх шинэ үйл явдал
-
-    // Хүргэлтийн сагсыг шинэчлэх
-    const cartEl = document.querySelector('delivery-cart');
-    if (cartEl && typeof cartEl.load === 'function') {
-      cartEl.load();
-    }
-
-    // Offers жагсаалтыг шинэчлэх
-    if (!document.querySelector('delivery-cart')) {
-      location.hash = '#delivery';
+    } catch (error) {
     }
   }
 
-  async handleDelete() {
+  const addedToCart = await this.addToDeliveryCart(this.currentData);
+  
+  if (!addedToCart) {
+    this.closeModal();
+    return;
+  }
+
+  const activeOrder = this.buildActiveOrderData(this.currentData, orderDetails);
+  await this.saveActiveOrder(activeOrder);
+  
+  window.NumAppState?.setState("courier", "delivery_started");
+  localStorage.setItem("deliveryActive", "1");
+
+
+  this.removeFromOffersList(this.currentData);
+
+  try {
+    const response = await apiFetch("/api/courier/me", {
+      credentials: "include",
+    });
+
+    if (response.ok) {
+      const courier = await response.json();
+    }
+  } catch (error) {
+    console.warn('courier fetch failed', error);
+  }
+
+  this.closeModal();
+
+  window.dispatchEvent(new Event('order-updated'));
+  window.dispatchEvent(new Event('delivery-cart-updated'));
+  window.dispatchEvent(new Event('offers-updated'));
+
+  const cartElement = document.querySelector('delivery-cart');
+  if (cartElement && typeof cartElement.load === 'function') {
+    cartElement.load();
+  }
+
+  const isMobile = window.matchMedia("(max-width: 30rem)").matches;
+  
+  if (isMobile) {
+    location.hash = '#delivery';
+  } else {
+    console.log('Сагсанд амжилттай нэмэгдлээ');
+  }
+}
+
+  async deleteOffer() {
     if (!this.currentData) {
-      this.close();
+      this.closeModal();
       return;
     }
 
-    await this.fetchCurrentUser();
+    await this.loadCurrentUser();
     const orderId = this.currentData?.orderId || this.currentData?.id || null;
-    const isOwner = this.isOwnerOfOrder(this.currentData);
+    const isOwner = this.checkIfOwner(this.currentData);
 
     if (isOwner && orderId) {
-      const cancelled = await this.cancelOrderOnServer(orderId);
-      if (!cancelled) {
+      const deleted = await this.deleteOrderFromServer(orderId);
+      if (!deleted) {
         return;
       }
     }
 
-    this.removeOfferFromList(this.currentData);
-    this.refreshOffersList();
-    this.close();
+    this.removeFromOffersList(this.currentData);
+    window.dispatchEvent(new Event('offers-updated'));
+    this.closeModal();
   }
 
-  isOwnerOfOrder(data) {
-    const customer = data?.customer || {};
+  checkIfOwnOrder(offerData) {
+    const customer = offerData?.customer || {};
     const user = this.currentUser || {};
+    
     const customerId = customer?.id || customer?.customer_id || null;
     const customerStudentId = customer?.student_id || customer?.studentId || null;
     const userId = user?.id || null;
     const userStudentId = user?.student_id || user?.studentId || null;
+    
     if (customerId && userId && String(customerId) === String(userId)) return true;
     if (customerStudentId && userStudentId && String(customerStudentId) === String(userStudentId)) return true;
+    
     return false;
   }
 
-  async cancelOrderOnServer(orderId) {
+  checkIfOwner(offerData) {
+    return this.checkIfOwnOrder(offerData);
+  }
+
+  async deleteOrderFromServer(orderId) {
     try {
-      const res = await apiFetch(`/api/orders/${orderId}`, {
+      const response = await apiFetch(`/api/orders/${orderId}`, {
         method: "DELETE",
-        credentials: "include",
       });
-      if (res.status === 401) {
+      
+      if (response.status === 401) {
         location.hash = "#login";
         return false;
       }
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        alert(err?.error || "Захиалга устгахад алдаа гарлаа");
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        alert(error?.error || "Захиалга устгахад алдаа гарлаа");
         return false;
       }
+      
       return true;
-    } catch (e) {
+    } catch (error) {
       alert("Захиалга устгахад алдаа гарлаа");
       return false;
     }
   }
 
-  async addToDeliveryCart(data) {
-    const title = data.title || '';
-    const meta = data.meta || '';
-    const price = data.price || '';
-    const orderId = data.orderId || data.id || null;
+  async addToDeliveryCart(offerData) {
+    const cartItem = {
+      title: offerData.title || '',
+      meta: offerData.meta || '',
+      price: offerData.price || '',
+      thumb: offerData.thumb || "assets/img/box.svg",
+      sub: Array.isArray(offerData.sub) ? offerData.sub : [],
+      orderId: offerData.orderId || offerData.id || null,
+    };
+    
     try {
-      const res = await apiFetch("/api/delivery-cart", {
+      const response = await apiFetch("/api/delivery-cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          meta,
-          price,
-          thumb: data.thumb || "assets/img/box.svg",
-          sub: Array.isArray(data.sub) ? data.sub : [],
-          orderId,
-        }),
+        body: JSON.stringify(cartItem),
       });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        if (String(err.error || "").toLowerCase().includes("unauthorized")) {
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        if (String(error.error || "").toLowerCase().includes("unauthorized")) {
           location.hash = "#login";
           return false;
         }
-        alert(err.error || "Хүргэлт нэмэхэд алдаа гарлаа");
+        alert(error.error || "Хүргэлт нэмэхэд алдаа гарлаа");
         return false;
       }
-      await res.json().catch(() => ({}));
+      
       return true;
-    } catch (e) {
+    } catch (error) {
       alert("Хүргэлт нэмэхэд алдаа гарлаа");
       return false;
     }
   }
 
-  async saveActiveOrder(order) {
+  buildActiveOrderData(offerData, orderDetails) {
+    const titleParts = (offerData.title || '').split('-').map((s) => s.trim());
+    const fromLocation = titleParts[0] || '';
+    const toLocation = titleParts[1] || '';
+    
+    const firstItem = Array.isArray(offerData.sub) && offerData.sub.length 
+      ? offerData.sub[0] 
+      : null;
+    
+    const customer = orderDetails?.customer || offerData?.customer || {};
+    
+    return {
+      orderId: offerData?.orderId || null,
+      from: orderDetails?.from_name || fromLocation,
+      to: orderDetails?.to_name || toLocation,
+      item: firstItem?.name || '',
+      items: Array.isArray(offerData.sub) ? offerData.sub : [],
+      total: offerData.price || '',
+      createdAt: orderDetails?.created_at || new Date().toISOString(),
+      customer: {
+        name: customer?.name || "Чигцалмаа",
+        phone: customer?.phone || "99001234",
+        studentId: customer?.studentId || customer?.student_id || "23b1num0245",
+        avatar: customer?.avatar || "assets/img/profile.jpg",
+      },
+    };
+  }
+
+  async saveActiveOrder(orderData) {
     try {
       await apiFetch("/api/active-order", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ order }),
+        body: JSON.stringify({ order: orderData }),
       });
-    } catch (e) {
-      // ignore
+    } catch (error) {
     }
   }
 
-  async fetchCurrentUser() {
+  async loadCurrentUser() {
     if (this.currentUser) return this.currentUser;
+    
     try {
-      const res = await apiFetch("/api/auth/me", {
-        credentials: "include",
-      });
-      if (!res.ok) {
+      const response = await apiFetch("/api/auth/me");
+      
+      if (!response.ok) {
         this.currentUser = null;
       } else {
-        const data = await res.json();
+        const data = await response.json();
         this.currentUser = data?.user || null;
       }
-    } catch (e) {
+    } catch (error) {
       this.currentUser = null;
     }
+    
     return this.currentUser;
   }
 
+  removeFromOffersList(offerData) {
+    if (!offerData || typeof offerData !== 'object') return false;
+
+    const offersJSON = localStorage.getItem('offers');
+    
+    let offersList = [];
+    try {
+      offersList = offersJSON ? JSON.parse(offersJSON) : [];
+    } catch (error) {
+      console.error('Offers задлахад алдаа:', error);
+      offersList = [];
+    }
+
+    const orderId = offerData.orderId || offerData.id || null;
+    const offerKey = `${offerData.title || ''}|${offerData.meta || ''}|${offerData.price || ''}`;
+    const originalLength = offersList.length;
+
+    const updatedOffers = offersList.filter(item => {
+      const itemId = item.orderId || item.id || null;
+
+      if (orderId && itemId && String(itemId) === String(orderId)) {
+        return false;
+      }
+   
+      const itemKey = `${item.title || ''}|${item.meta || ''}|${item.price || ''}`;
+      return itemKey !== offerKey;
+    });
+
+    if (orderId) {
+      const removedIdsKey = this.getRemovedStorageKey('removed_offer_ids');
+      const removedIdsJSON = localStorage.getItem(removedIdsKey);
+      
+      let removedIds = [];
+      try {
+        removedIds = JSON.parse(removedIdsJSON) || [];
+      } catch (error) {
+        removedIds = [];
+      }
+      
+      const normalizedId = String(orderId);
+      if (!removedIds.includes(normalizedId)) {
+        removedIds.push(normalizedId);
+        localStorage.setItem(removedIdsKey, JSON.stringify(removedIds));
+      }
+    }
+
+    if (updatedOffers.length === originalLength) {
+      return false;
+    }
+
+    localStorage.setItem('offers', JSON.stringify(updatedOffers));
+
+    window.dispatchEvent(new CustomEvent('offer-removed', {
+      detail: {
+        removedOffer: offerData,
+        remainingOffers: updatedOffers
+      }
+    }));
+
+    return true;
+  }
+
+  // Хэрэглэгчийн storage key үүсгэх
   getRemovedStorageKey(baseKey) {
     const authKey = localStorage.getItem("authUserKey");
     const userId = this.currentUser?.id || "";
@@ -619,87 +684,24 @@ class OfferModal extends HTMLElement {
     return suffix ? `${baseKey}:${suffix}` : baseKey;
   }
 
-  removeOfferFromList(data) {
-    // Validate input
-    if (!data || typeof data !== 'object') return false;
-
-    // Get offers from localStorage
-    const raw = localStorage.getItem('offers');
-
-    // Parse offers
-    let offers = [];
-    try {
-      offers = raw ? (JSON.parse(raw) || []) : [];
-    } catch (e) {
-      console.error('Failed to parse offers from localStorage:', e);
-      offers = [];
-    }
-
-    const orderId = data.orderId || data.id || null;
-    const key = `${data.title || ''}|${data.meta || ''}|${data.price || ''}`;
-    const originalLength = offers.length;
-
-    // Filter out the matching offer
-    const next = offers.filter(item => {
-      const itemId = item.orderId || item.id || null;
-      if (orderId && itemId && String(itemId) === String(orderId)) {
-        return false;
-      }
-      const itemKey = `${item.title || ''}|${item.meta || ''}|${item.price || ''}`;
-      return itemKey !== key;
-    });
-
-    // Track removed offers to avoid rehydrating from API
-    if (orderId) {
-      const removedIdsKey = this.getRemovedStorageKey('removed_offer_ids');
-      const removedIdsRaw = localStorage.getItem(removedIdsKey);
-      let removedIds = [];
-      try {
-        removedIds = JSON.parse(removedIdsRaw) || [];
-      } catch (e) {
-        removedIds = [];
-      }
-      const normalizedId = String(orderId);
-      if (!removedIds.includes(normalizedId)) {
-        removedIds.push(normalizedId);
-        localStorage.setItem(removedIdsKey, JSON.stringify(removedIds));
-      }
-    } else if (key) {
-      const removedKeysKey = this.getRemovedStorageKey('removed_offer_keys');
-      const removedKeysRaw = localStorage.getItem(removedKeysKey);
-      let removedKeys = [];
-      try {
-        removedKeys = JSON.parse(removedKeysRaw) || [];
-      } catch (e) {
-        removedKeys = [];
-      }
-      if (!removedKeys.includes(key)) {
-        removedKeys.push(key);
-        localStorage.setItem(removedKeysKey, JSON.stringify(removedKeys));
-      }
-    }
-
-    // Check if anything was actually removed
-    if (next.length === originalLength) {
-      return false; // No offer was removed
-    }
-
-    // Save to localStorage
-    localStorage.setItem('offers', JSON.stringify(next));
-
-    // Dispatch event for other parts of the app
-    window.dispatchEvent(new CustomEvent('offer-removed', {
-      detail: {
-        removedOffer: data,
-        remainingOffers: next
-      }
-    }));
-
-    return true;
+  refreshOffersList() {
+    window.dispatchEvent(new Event('offers-updated'));
   }
 
-  async populateCourier(data) {
-    // courier details removed
+  parseMetaToISO(metaText) {
+    if (!metaText) return null;
+    const sanitized = metaText.replace('•', '');
+    const parsed = Date.parse(sanitized);
+    if (!Number.isNaN(parsed)) return new Date(parsed).toISOString();
+    return null;
+  }
+
+  normalizeName(nameValue) {
+    const rawName = String(nameValue || "").trim();
+    if (!rawName) return "Чигцалмаа";
+    
+    const nameTokens = rawName.split(/\s+/).filter((token) => token && token.length > 1);
+    return nameTokens.length ? nameTokens.join(" ") : rawName;
   }
 }
 
