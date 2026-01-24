@@ -179,6 +179,64 @@ router.get("/orders", async (req, res) => {
   }
 });
 
+router.get("/orders/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const q = `
+      SELECT
+        o.id,
+        o.status,
+        o.total_amount,
+        o.scheduled_at,
+        o.created_at,
+        fp.name AS from_name,
+        tp.name AS to_name,
+        json_build_object(
+          'id', c.id,
+          'name', c.full_name,
+          'phone', c.phone,
+          'student_id', c.student_id,
+          'avatar', c.avatar_url
+        ) AS customer,
+        CASE WHEN cu.id IS NULL THEN NULL ELSE json_build_object(
+          'id', cu.id,
+          'name', cu.full_name,
+          'phone', cu.phone,
+          'student_id', cu.student_id,
+          'avatar', cu.avatar_url
+        ) END AS courier,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'name', oi.name,
+              'qty', oi.qty
+            )
+          ) FILTER (WHERE oi.id IS NOT NULL),
+          '[]'::json
+        ) AS items
+      FROM orders o
+      JOIN places fp ON fp.id = o.from_place_id
+      JOIN places tp ON tp.id = o.to_place_id
+      JOIN users c ON c.id = o.customer_id
+      LEFT JOIN order_items oi ON oi.order_id = o.id
+      LEFT JOIN order_couriers oc ON oc.order_id = o.id
+      LEFT JOIN users cu ON cu.id = oc.courier_id
+      WHERE o.id = $1
+      GROUP BY o.id, fp.name, tp.name, c.id, c.full_name, c.phone, c.student_id, c.avatar_url,
+               cu.id, cu.full_name, cu.phone, cu.student_id, cu.avatar_url
+    `;
+
+    const r = await pool.query(q, [id]);
+    if (r.rows.length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    res.json(r.rows[0]);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.delete("/orders/:id", requireAuth, async (req, res) => {
   const { id } = req.params;
   const userId = req.user?.sub;

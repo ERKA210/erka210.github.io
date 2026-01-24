@@ -1,4 +1,8 @@
 class PersonDetail extends HTMLElement {
+    static get observedAttributes() {
+        return ["customer"];
+    }
+
     constructor() {
         super();
     }
@@ -6,6 +10,14 @@ class PersonDetail extends HTMLElement {
     connectedCallback() {
         this.title=this.getAttribute("title") ?? "";
         this.type=this.getAttribute("type") ?? "medium";
+
+        if (this.hasAttribute("customer")) {
+            try {
+                this.orderCustomer = JSON.parse(this.getAttribute("customer"));
+            } catch (e) {}
+            this.render();
+            return;
+        }
 
         this.render();
 
@@ -21,6 +33,12 @@ class PersonDetail extends HTMLElement {
     }
 
     attributeChangedCallback(name, oldVal, newVal) {
+        if (name === "customer" && oldVal !== newVal) {
+            try {
+                this.orderCustomer = JSON.parse(newVal);
+                this.render();
+            } catch (e) {}
+        }
     }
 
     adoptedCallback() {

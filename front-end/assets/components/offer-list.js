@@ -46,11 +46,6 @@ class OffersList extends HTMLElement {
     const rowElement = this.querySelector(".offers-row");
     
     if (!rowElement) return;
-
-    if (!offersArray || offersArray.length === 0) {
-      rowElement.innerHTML = '<p style="text-align: center; padding: 2rem;">Одоогоор саналгүй байна</p>';
-      return;
-    }
  
     rowElement.innerHTML = offersArray.map(createOfferCardHTML).join("");
   }
