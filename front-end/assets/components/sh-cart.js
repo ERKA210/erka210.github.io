@@ -1,31 +1,23 @@
-import { } from "../helper/escape-attr.js";
+import { escapeAttr} from "../helper/escape-attr.js";
+import { escapeHtml } from "../helper/escape-html.js";
+import { formatPrice } from "../helper/format-d-ts-p.js";
 import { getDeliveryIcon } from "../helper/delivery-icon.js";
 import { getDeliveryFee } from "../helper/delivery-fee.js";
 
 class ShCart extends HTMLElement {
     constructor() {
         super();
-        this.prices = {
-            "Кимбаб": 5500,
-            "Бургер": 6500,
-            "Бууз": 4000,
-            "Салад": 3000,
-            "Кола 0.5л": 2500,
-            "Хар цай": 1500,
-            "Кофе": 3000,
-            "Жүүс 0.33л": 2500
-        };
-
     }
 
     connectedCallback() {
         this.render();
-        this.initializeElements();
-        this.setupEventListeners();
-        this.updateTotalsAndCount();
+        this.getElements();
+        this.setupEvents();
+        this.updateCartTotals();
     }
     render() {
        this.innerHTML = `
+       <section>
           <h3>Таны сагс</h3>
           <div class="cart-icon">
             <svg><path opacity="0.4" d="M8.26012 21.9703C9.1827 21.9703 9.93865 22.7536 9.93883 23.7213C9.93883 24.6776 9.18281 25.4615 8.26012 25.4615C7.32644 25.4613 6.57066 24.6775 6.57066 23.7213C6.57084 22.7537 7.32655 21.9704 8.26012 21.9703ZM20.767 21.9703C21.6894 21.9704 22.4455 22.7536 22.4457 23.7213C22.4457 24.6775 21.6896 25.4614 20.767 25.4615C19.8331 25.4615 19.0765 24.6776 19.0765 23.7213C19.0767 22.7536 19.8333 21.9703 20.767 21.9703Z" fill="#C90D30"/>
@@ -47,16 +39,18 @@ class ShCart extends HTMLElement {
               <p class="total-price">0₮</p>
             </div>
           </div>
+        </section>
         `;
     }
 
-    initializeElements() {
+    getElements() {
         this.totalPriceEl = this.querySelector(".total-price");
         this.deliveryPriceEl = this.querySelector(".delivery-box p:last-child");
-        this.cartItemsContainer = this.querySelector(".cart-content > div:first-child");
+        this.cartItemsContainer = this.querySelector(".cart-content div:first-child");
         this.cartBadge = this.querySelector(".cart-icon span");
         this.foodSelect = document.querySelector("#what") || document.querySelector(".bottom-row select");
         this.deliveryImgEl = this.querySelector(".delivery-box img");
+
         if (!this.cartItemsContainer) {
             const cc = this.querySelector(".cart-content");
             if (cc) {
@@ -67,60 +61,146 @@ class ShCart extends HTMLElement {
         }
     }
 
-    setupEventListeners() {
+    setupEvents() {
         if (this.foodSelect) {
             this.foodSelect.addEventListener("change", (e) => {
-                    const opt = e.target.selectedOptions?.[0];
-                    if (!opt) return;
 
-                    const name = (opt.dataset.name || opt.textContent || "").split(" — ")[0].trim();
-                    const price = Number(opt.dataset.price || 0);
-                const img = e.target.selectedOptions && e.target.selectedOptions[0].dataset.img ? e.target.selectedOptions[0].dataset.img : '';
-                this.addItemToCart(name, price, img);
-                e.target.selectedIndex = 0;
-            });
-        }
+            const selectEl = e.target;
+            const options = selectEl.selectedOptions;
+
+            if (options.length === 0) {
+            return;
+            }
+
+            const option = options[0];
+
+            let name = "";
+
+            if (option.dataset.name) {
+            name = option.dataset.name;
+            } else {
+            name = option.textContent;
+            }
+
+            if (name.indexOf(" — ") !== -1) {
+            name = name.split(" — ")[0];
+            }
+
+            let price = 0;
+
+            if (option.dataset.price) {
+            price = option.dataset.price;
+            }
+
+            let img = "";
+
+            if (option.dataset.img) {
+            img = option.dataset.img;
+            }
+
+    this.addItemToCart(name, price, img);
+
+    selectEl.selectedIndex = 0;
+  });
+    }
 
         if (this.cartItemsContainer) {
-            this.cartItemsContainer.addEventListener("click", (e) => {
-                const delBtn = e.target.closest("svg.del-btn");
-                if (!delBtn) return;
-                const box = delBtn.closest(".item-box");
-                if (!box) return;
-                const qty = parseInt(box.dataset.qty || (box.querySelector("p")?.textContent.match(/(\d+)/)||[0,1])[1], 10) || 1;
-                const base = parseInt(box.dataset.price || this.parsePrice(box.querySelector(".price").textContent) / Math.max(qty,1), 10) || 0;
-                if (qty > 1) {
-                    const newQty = qty - 1;
-                    box.dataset.qty = String(newQty);
-                    box.querySelector("p").innerHTML = `<b>${this.escapeHtml(box.querySelector("b").textContent)}</b><br>${newQty} ширхэг`;
-                    box.querySelector(".price").textContent = this.formatPrice(base * newQty);
-                } else {
-                    box.remove();
-                }
-                this.updateTotalsAndCount();
-            });
+        this.cartItemsContainer.addEventListener("click", (e) => {
+
+        const delBtn = e.target.closest("svg.del-btn");
+        if (!delBtn) return;
+
+        const box = delBtn.closest(".item-box");
+        if (!box) return;
+
+        let qty = 1;
+        
+        if (box.dataset.qty) {
+        //10tiin toollin systemd too bolgno
+        qty = parseInt(box.dataset.qty, 10);
         }
+
+        let basePrice = 0;
+
+        if (box.dataset.price) {
+        basePrice = parseInt(box.dataset.price, 10);
+        }
+
+        if (qty > 1) {
+            const newQty = qty - 1;
+
+            box.dataset.qty = String(newQty);
+
+      const b = box.querySelector("b");
+      let title = "";
+      if (b) title = b.textContent || "";
+
+      const p = box.querySelector("p");
+      if (p) {
+        const safeTitle = escapeHtml(title);
+        p.innerHTML = `<b>${safeTitle}</b><br>${newQty} ширхэг`;
+      }
+
+      const priceEl = box.querySelector(".price");
+      if (priceEl) {
+        const newTotal = basePrice * newQty;
+        priceEl.textContent = formatPrice(newTotal);
+      }
+    } else {
+      box.remove();
+    }
+
+    this.updateCartTotals();
+  });
+}
     }
 
     addItemToCart(name, price, img = '') {
-        if (!name) return;
-        const boxes = [...this.cartItemsContainer.querySelectorAll(".item-box")];
-        const existing = boxes.find((box) => {
-            const label = box.querySelector("b");
-            return label && label.textContent.trim() === name;
-        });
+        const boxes = this.cartItemsContainer.querySelectorAll(".item-box");
+        let existingBox = null;
 
-        if (existing) {
-            const qty = parseInt(existing.dataset.qty || "1", 10) || 1;
+        for (let i = 0; i < boxes.length; i++) {
+            const box = boxes[i];
+
+            const b = box.querySelector("b");
+            if (!b) continue;
+
+            const label = b.textContent ? b.textContent.trim() : "";
+            if (label === name) {
+            existingBox = box;
+            break;
+            }
+        }
+
+          if (existingBox) {
+            let qty = 1;
+
+            if (existingBox.dataset.qty) {
+            qty = parseInt(existingBox.dataset.qty, 10);
+            }
+
             const newQty = qty + 1;
-            const basePrice = parseInt(existing.dataset.price || price, 10) || price;
 
-            existing.dataset.qty = String(newQty);
-            existing.dataset.price = String(basePrice);
-            existing.querySelector("p").innerHTML = `<b>${this.escapeHtml(name)}</b><br>${newQty} ширхэг`;
-            existing.querySelector(".price").textContent = this.formatPrice(basePrice * newQty);
+            let basePrice = price;
+            if (existingBox.dataset.price) {
+            const p = parseInt(existingBox.dataset.price, 10);
+            }
 
-            this.updateTotalsAndCount();
+            existingBox.dataset.qty = String(newQty);
+            existingBox.dataset.price = String(basePrice);
+
+            const pEl = existingBox.querySelector("p");
+            if (pEl) {
+            const safeName = escapeHtml(name);
+            pEl.innerHTML = `<b>${safeName}</b><br>${newQty} ширхэг`;
+            }
+
+            const priceEl = existingBox.querySelector(".price");
+            if (priceEl) {
+            priceEl.textContent = formatPrice(basePrice * newQty);
+            }
+
+            this.updateCartTotals();
             return;
         }
 
@@ -128,83 +208,121 @@ class ShCart extends HTMLElement {
         box.className = "item-box";
         box.dataset.qty = "1";
         box.dataset.price = String(price);
-        const imgHtml = img ? `<img class="item-img" src="${this.escapeAttr(img)}" alt="${this.escapeAttr(name)}">` : "";
-        box.innerHTML = `
-            ${imgHtml}
-            <p><b>${this.escapeHtml(name)}</b><br>1 ширхэг</p>
-            <p class="price">${this.formatPrice(price)}</p>
-            <svg class="del-btn" viewBox="0 0 20 20" width="18" height="18" role="button" aria-label="remove">
+
+        let imgHtml = "";
+        if (img !== "") {
+            const safeImg = escapeAttr(img);
+            const safeAlt = escapeAttr(name);
+            imgHtml = `<img class="item-img" src="${safeImg}" alt="${safeAlt}">`;
+        }
+
+        const safeName = escapeHtml(name);
+        const safePrice = formatPrice(price);
+
+        box.innerHTML =
+            imgHtml +
+            `<p><b>${safeName}</b><br>1 ширхэг</p>` +
+            `<p class="price">${safePrice}</p>` +
+            `<svg class="del-btn" viewBox="0 0 20 20" width="18" height="18" role="button" aria-label="remove">
                 <path d="M5.5415 15.75C5.10609 15.75 4.73334 15.6031 4.42327 15.3094C4.11321 15.0156 3.95817 14.6625 3.95817 14.25V4.5H3.1665V3H7.12484V2.25H11.8748V3H15.8332V4.5H15.0415V14.25C15.0415 14.6625 14.8865 15.0156 14.5764 15.3094C14.2663 15.6031 13.8936 15.75 13.4582 15.75H5.5415Z" fill="#C7C4CD"/>
             </svg>`;
+
         this.cartItemsContainer.appendChild(box);
 
-        this.updateTotalsAndCount();
+        this.updateCartTotals();
+        }
+
+    updateCartTotals() {
+    let boxes = [];
+    if (this.cartItemsContainer) {
+        boxes = this.cartItemsContainer.querySelectorAll(".item-box");
     }
 
-    updateTotalsAndCount() {
-        const boxes = [...(this.cartItemsContainer ? this.cartItemsContainer.querySelectorAll(".item-box") : [])];
-        let itemsTotal = 0;
-        let totalQty = 0;
-        const items = [];
+    let itemsTotal = 0;
+    let totalQty = 0;
+    const items = [];
 
-        boxes.forEach(box => {
-            const qty = parseInt(box.dataset.qty || (box.querySelector("p")?.textContent.match(/(\d+)/)||[0,1])[1], 10) || 1;
-            const base = parseInt(box.dataset.price || (this.parsePrice(box.querySelector(".price").textContent) / Math.max(qty,1)), 10) || 0;
-            itemsTotal += base * qty;
-            totalQty += qty;
+    for (let i = 0; i < boxes.length; i++) {
+        const box = boxes[i];
 
-            const name = box.querySelector("b")?.textContent?.trim() || "";
-            // Keep unit price to avoid NaN when sending to API
-            items.push({ name, qty, price: base, unitPrice: base });
+        let qty = 1;
+
+        if (box.dataset.qty) {
+        qty = parseInt(box.dataset.qty, 10);
+        } 
+        let base = 0;
+
+        if (box.dataset.price) {
+        base = parseInt(box.dataset.price, 10);
+        } 
+
+        let name = "";
+        const b = box.querySelector("b");
+        if (b) {
+        name = (b.textContent || "").trim();
+        }
+
+        itemsTotal = itemsTotal + (base * qty);
+        totalQty = totalQty + qty;
+
+        items.push({
+        name: name,
+        qty: qty,
+        price: base,
+        unitPrice: base
         });
+    }
 
-        const deliveryFee = getDeliveryFee(totalQty);
+    const deliveryFee = getDeliveryFee(totalQty);
 
-        const deliveryText = itemsTotal > 0 ? this.formatPrice(deliveryFee) : '0₮';
-        if (this.deliveryPriceEl) this.deliveryPriceEl.textContent = deliveryText;
+    let deliveryText = "0₮";
+    if (itemsTotal > 0) {
+        deliveryText = formatPrice(deliveryFee);
+    }
+    if (this.deliveryPriceEl) {
+        this.deliveryPriceEl.textContent = deliveryText;
+    }
 
-        const totalWithDelivery = itemsTotal > 0 ? itemsTotal + deliveryFee : 0;
-        if (this.totalPriceEl) this.totalPriceEl.textContent = this.formatPrice(totalWithDelivery);
+    let totalWithDelivery = 0;
+    if (itemsTotal > 0) {
+        totalWithDelivery = itemsTotal + deliveryFee;
+    }
+    if (this.totalPriceEl) {
+        this.totalPriceEl.textContent = formatPrice(totalWithDelivery);
+    }
 
-        if (this.cartBadge) this.cartBadge.textContent = String(totalQty);
+    if (this.cartBadge) {
+        this.cartBadge.textContent = String(totalQty);
+    }
 
-        const iconSrc = getDeliveryIcon(totalQty);
-            if (this.deliveryImgEl) {
-            this.deliveryImgEl.src = iconSrc;
-            this.deliveryImgEl.alt = `delivery tier ${totalQty}`;
-            }
+    const iconSrc = getDeliveryIcon(totalQty);
+    if (this.deliveryImgEl) {
+        this.deliveryImgEl.src = iconSrc;
+        this.deliveryImgEl.alt = "delivery tier " + totalQty;
+    }
 
-        this.style.display = totalQty === 0 ? "none" : "block";
+    if (totalQty === 0) {
+        this.style.display = "none";
+    } else {
+        this.style.display = "block";
+    }
 
-        // cache summary for external usage
-        this.summary = {
-            items,
-            itemsTotal,
-            deliveryFee,
-            total: totalWithDelivery,
-            totalQty,
-            deliveryIcon: iconSrc
-        };
+    this.summary = {
+        items: items,
+        itemsTotal: itemsTotal,
+        deliveryFee: deliveryFee,
+        total: totalWithDelivery,
+        totalQty: totalQty,
+        deliveryIcon: iconSrc
+    };
     }
 
     parsePrice(str) {
-        return parseInt(String(str || '').replace(/[^\d]/g, ''), 10) || 0;
-    }
-
-    formatPrice(n) {
-        return Number(n).toLocaleString('mn-MN') + '₮';
+        return parseInt(String(str || '').replace(/[^\d]/g, ''), 10);
     }
 
     getSummary() {
-        return this.summary || { items: [], itemsTotal: 0, deliveryFee: 0, total: 0, totalQty: 0 };
-    }
-
-    escapeAttr(s) {
-        return String(s || '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-    }
-
-    escapeHtml(s) {
-        return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return this.summary;
     }
 
 }

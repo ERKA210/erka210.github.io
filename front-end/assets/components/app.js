@@ -14,7 +14,6 @@ import './offer-list.js';
 import './delivery-cart.js';
 import './offer-modal.js';
 import './confirm-modal.js';
-import './order-confirm.js';
 import './order-progress.js';
 import './d-orders.js';
 import './del-order-details.js';

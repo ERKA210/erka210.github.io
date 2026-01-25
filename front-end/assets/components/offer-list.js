@@ -277,10 +277,8 @@ async function loadOffers() {
   }
   
   offersArray = filterExpiredOffers(offersArray);
-  console.log('Хугацаа дууссан хассаны дараа:', offersArray.length);
 
   offersArray = filterRemovedOffers(offersArray);
-  console.log('Устгасан хассаны дараа:', offersArray.length);
 
   localStorage.setItem("offers", JSON.stringify(offersArray));
 

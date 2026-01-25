@@ -1,33 +1,25 @@
 class SiteHeader extends HTMLElement {
   connectedCallback() {
-    this.render = this.render.bind(this);
-    this.updateActive = this.updateActive.bind(this);
-    this.handleDocClick = this.handleDocClick.bind(this);
-    this.handleUserUpdated = this.handleUserUpdated.bind(this);
-    this.handleAppStateChanged = this.handleAppStateChanged.bind(this);
-    this.loadUser = this.loadUser.bind(this);
-    this.scheduleIdle = this.scheduleIdle?.bind(this) || ((work) => {
-      if (typeof window.requestIdleCallback === "function") {
-        window.requestIdleCallback(() => work(), { timeout: 1200 });
-      } else {
-        setTimeout(work, 300);
-      }
-    });
+    this.onHashChange = () => this.updateActive();
+    this.onUserUpdated = () => this.handleUserUpdated();
+    this.onAppStateChanged = () => this.handleAppStateChanged();
+    this.onDocClick = (e) => this.handleDocClick(e);
+
 
     this.render();
 
-    window.addEventListener('hashchange', this.updateActive);
-    window.addEventListener('user-updated', this.handleUserUpdated);
-    window.addEventListener('app-state-changed', this.handleAppStateChanged);
-    this.scheduleIdle(this.loadUser);
+    window.addEventListener('hashchange', this.onHashChange);
+    window.addEventListener('user-updated', this.onUserUpdated);
+    window.addEventListener('app-state-changed', this.onAppStateChanged);
+    this.loadUser();
     this.updateActive();
   }
 
   disconnectedCallback() {
-    window.removeEventListener('hashchange', this.updateActive);
-    window.removeEventListener('user-updated', this.handleUserUpdated);
-    window.removeEventListener('app-state-changed', this.handleAppStateChanged);
-    document.removeEventListener('click', this.handleDocClick);
+    window.removeEventListener('hashchange', this.onHashChange);
+    window.removeEventListener('user-updated', this.onUserUpdated);
+    window.removeEventListener('app-state-changed', this.onAppStateChanged);
+    document.removeEventListener('click', this.onDocClick);
   }
 
   getAppState() {
