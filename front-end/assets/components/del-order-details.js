@@ -18,7 +18,6 @@ class DelOrderDetails extends HTMLElement {
             customer = json.customer || (json.order && json.order.customer);
           }
         } catch (err) {
-          // ignore
         }
       }
 
