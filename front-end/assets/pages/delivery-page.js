@@ -145,7 +145,7 @@ class DeliveryPage extends HTMLElement {
       const res = await fetch("/api/delivery-cart");
       if (res.ok) {
         const data = await res.json();
-        items = Array.isArray(data?.items) ? data.items : [];
+        items = data.items || [];
       }
     } catch (e) {
       items = [];
@@ -154,7 +154,6 @@ class DeliveryPage extends HTMLElement {
     if (!items.length) {
       listEl.innerHTML = '<p class="muted">Хүргэлт сонгоогүй байна.</p>';
 
-      // ✅ details + progress доторхийг empty болгож үлдээнэ (section title үлдэнэ)
       const details = this.querySelector("del-order-details");
       const progress = this.querySelector("del-order-progress");
       if (details) details.setAttribute("data-empty", "1");
@@ -163,7 +162,6 @@ class DeliveryPage extends HTMLElement {
       return;
     }
 
-    // ✅ items байгаа үед empty mode-г салгана
     const details = this.querySelector("del-order-details");
     const progress = this.querySelector("del-order-progress");
     if (details) details.removeAttribute("data-empty");

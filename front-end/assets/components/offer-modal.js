@@ -528,7 +528,7 @@ async confirmDelivery() {
       meta: offerData.meta || '',
       price: offerData.price || '',
       thumb: offerData.thumb || "assets/img/box.svg",
-      sub: Array.isArray(offerData.sub) ? offerData.sub : [],
+      sub: offerData.sub || [],
       orderId: offerData.orderId || offerData.id || null,
     };
     
@@ -572,7 +572,7 @@ async confirmDelivery() {
       from: orderDetails?.from_name || fromLocation,
       to: orderDetails?.to_name || toLocation,
       item: firstItem?.name || '',
-      items: Array.isArray(offerData.sub) ? offerData.sub : [],
+      items: offerData.sub || [],
       total: offerData.price || '',
       createdAt: orderDetails?.created_at || new Date().toISOString(),
       customer: {

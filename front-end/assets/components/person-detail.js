@@ -1,3 +1,5 @@
+import { escapeAttr } from "../helper/escape-attr.js";
+
 class PersonDetail extends HTMLElement {
     static get observedAttributes() {
         return ["customer"];
@@ -55,11 +57,11 @@ class PersonDetail extends HTMLElement {
       this.innerHTML=`
         <p style="font-weight: bold; font-size: 1rem;">${this.title}</p>
         <div class="delivery ${this.type=="medium" ? "" : "big"}">
-          <img src="${this.escape(avatar)}" alt="Захиалагчийн зураг">
+          <img src="${escapeAttr(avatar)}" alt="Захиалагчийн зураг">
           <div class="delivery-info">
-            <h3>Нэр: ${this.escape(name)}</h3>
-            <p>Утас: ${this.escape(phone)}</p>
-            <p>ID: ${this.escape(displayId)}</p>
+            <h3>Нэр: ${escapeAttr(name)}</h3>
+            <p>Утас: ${escapeAttr(phone)}</p>
+            <p>ID: ${escapeAttr(displayId)}</p>
           </div>
         </div>`;
 
@@ -72,10 +74,6 @@ class PersonDetail extends HTMLElement {
           }
         });
       }
-    }
-
-    escape(s) {
-      return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;");
     }
 
     normalizeName(value) {

@@ -50,8 +50,8 @@ router.post("/orders", async (req, res) => {
 
     const resolvedCustomerId = await ensureCustomerUser(client, {
       id: customerId,
-      name: sanitizeText(customerName || "Зочин хэрэглэгч", { maxLen: 80 }),
-      phone: customerPhone || "00000000",
+      name: sanitizeText(customerName || "", { maxLen: 80 }),
+      phone: customerPhone || "",
       studentId: sanitizeText(customerStudentId || "", { maxLen: 32 }),
     });
 
@@ -426,7 +426,7 @@ router.patch("/orders/:id/status", requireAuth, async (req, res) => {
     return res.status(403).json({ error: "Forbidden: courier only" });
   }
 
-  const status = String(req.body?.status || "").toLowerCase();
+  const status = req.body?.status;
   const allowed = new Set(["created", "preparing", "delivering", "delivered"]);
   if (!allowed.has(status)) {
     return res.status(400).json({ error: "Invalid status" });
@@ -473,51 +473,6 @@ router.patch("/orders/:id/status", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/orders/:id/pay", async (req, res) => {
-  const { id } = req.params;
-  const { amount, method } = req.body;
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-    await client.query(
-      `INSERT INTO payments (order_id, amount, method, status, paid_at)
-       VALUES ($1,$2,$3,'paid',now())`,
-      [id, amount, method]
-    );
-    await client.query(
-      `UPDATE orders SET status='delivered', total_amount=$1 WHERE id=$2`,
-      [amount, id]
-    );
-    await client.query(
-      `INSERT INTO order_status_history (order_id, status, note)
-       VALUES ($1,'delivered','Paid and delivered')`,
-      [id]
-    );
-    await client.query("COMMIT");
-    const meta = await pool.query(
-      `SELECT o.customer_id, oc.courier_id
-         FROM orders o
-         LEFT JOIN order_couriers oc ON oc.order_id = o.id
-        WHERE o.id = $1`,
-      [id]
-    );
-    const customerId = meta.rows[0]?.customer_id || null;
-    const courierId = meta.rows[0]?.courier_id || null;
-    broadcastOrderEvent({
-      event: "order-status",
-      orderId: id,
-      status: "delivered",
-      courierId,
-      customerId,
-    });
-    res.json({ ok: true });
-  } catch (e) {
-    await client.query("ROLLBACK");
-    res.status(500).json({ error: e.message });
-  } finally {
-    client.release();
-  }
-});
 
 router.post("/orders/:id/review", async (req, res) => {
   const { id } = req.params;

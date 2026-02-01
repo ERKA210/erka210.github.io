@@ -1,25 +1,33 @@
+import { apiFetch } from "../api_client.js";
+
 class SiteHeader extends HTMLElement {
   connectedCallback() {
-    this.onHashChange = () => this.updateActive();
-    this.onUserUpdated = () => this.handleUserUpdated();
-    this.onAppStateChanged = () => this.handleAppStateChanged();
-    this.onDocClick = (e) => this.handleDocClick(e);
-
-
     this.render();
-
-    window.addEventListener('hashchange', this.onHashChange);
-    window.addEventListener('user-updated', this.onUserUpdated);
-    window.addEventListener('app-state-changed', this.onAppStateChanged);
+    this.setupEventListeners();
     this.loadUser();
     this.updateActive();
+
   }
 
   disconnectedCallback() {
-    window.removeEventListener('hashchange', this.onHashChange);
+    window.removeEventListener('hashchange', this.handleHashChange);
     window.removeEventListener('user-updated', this.onUserUpdated);
     window.removeEventListener('app-state-changed', this.onAppStateChanged);
     document.removeEventListener('click', this.onDocClick);
+  }
+
+  setupEventListeners() {
+   this.handleHashChange = () => this.updateActive();
+   window.addEventListener("hashchange", this.handleHashChange);
+
+   this.onUserUpdated = () => this.loadUser();
+   window.addEventListener("user-updated", this.onUserUpdated);
+
+   this.onAppStateChanged = () => this.handleAppStateChanged();
+   window.addEventListener("app-state-changed", this.onAppStateChanged);
+
+   this.onDocClick = (e) => this.handleDocClick(e);
+   document.addEventListener("click", this.onDocClick);
   }
 
   getAppState() {
@@ -93,8 +101,7 @@ class SiteHeader extends HTMLElement {
   render() {
     const isAuthed = Boolean(this.currentUser);
 
-    document.removeEventListener("click", this.handleDocClick);
-
+    document.removeEventListener('click', this.onDocClick);
     const logoPng = "assets/img/logo_light_last.png";
     const logoWebp = "assets/img/logo_light_last.webp";
 
@@ -135,22 +142,6 @@ class SiteHeader extends HTMLElement {
       });
     }
 
-    if (window.matchMedia) {
-      const media = window.matchMedia("(prefers-color-scheme: dark)");
-      const logo = this.querySelector(".brand-logo");
-      if (logo) {
-        const updateLogo = () => {
-          logo.src = logoPng;
-        };
-        updateLogo(media);
-        if (media.addEventListener) {
-          media.addEventListener("change", updateLogo);
-        } else {
-          media.addListener(updateLogo);
-        }
-      }
-    }
-
     const avatarBtn = this.querySelector(".avatar-btn");
     if (avatarBtn) {
       avatarBtn.innerHTML = `<img src="assets/img/profile.jpg" alt="Профайл" width="40" height="40" decoding="async">`;
@@ -159,21 +150,12 @@ class SiteHeader extends HTMLElement {
       });
     }
 
-    const profileAction = this.querySelector(".avatar-action");
-    if (profileAction) {
-      profileAction.addEventListener("click", () => {
-        location.hash = "#profile";
-      });
-    }
-
     const logoutHandlers = this.querySelectorAll(".avatar-logout, .logout-btn");
     logoutHandlers.forEach((logoutBtn) => {
       logoutBtn.addEventListener("click", async () => {
         try {
-          await fetch("/api/auth/logout", { method: "POST" });
-        } catch (e) {
-          // ignore
-        }
+          await apiFetch("/api/auth/logout", { method: "POST" });
+        } catch {}
         localStorage.removeItem("auth_token");
 
         localStorage.removeItem("authLoggedIn");
@@ -200,6 +182,8 @@ class SiteHeader extends HTMLElement {
       this.classList.remove("profile-open");
     }
   }
+
+
 
   handleUserUpdated() {
     this.loadUser();
@@ -228,14 +212,13 @@ class SiteHeader extends HTMLElement {
 
   updateActive() {
     if (!location.hash) {
-      history.replaceState(null, '', '#home');
+      location.hash = "#home";
     }
 
     const current = location.hash || '#home';
     const allowed = new Set(this.getNavLinks().map((link) => link.href));
     allowed.add("#pay");
     allowed.add("#login");
-    if (!allowed.size) return;
     if (!allowed.has(current)) {
       location.hash = "#home";
       return;

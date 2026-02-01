@@ -1,4 +1,3 @@
-// Бусад файлуудаас функцүүдийг авч ирэх
 import { formatPrice, parsePrice } from "../helper/format-d-ts-p.js";
 import { escapeAttr } from "../helper/escape-attr.js";
 import { escapeHtml } from "../helper/escape-html.js";
@@ -97,10 +96,9 @@ class DeliveryCart extends HTMLElement {
         this.items = [];
       } else {
         const data = await response.json();
-        this.items = Array.isArray(data?.items) ? data.items : [];
+        this.items = data.items || [];
       }
     } catch (error) {
-      this.items = [];
     }
     
     this.displayCartItems();
@@ -109,7 +107,7 @@ class DeliveryCart extends HTMLElement {
   displayCartItems() {
     if (!this.listEl) return;
     
-    const cartItems = Array.isArray(this.items) ? this.items : [];
+    const cartItems = this.items || [];
     this.listEl.innerHTML = "";
 
     if (cartItems.length === 0) {
@@ -159,7 +157,7 @@ class DeliveryCart extends HTMLElement {
   }
   
   createSubtitleText(subItems) {
-    const itemsArray = Array.isArray(subItems) ? subItems : [];
+    const itemsArray = subItems || [];
     const itemNames = itemsArray.map((s) => s?.name).filter(Boolean);
     
     return itemNames.length > 0 ? itemNames.join(", ") : "Бараа алга";

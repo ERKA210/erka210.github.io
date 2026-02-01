@@ -10,6 +10,7 @@
   --color-pay-confirm-hover: #059669;
   --color-pay-status: #34d399;
   --color-pay-primary-hover: #a00a27;
+   --color-white: #ffffff;
 
 
   --color-surface: #fff;        
@@ -91,6 +92,7 @@
     --color-border: #243040;
     --color-text: #e5e7eb;
     --color-muted: #9aa4b2;
+    --color-white: #ffffff;
 
     --color-surface: var(--color-bg);
     --color-surface-hover: var(--color-surface-2);
@@ -457,7 +459,7 @@ num-router > [data-route].is-leaving {
   }
 
   .top-menu a.is-active svg path {
-    fill: var(--color-surface);
+    fill: var(--color-white);
   }
 
   .top-menu a.is-active span {

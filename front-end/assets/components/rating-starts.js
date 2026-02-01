@@ -6,49 +6,50 @@ class RatingStars extends HTMLElement {
   }
 
   connectedCallback() {
-    const max = parseInt(this.getAttribute('max')) || 5;
-    const color = this.getAttribute('color') || 'gold';
-    const size = this.getAttribute('size') || '26px';
-
-    const style = document.createElement('style');
-    style.textContent = `
-      .rating {
-        display: flex;
-        gap: 5px;
-        cursor: pointer;
-        justify-content: center;
-      }
-      .star {
-        font-size: ${size};
-        color: #ccc;
-        transition: color 0.25s;
-      }
-      .star.filled {
-        color: ${color};
-      }
+    this.shadowRoot.innerHTML = `
+      <style>
+        .rating {
+          display: flex;
+          gap: 5px;
+          cursor: pointer;
+          justify-content: center;
+        }
+        .star {
+          font-size: 28px;
+          color: #ccc;
+          transition: color 0.25s;
+        }
+        .star.filled {
+          color: orange;
+        }
+      </style>
+      <div class="rating">
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+      </div>
     `;
 
-    const container = document.createElement('div');
-    container.classList.add('rating');
+    this.setupEvents();
+  }
 
-    for (let i = 1; i <= max; i++) {
-      const span = document.createElement('span');
-      span.textContent = '★';
-      span.classList.add('star');
+  setupEvents() {
+    const stars = this.shadowRoot.querySelectorAll('.star');
+    
+    stars.forEach((span, index) => {
+      const starValue = index + 1;
 
-      span.addEventListener('mouseover', () => this.updateStars(i));
+      span.addEventListener('mouseover', () => this.updateStars(starValue));
       span.addEventListener('mouseout', () => this.updateStars(this.value));
 
       span.addEventListener('click', () => {
-        this.value = i;
-        this.setAttribute('value', i);
-        this.dispatchEvent(new CustomEvent('rate', { detail: i }));
+        this.value = starValue;
+        this.setAttribute('value', starValue);
+        this.dispatchEvent(new CustomEvent('rate', { detail: starValue }));
       });
-
-      container.appendChild(span);
-    }
-
-    this.shadowRoot.append(style, container);
+    });
   }
 
   updateStars(count) {

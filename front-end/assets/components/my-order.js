@@ -76,7 +76,7 @@ class MyOrder extends HTMLElement {
     try {
       const raw = localStorage.getItem("offers");
       const offers = raw ? JSON.parse(raw) : [];
-      const match = Array.isArray(offers) ? offers.find((o) => (o?.orderId || o?.id) === orderId) : null;
+      const match = offers.find((o) => (o?.orderId || o?.id) === orderId) || null;
       return match?.thumb || "";
     } catch {
       return "";

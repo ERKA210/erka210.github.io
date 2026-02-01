@@ -1,5 +1,3 @@
-import { apiFetch } from "../api_client.js";
-
 class PlacePicker extends HTMLElement {
     constructor() {
         super();
@@ -8,18 +6,16 @@ class PlacePicker extends HTMLElement {
 
     connectedCallback() {
         //implementation
-        this.render();
-        this.elements();
-        this.loadPlaces();
+        this.render()
     }
 
     disconnectedCallback() {
         //implementation
     }
 
-    render() {
+    render(){
         this.innerHTML = `
-         <div class="ctrl">
+        <div class="ctrl">
             <span><img src="assets/img/map_pin.svg" alt="icon" width="16" height="16" /></span>
             <select id="fromPlace">
               <option value="" disabled selected hidden>Хаанаас</option>
@@ -33,43 +29,24 @@ class PlacePicker extends HTMLElement {
             <select id="toPlace">
               <option value="" disabled selected hidden>Хаашаа</option>
             </select>
-          </div>
-          `;
-        }
-    
-    elements() {
-    this.fromSel = this.querySelector("#from");
-    this.toSel = this.querySelector("#to");
+          </div>`
     }
-     async loadPlaces() {
-    const [fromRes, toRes] = await Promise.all([
-      apiFetch("/api/from-places"),
-      apiFetch("/api/to-places"),
-    ]);
 
-    if (!fromRes.ok || !toRes.ok) return;
+    fromSel = this.querySelector("#fromPlace");
+    toSel = this.querySelector("#toPlace");
 
-    this.fill(this.fromSel, await fromRes.json());
-    this.fill(this.toSel, await toRes.json());
-  }
+    async loadData(){
+        try {
+            const fromRes = await apiFetch("/api/from-places");
+            const toRes = await apiFetch("/api/to-places");
+            if (!fromRes.ok || !toRes.ok) return;
+            const [from, to] = await Promise.all([fromRes.json(), toRes.json()]);
+            this.fillPlaceSelect(this.fromSel, from, "Хаанаас", (p) => p.name);
+            this.fillPlaceSelect(this.toSel, to, "Хаашаа", (p) => p.name);
 
-    fill(select, items) {
-    items.forEach(p => {
-      const o = document.createElement("option");
-      o.value = p.id;
-      o.textContent = p.name;
-      select.appendChild(o);
-    });
-  }
-
-    getValue() {
-    return {
-      fromId: this.fromSel.value,
-      toId: this.toSel.value,
-      fromText: this.fromSel.selectedOptions[0]?.textContent || "",
-      toText: this.toSel.selectedOptions[0]?.textContent || "",
-    };
+        } catch {}
     }
+
 }
 
-customElements.define('place-picker', PlacePicker);
+window.customElements.define('place-picker', PlacePicker);

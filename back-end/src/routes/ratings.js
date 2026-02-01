@@ -44,7 +44,7 @@ router.post("/ratings", requireAuth, async (req, res) => {
     const { orderId, stars, comment } = req.body || {};
     assertUuid(orderId, "orderId must be UUID");
     const starsNum = Number(stars);
-    if (!Number.isInteger(starsNum) || starsNum < 1 || starsNum > 5) {
+    if (starsNum < 1 || starsNum > 5) {
       return res.status(400).json({ error: "stars must be 1-5" });
     }
 

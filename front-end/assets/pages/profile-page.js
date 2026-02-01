@@ -1,3 +1,4 @@
+import { apiFetch } from "../api_client";
 class ProfilePage extends HTMLElement {
   connectedCallback() {
     this.handleRouteChange = this.handleRouteChange?.bind(this) || (() => this.onRouteChange());
@@ -386,15 +387,22 @@ class ProfilePage extends HTMLElement {
 
   async loadOrderHistory() {
     try {
-      if (this.currentUser?.role && this.currentUser.role !== "customer") {
+      const userId = this.currentUser?.id;
+      if (!userId) {
         this.updateHistoryUI("orders", [], "Захиалга байхгүй");
         return;
       }
+
       this.updateHistoryMessage("orders", "Ачааллаж байна...");
-      const res = await fetch("/api/orders/history/customer", { credentials: "include" });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) return;
-      const items = Array.isArray(data?.items) ? data.items : [];
+      const res = await fetch(`/api/orders?customerId=${encodeURIComponent(userId)}`, { credentials: "include" });
+      const data = await res.json().catch(() => []);
+      
+      if (!res.ok) {
+        this.updateHistoryUI("orders", [], "Захиалга ачааллахад алдаа гарлаа");
+        return;
+      }
+
+      const items = data || [];
       const list = items.map((item) => ({
         title: `${item.from_name || ""} → ${item.to_name || ""}`.trim(),
         detail: this.formatHistoryDetail(item),
@@ -416,7 +424,7 @@ class ProfilePage extends HTMLElement {
       const res = await fetch("/api/orders/history/courier", { credentials: "include" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) return;
-      const items = Array.isArray(data?.items) ? data.items : [];
+      const items = data.items || [];
       const list = items.map((item) => ({
         title: `${item.from_name || ""} → ${item.to_name || ""}`.trim(),
         detail: this.formatHistoryDetail(item),
@@ -568,7 +576,7 @@ class ProfilePage extends HTMLElement {
       const courierRes = await fetch(`/api/ratings/courier/${this.currentUser.id}`);
       if (!courierRes.ok) return;
       const courierData = await courierRes.json();
-      const items = Array.isArray(courierData?.items) ? courierData.items : [];
+      const items = courierData.items || [];
       const reviews = items.map((r) => ({
         text: r.comment || "",
         stars: r.stars,
@@ -649,16 +657,13 @@ class ProfilePage extends HTMLElement {
     if (!userId) return;
 
     try {
-      const res = await fetch(`/api/orders?customerId=${encodeURIComponent(userId)}`, {
-        credentials: "include",
-      });
-      const data = await res.json().catch(() => []);
-      if (!res.ok || !Array.isArray(data)) return;
+      const res = await apiFetch(`/api/orders?customerId=${userId}`);
+      if (!res.ok) return;
+      const data = await res.json();
 
       const total = data.length;
       totalEl.textContent = String(total);
     } catch (e) {
-      // ignore
     }
   }
 

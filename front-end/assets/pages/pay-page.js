@@ -1,7 +1,8 @@
+import { apiFetch } from "../api_client";
+
 class PayPage extends HTMLElement {
   connectedCallback() {
-    this.handleRouteChange = this.handleRouteChange.bind(this);
-    window.addEventListener("hashchange", this.handleRouteChange);
+    window.addEventListener("hashchange", () => this.handleRouteChange());
     this.handleRouteChange();
   }
 
@@ -11,8 +12,6 @@ class PayPage extends HTMLElement {
 
   async handleRouteChange() {
     if (location.hash !== "#pay") return;
-
-    // 🔐 ROLE GUARD (only logged-in courier)
     const loggedIn = localStorage.getItem("authLoggedIn");
     const role = localStorage.getItem("authRole");
 
@@ -20,15 +19,13 @@ class PayPage extends HTMLElement {
       location.hash = "#login";
       return;
     }
-
-    // ✅ identify user (fallback to API if localStorage missing)
     let phone = (localStorage.getItem("authPhone") || "").trim();
     let studentId = (localStorage.getItem("authStudentId") || "").trim();
     let userId = (localStorage.getItem("authUserKey") || "").trim();
 
     if (!phone && !studentId) {
       try {
-        const meRes = await fetch("/api/auth/me", { credentials: "include" });
+        const meRes = await apiFetch("/api/auth/me");
         if (meRes.ok) {
           const data = await meRes.json();
           const user = data?.user || {};
@@ -37,7 +34,6 @@ class PayPage extends HTMLElement {
           userId = String(user.id || userId || "").trim();
         }
       } catch {
-        // ignore
       }
     }
 
@@ -161,15 +157,13 @@ class PayPage extends HTMLElement {
     methodRadios.forEach((r) => r.addEventListener("change", syncMethodUI));
     syncMethodUI();
 
-    // ✅ init paid sync for current session (delivery guard uses courierPaid)
     localStorage.setItem("courierPaid", isPaid() ? "1" : "0");
     if (isPaid()) showPaidUI();
     else showUnpaidUI();
 
     payBtn?.addEventListener("click", () => {
-      // mock payment success
-      localStorage.setItem(paidKey, "1");     // ✅ per-user
-      localStorage.setItem("courierPaid", "1"); // ✅ current session sync
+      localStorage.setItem(paidKey, "1");     
+      localStorage.setItem("courierPaid", "1"); 
       showPaidUI();
       window.dispatchEvent(new Event("user-updated"));
     });

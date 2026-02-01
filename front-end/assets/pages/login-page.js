@@ -229,7 +229,6 @@ class LoginPage extends HTMLElement {
 
           const data = await res.json();
 
-          // ✅ auth state (server role/identity ашиглана)
           const serverRole =
             (data?.user?.role || data?.role || roleValue || role || "customer") === "courier"
               ? "courier"
@@ -245,7 +244,6 @@ class LoginPage extends HTMLElement {
           localStorage.setItem("authStudentId", serverStudentId);
           localStorage.setItem("authUserKey", userKey);
 
-          // ✅ courierPaid-г per-user key-ээс сэргээнэ
           if (serverRole === "courier" && userKey) {
             const paidKey = `courierPaid:${userKey}`;
             const paid = localStorage.getItem(paidKey) === "1" ? "1" : "0";
@@ -256,7 +254,6 @@ class LoginPage extends HTMLElement {
 
 
 
-          // ✅ courierPaid-г default 0 болгож тогтооно (null биш)
           if (role === "courier") {
             if (localStorage.getItem("courierPaid") !== "1") {
               localStorage.setItem("courierPaid", "0");
