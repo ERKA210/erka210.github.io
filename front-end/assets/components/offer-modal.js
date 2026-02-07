@@ -615,7 +615,7 @@ async confirmDelivery() {
   }
 
   removeFromOffersList(offerData) {
-    if (!offerData || typeof offerData !== 'object') return false;
+    if (!offerData) return false;
 
     const offersJSON = localStorage.getItem('offers');
     

@@ -24,7 +24,6 @@ delivery-page {
 /*Миний сонгосон захиалгын жагсаалт харуулах хэсэг*/
   .orders {
     grid-area: ord;
-    flex: 1;
     background: var(--color-bg);
     border-radius: var(--radius-lg);
     box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
@@ -91,7 +90,6 @@ delivery-page {
 /*Миний сонгосон захиалгын захиалагчийн мэдээллийг харуулах хэсэг*/
   .details {
     grid-area: det;
-    flex: 1.5;
     background: var(--color-bg);
     border-radius: var(--radius-lg);
     box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.08);
@@ -101,7 +99,6 @@ delivery-page {
 /*Миний сонгосон захиалгын захиалагчид явцын харуулах хэсэг*/
   .order-step {
     grid-area: stp;
-    flex: 0.8;
     background: var(--color-bg);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
@@ -337,8 +334,6 @@ delivery-page {
 
     .orders {
       grid-area: ord;
-      display: flex;
-      flex-wrap: wrap;
       width: 100%;
       padding: 0.8rem 1rem;
       margin-top: 0.5rem;

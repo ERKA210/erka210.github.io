@@ -223,8 +223,7 @@ class LoginPage extends HTMLElement {
           });
 
           if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || "Нэвтрэх үед алдаа гарлаа");
+            console.warn("login failed", res.status);
           }
 
           const data = await res.json();

@@ -1,3 +1,4 @@
+import { apiFetch } from "../api_client.js";
 import { ORDERS, getOrderById, loadSteps, saveSteps } from "./delivery-data.js";
 
 const STEP_LABELS = [
@@ -11,41 +12,42 @@ class DelOrderProgress extends HTMLElement {
     this.stepsState = loadSteps();
     this.currentId = ORDERS[0]?.id || null;
     this.activeOrder = null;
-    this.handleDeliverySelect = (e) => {
-      const data = e.detail || null;
-      const selectedId = data?.orderId || data?.id || null;
-      if (!selectedId) return;
-      this.userSelected = true;
-      this.activeOrder = { id: selectedId };
-      this.currentId = selectedId;
-      this.render();
-    };
-    this.handleOrderSelect = (e) => {
-      this.currentId = e.detail.id;
-      this.render();
-    };
-    this.handleOrderUpdated = this.loadActiveOrder.bind(this);
+    this.userSelected = false;
 
     this.render();
     this.loadActiveOrder();
 
     document.addEventListener("order-select", this.handleOrderSelect);
     document.addEventListener("delivery-select", this.handleDeliverySelect);
-    window.addEventListener("order-updated", this.handleOrderUpdated);
+    window.addEventListener("order-updated", this.loadActiveOrder);
   }
 
   disconnectedCallback() {
     document.removeEventListener("order-select", this.handleOrderSelect);
     document.removeEventListener("delivery-select", this.handleDeliverySelect);
-    window.removeEventListener("order-updated", this.handleOrderUpdated);
+    window.removeEventListener("order-updated", this.loadActiveOrder);
     if (this._ratingTimer) {
       clearInterval(this._ratingTimer);
       this._ratingTimer = null;
     }
-
   }
 
-  async loadActiveOrder() {
+  handleDeliverySelect = (e) => {
+    const data = e.detail || null;
+    const selectedId = data?.orderId || data?.id || null;
+    if (!selectedId) return;
+    this.userSelected = true;
+    this.activeOrder = { id: selectedId };
+    this.currentId = selectedId;
+    this.render();
+  };
+
+  handleOrderSelect = (e) => {
+    this.currentId = e.detail.id;
+    this.render();
+  };
+
+  loadActiveOrder = async () => {
     try {
       const res = await fetch("/api/active-order", { credentials: "include" });
       if (!res.ok) return;
@@ -59,7 +61,7 @@ class DelOrderProgress extends HTMLElement {
     } catch (e) {
       // ignore
     }
-  }
+  };
 
   getCurrentStep() {
     const order = this.getCurrentOrder();
@@ -130,7 +132,6 @@ class DelOrderProgress extends HTMLElement {
       const current = this.getCurrentStep();
       const maxIndex = STEP_LABELS.length - 1;
 
-      // ✅ Delivered дээр дахиж Next даруулахгүй
       if (current >= maxIndex) {
         nextBtn.disabled = true;
         nextBtn.textContent = "Үнэлгээ хүлээж байна";
@@ -153,56 +154,47 @@ class DelOrderProgress extends HTMLElement {
       }
 
       if (nextIdx === maxIndex) {
-        // ✅ Delivered болсон: устгахгүй, үнэлгээ иртэл хүлээнэ
         localStorage.setItem("deliveryAwaitRating", "1");
         this.startRatingPoll(order.id);
       }
 
-
-
       this.render();
     });
-
   }
 
-  async updateOrderStatus(orderId, stepIndex) {
+  updateOrderStatus = async (orderId, stepIndex) => {
     const statusMap = {
       1: "delivering",
       2: "delivered",
     };
     const status = statusMap[stepIndex] || "created";
     try {
-      const res = await fetch(`/api/orders/${encodeURIComponent(orderId)}/status`, {
+      const res = await apiFetch(`/api/orders/${orderId}/status`, {
         method: "PATCH",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.warn("status update failed", err?.error || res.status);
+        console.warn("status update failed", res.status);
       }
     } catch (e) {
       console.warn("status update error", e);
     }
-  }
-  startRatingPoll(orderId) {
+  };
+
+  startRatingPoll = (orderId) => {
     if (this._ratingTimer) return;
 
     this._ratingTimer = setInterval(async () => {
       try {
-        // ✅ courier өөрийн id-г авна
-        const meRes = await fetch("/api/auth/me", { credentials: "include" });
+        const meRes = await apiFetch("/api/auth/me");
         if (!meRes.ok) return;
         const me = await meRes.json();
         const courierId = me?.user?.id;
         if (!courierId) return;
 
-        // ✅ courier-д ирсэн ratings-аас энэ order үнэлэгдсэн эсэхийг шалгана
-        const rRes = await fetch(`/api/ratings/courier/${encodeURIComponent(courierId)}`, {
-          credentials: "include",
-        });
+        const rRes = await apiFetch(`/api/ratings/courier/${courierId}`);
         if (!rRes.ok) return;
         const data = await rRes.json();
         const items = data?.items || [];
@@ -210,22 +202,19 @@ class DelOrderProgress extends HTMLElement {
         const rated = items.some(r => String(r.order_id) === String(orderId));
         if (!rated) return;
 
-        // ✅ үнэлгээ орсон байна → одоо л courier тал цэвэрлэнэ
         clearInterval(this._ratingTimer);
         this._ratingTimer = null;
 
-        // local steps цэвэрлээд дараа нь reset
         delete this.stepsState[orderId];
         saveSteps(this.stepsState);
         localStorage.removeItem("deliveryAwaitRating");
 
-        window.NumAppState?.resetToGuest("rating_done");
-      } catch {
+        window.NumAppState?.logout("rating_done");
+      } catch (e) {
         // ignore
       }
-    }, 3000); // 3 секунд тутам
-  }
-
+    }, 3000);
+  };
 }
 
 customElements.define("del-order-progress", DelOrderProgress);

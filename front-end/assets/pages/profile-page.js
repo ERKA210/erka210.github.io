@@ -1,16 +1,21 @@
 import { apiFetch } from "../api_client";
+
 class ProfilePage extends HTMLElement {
   connectedCallback() {
-    this.handleRouteChange = this.handleRouteChange?.bind(this) || (() => this.onRouteChange());
     window.addEventListener("hashchange", this.handleRouteChange);
     this.handleRouteChange();
   }
 
-  onRouteChange() {
+  disconnectedCallback() {
+    window.removeEventListener("hashchange", this.handleRouteChange);
+    window.removeEventListener("reviews-updated", this.loadReviews);
+  }
+
+  handleRouteChange = () => {
     if (location.hash !== "#profile") return;
     this.renderAccessGate();
     this.ensureAuthenticated();
-  }
+  };
 
   renderAccessGate() {
     this.innerHTML = `
@@ -29,7 +34,7 @@ class ProfilePage extends HTMLElement {
     `;
   }
 
-  async ensureAuthenticated() {
+  ensureAuthenticated = async () => {
     try {
       const res = await fetch("/api/auth/me");
       if (!res.ok) {
@@ -46,7 +51,7 @@ class ProfilePage extends HTMLElement {
     } catch (e) {
       this.redirectToLogin();
     }
-  }
+  };
 
   redirectToLogin() {
     this.innerHTML = `
@@ -67,13 +72,11 @@ class ProfilePage extends HTMLElement {
 
   renderProfile() {
     this.profileData = this.loadProfileData();
-    const activeOrders = this.getActiveOrders();
-    const activeOrdersMarkup = this.buildActiveOrdersMarkup(activeOrders);
-    const reviews = this.getReviews();
-    const reviewsMarkup = this.buildReviewsMarkup(reviews);
-    const reviewsModalMarkup = this.buildReviewsMarkup(reviews);
-    const orderHistory = this.getOrderHistory();
-    const deliveryHistory = this.getDeliveryHistory();
+    const activeOrdersMarkup = this.buildActiveOrdersMarkup([]);
+    const reviewsMarkup = this.buildReviewsMarkup([]);
+    const reviewsModalMarkup = this.buildReviewsMarkup([]);
+    const orderHistory = [];
+    const deliveryHistory = [];
     const isCourier = this.currentUser?.role === "courier";
     this.innerHTML = `
       <section class="profile-page">
@@ -245,18 +248,10 @@ class ProfilePage extends HTMLElement {
     this.hydrateProfileFromApi();
     this.loadActiveOrder();
     this.loadOrderStats();
-    this.handleReviewsUpdated = this.loadReviews.bind(this);
-    window.addEventListener("reviews-updated", this.handleReviewsUpdated);
+    window.addEventListener("reviews-updated", this.loadReviews);
     this.loadReviews();
     this.loadOrderHistory();
     this.loadDeliveryHistory();
-  }
-
-  disconnectedCallback() {
-    window.removeEventListener("hashchange", this.handleRouteChange);
-    if (this.handleReviewsUpdated) {
-      window.removeEventListener("reviews-updated", this.handleReviewsUpdated);
-    }
   }
 
   loadProfileData() {
@@ -269,7 +264,7 @@ class ProfilePage extends HTMLElement {
     };
   }
 
-  async hydrateProfileFromApi() {
+  hydrateProfileFromApi = async () => {
     try {
       const res = await fetch("/api/auth/me");
       if (!res.ok) return;
@@ -287,23 +282,7 @@ class ProfilePage extends HTMLElement {
     } catch (e) {
       // ignore
     }
-  }
-
-  getActiveOrders() {
-    return [];
-  }
-
-  getReviews() {
-    return [];
-  }
-
-  getOrderHistory() {
-    return [];
-  }
-
-  getDeliveryHistory() {
-    return [];
-  }
+  };
 
   buildActiveOrdersMarkup(orders) {
     if (!orders.length) {
@@ -385,7 +364,7 @@ class ProfilePage extends HTMLElement {
     return `${dt.toLocaleDateString()} · ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
   }
 
-  async loadOrderHistory() {
+  loadOrderHistory = async () => {
     try {
       const userId = this.currentUser?.id;
       if (!userId) {
@@ -394,8 +373,8 @@ class ProfilePage extends HTMLElement {
       }
 
       this.updateHistoryMessage("orders", "Ачааллаж байна...");
-      const res = await fetch(`/api/orders?customerId=${encodeURIComponent(userId)}`, { credentials: "include" });
-      const data = await res.json().catch(() => []);
+      const res = await apiFetch(`/api/orders?customerId=${userId}`);
+      const data = await res.json();
       
       if (!res.ok) {
         this.updateHistoryUI("orders", [], "Захиалга ачааллахад алдаа гарлаа");
@@ -412,9 +391,9 @@ class ProfilePage extends HTMLElement {
     } catch (e) {
       this.updateHistoryMessage("orders", "Ачааллаж чадсангүй");
     }
-  }
+  };
 
-  async loadDeliveryHistory() {
+  loadDeliveryHistory = async () => {
     try {
       if (this.currentUser?.role && this.currentUser.role !== "courier") {
         this.updateHistoryUI("deliveries", [], "Хүргэлт байхгүй");
@@ -422,7 +401,7 @@ class ProfilePage extends HTMLElement {
       }
       this.updateHistoryMessage("deliveries", "Ачааллаж байна...");
       const res = await fetch("/api/orders/history/courier", { credentials: "include" });
-      const data = await res.json().catch(() => ({}));
+      const data = await res.json();
       if (!res.ok) return;
       const items = data.items || [];
       const list = items.map((item) => ({
@@ -434,7 +413,7 @@ class ProfilePage extends HTMLElement {
     } catch (e) {
       this.updateHistoryMessage("deliveries", "Ачааллаж чадсангүй");
     }
-  }
+  };
 
   updateHistoryUI(type, list, emptyText) {
     const html = this.buildHistoryMarkup(list, emptyText);
@@ -458,8 +437,6 @@ class ProfilePage extends HTMLElement {
     ];
     return icons[idx % icons.length];
   }
-
-
 
   bindProfileData() {
     const { name, phone, email, id, avatar } = this.profileData;
@@ -566,7 +543,7 @@ class ProfilePage extends HTMLElement {
     }
   }
 
-  async loadReviews() {
+  loadReviews = async () => {
     try {
       if (this.currentUser?.role !== "courier") {
         this.updateReviewsUI([]);
@@ -586,7 +563,7 @@ class ProfilePage extends HTMLElement {
     } catch (e) {
       console.error("Load reviews error:", e);
     }
-  }
+  };
 
   updateReviewsUI(reviews) {
     const content = this.buildReviewsMarkup(reviews);
@@ -615,7 +592,7 @@ class ProfilePage extends HTMLElement {
     textEl.textContent = `${safeAvg.toFixed(1)} / 5`;
   }
 
-  async saveProfileToApi() {
+  saveProfileToApi = async () => {
     try {
       await fetch("/api/auth/me", {
         method: "PUT",
@@ -630,9 +607,9 @@ class ProfilePage extends HTMLElement {
     } catch (e) {
       // ignore
     }
-  }
+  };
 
-  async loadActiveOrder() {
+  loadActiveOrder = async () => {
     try {
       const res = await fetch("/api/active-order");
       if (!res.ok) return;
@@ -647,9 +624,9 @@ class ProfilePage extends HTMLElement {
     } catch (e) {
       // ignore
     }
-  }
+  };
 
-  async loadOrderStats() {
+  loadOrderStats = async () => {
     const totalEl = this.querySelector("#orderTotal");
     if (!totalEl) return;
 
@@ -664,8 +641,9 @@ class ProfilePage extends HTMLElement {
       const total = data.length;
       totalEl.textContent = String(total);
     } catch (e) {
+      // ignore
     }
-  }
+  };
 
   getOrderTimestamp(o) {
     const raw =

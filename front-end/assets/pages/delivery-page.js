@@ -3,11 +3,9 @@ import { escapeAttr } from "../helper/escape-attr.js";
 class DeliveryPage extends HTMLElement {
   constructor() {
     super();
-    this.handleRouteChange = this.handleRouteChange.bind(this);
-    this.applyActiveOrderBound = this.applyActiveOrder.bind(this);
-    this.renderDeliveryCartBound = this.renderDeliveryCart.bind(this);
     this._initialized = false;
   }
+
   connectedCallback() {
     window.addEventListener('hashchange', this.handleRouteChange);
     this.handleRouteChange();
@@ -15,11 +13,11 @@ class DeliveryPage extends HTMLElement {
 
   disconnectedCallback() {
     window.removeEventListener('hashchange', this.handleRouteChange);
-    window.removeEventListener('order-updated', this.applyActiveOrderBound);
-    window.removeEventListener('delivery-cart-updated', this.renderDeliveryCartBound);
+    window.removeEventListener('order-updated', this.applyActiveOrder);
+    window.removeEventListener('delivery-cart-updated', this.renderDeliveryCart);
   }
 
-  handleRouteChange() {
+  handleRouteChange = () => {
     if (location.hash !== '#delivery') return;
 
     const loggedIn = localStorage.getItem("authLoggedIn");
@@ -41,14 +39,14 @@ class DeliveryPage extends HTMLElement {
 
     if (!this._initialized) {
       this.render();
-      window.addEventListener('order-updated', this.applyActiveOrderBound);
-      window.addEventListener('delivery-cart-updated', this.renderDeliveryCartBound);
+      window.addEventListener('order-updated', this.applyActiveOrder);
+      window.addEventListener('delivery-cart-updated', this.renderDeliveryCart);
       this._initialized = true;
     }
 
     this.applyActiveOrder();
     this.renderDeliveryCart();
-  }
+  };
 
   render() {
     this.innerHTML = `
@@ -70,11 +68,11 @@ class DeliveryPage extends HTMLElement {
     `;
   }
 
-  applyActiveOrder() {
+  applyActiveOrder = () => {
     this.fetchActiveOrder();
-  }
+  };
 
-  async fetchActiveOrder() {
+  fetchActiveOrder = async () => {
     try {
       const res = await fetch("/api/active-order");
       if (!res.ok) return;
@@ -91,13 +89,13 @@ class DeliveryPage extends HTMLElement {
     } catch (e) {
       // ignore
     }
-  }
+  };
 
-  renderDeliveryCart() {
+  renderDeliveryCart = () => {
     const listEl = this.querySelector('#deliveryList');
     if (!listEl) return;
     this.fetchDeliveryItems(listEl);
-  }
+  };
 
   attachOrderSelection(items = []) {
     const orderElements = this.querySelectorAll('d-orders');
@@ -138,8 +136,7 @@ class DeliveryPage extends HTMLElement {
     document.dispatchEvent(event);
   }
 
-
-  async fetchDeliveryItems(listEl) {
+  fetchDeliveryItems = async (listEl) => {
     let items = [];
     try {
       const res = await fetch("/api/delivery-cart");
@@ -167,12 +164,10 @@ class DeliveryPage extends HTMLElement {
     if (details) details.removeAttribute("data-empty");
     if (progress) progress.removeAttribute("data-empty");
 
-
     const normalized = items.map((item) => {
       const qty = Number(item.qty || 1);
       const detailParts = [];
       if (item.meta) detailParts.push(item.meta);
-      // console.log(item?.menuItemName);
       if (qty) detailParts.push(`x${qty}`);
       const detail = detailParts.join(' • ');
 
@@ -205,7 +200,7 @@ class DeliveryPage extends HTMLElement {
       `).join('');
 
     this.attachOrderSelection(normalized);
-  }
+  };
 }
 
 customElements.define('delivery-page', DeliveryPage);

@@ -174,9 +174,7 @@ function convertOrdersToOffers(ordersArray) {
       const orderItems = order?.items || [];
       
       const totalQuantity = orderItems.reduce(
-        (sum, item) => sum + (item?.qty ?? 0), 
-        0
-      );
+        (sum, item) => sum + (item?.qty ?? 0), 0);
       
       const subItems = orderItems.map((item) => ({
         name: `${item?.name || 'Бараа'} x${item?.qty || 1}`,

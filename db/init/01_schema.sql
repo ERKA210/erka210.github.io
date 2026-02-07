@@ -105,10 +105,7 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE INDEX IF NOT EXISTS idx_orders_customer ON orders(customer_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 
--- -----------------------------
--- ORDER_ITEMS (сонгосон хоол/ундаа)
--- item_snapshot_json: тухайн үедээ сонгосон сонголтууд (size, нэмэлт гэх мэт)
--- -----------------------------
+
 CREATE TABLE IF NOT EXISTS order_items (
   id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id           UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
@@ -150,9 +147,6 @@ CREATE TABLE IF NOT EXISTS order_couriers (
   assigned_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- -----------------------------
--- PAYMENTS (төлбөр)
--- -----------------------------
 CREATE TABLE IF NOT EXISTS payments (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id     UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
@@ -166,9 +160,6 @@ CREATE TABLE IF NOT EXISTS payments (
 
 CREATE INDEX IF NOT EXISTS idx_payments_order ON payments(order_id);
 
--- -----------------------------
--- RATINGS (од/сэтгэгдэл)
--- -----------------------------
 CREATE TABLE IF NOT EXISTS ratings (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id    UUID NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
@@ -179,9 +170,6 @@ CREATE TABLE IF NOT EXISTS ratings (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- -----------------------------
--- REVIEWS (orders/:id/review endpoint-д зориулсан)
--- -----------------------------
 CREATE TABLE IF NOT EXISTS reviews (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id    UUID NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
@@ -192,9 +180,6 @@ CREATE TABLE IF NOT EXISTS reviews (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- -----------------------------
--- RATING_HISTORY (ratings history)
--- -----------------------------
 CREATE TABLE IF NOT EXISTS rating_history (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id    UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
@@ -205,9 +190,6 @@ CREATE TABLE IF NOT EXISTS rating_history (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- -----------------------------
--- DELIVERY_CART_ITEMS (delivery-cart)
--- -----------------------------
 CREATE TABLE IF NOT EXISTS delivery_cart_items (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -222,9 +204,6 @@ CREATE TABLE IF NOT EXISTS delivery_cart_items (
   UNIQUE (user_id, title, meta, price)
 );
 
--- -----------------------------
--- ACTIVE_ORDERS (draft order state)
--- -----------------------------
 CREATE TABLE IF NOT EXISTS active_orders (
   user_id    UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   order_json JSONB NOT NULL,

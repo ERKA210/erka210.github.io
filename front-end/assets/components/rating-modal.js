@@ -168,8 +168,7 @@ class RatingModal extends HTMLElement {
     });
 
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || "Сэтгэгдэл алдаа гарлаа");
+      console.warn("rating failed", res.status);
     }
   }
 
